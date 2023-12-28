@@ -1,0 +1,742 @@
+{
+    "clubs": [
+        {
+            "name": "FC Barcelona",
+            "full_name": "Futbol Club Barcelona",
+            "country": "Spain",
+            "category": 1,
+            "stadium": "Camp Nou",
+            "colors": [
+                "Blue",
+                "Red"
+            ],
+            "nickname": [
+                "Blaugrana",
+                "Barça"
+            ]
+        },
+        {
+            "name": "Real Madrid",
+            "full_name": "Real Madrid Club de Fútbol",
+            "country": "Spain",
+            "category": 1,
+            "stadium": "Santiago Bernabéu",
+            "colors": [
+                "White"
+            ],
+            "nickname": [
+                "Los Blancos",
+                "The Merengues"
+            ]
+        },
+        {
+            "name": "Atletico Madrid",
+            "full_name": "Club Atlético de Madrid",
+            "country": "Spain",
+            "category": 2,
+            "stadium": "Wanda Metropolitano",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Los Colchoneros",
+                "Atleti"
+            ]
+        },
+        {
+            "name": "Sevilla FC",
+            "full_name": "Sevilla Fútbol Club",
+            "country": "Spain",
+            "category": 3,
+            "stadium": "Ramón Sánchez-Pizjuán",
+            "colors": [
+                "White",
+                "Red"
+            ],
+            "nickname": [
+                "Sevillistas"
+            ]
+        },
+        {
+            "name": "Valencia CF",
+            "full_name": "Valencia Club de Fútbol",
+            "country": "Spain",
+            "category": 3,
+            "stadium": "Mestalla",
+            "colors": [
+                "White",
+                "Black"
+            ],
+            "nickname": [
+                "Los Che"
+            ]
+        },
+        {
+            "name": "Villarreal CF",
+            "full_name": "Villarreal Club de Fútbol",
+            "country": "Spain",
+            "category": 3,
+            "stadium": "Estadio de la Cerámica",
+            "colors": [
+                "Yellow",
+                "Blue"
+            ],
+            "nickname": [
+                "El Submarino Amarillo"
+            ]
+        },
+        {
+            "name": "Real Sociedad",
+            "full_name": "Real Sociedad de Fútbol",
+            "country": "Spain",
+            "category": 3,
+            "stadium": "Reale Arena",
+            "colors": [
+                "Blue",
+                "White"
+            ],
+            "nickname": [
+                "Txuriurdines",
+                "La Real"
+            ]
+        },
+        {
+            "name": "Athletic Bilbao",
+            "full_name": "Athletic Club",
+            "country": "Spain",
+            "category": 4,
+            "stadium": "San Mamés",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Los Leones",
+                "Lions"
+            ]
+        },
+        {
+            "name": "Real Betis",
+            "full_name": "Real Betis Balompié",
+            "country": "Spain",
+            "category": 4,
+            "stadium": "Estadio Benito Villamarín",
+            "colors": [
+                "Green",
+                "White"
+            ],
+            "nickname": [
+                "Los Verdiblancos",
+                "Béticos"
+            ]
+        },
+        {
+            "name": "Manchester City",
+            "full_name": "Manchester City Football Club",
+            "country": "England",
+            "category": 1,
+            "stadium": "Etihad Stadium",
+            "colors": [
+                "Sky Blue"
+            ],
+            "nickname": [
+                "Citizens"
+            ]
+        },
+        {
+            "name": "Manchester United",
+            "full_name": "Manchester United Football Club",
+            "country": "England",
+            "category": 2,
+            "stadium": "Old Trafford",
+            "colors": [
+                "Red"
+            ],
+            "nickname": [
+                "Red Devils"
+            ]
+        },
+        {
+            "name": "Liverpool FC",
+            "full_name": "Liverpool Football Club",
+            "country": "England",
+            "category": 2,
+            "stadium": "Anfield",
+            "colors": [
+                "Red"
+            ],
+            "nickname": [
+                "The Reds"
+            ]
+        },
+        {
+            "name": "Chelsea FC",
+            "full_name": "Chelsea Football Club",
+            "country": "England",
+            "category": 2,
+            "stadium": "Stamford Bridge",
+            "colors": [
+                "Blue"
+            ],
+            "nickname": [
+                "The Blues"
+            ]
+        },
+        {
+            "name": "Arsenal FC",
+            "full_name": "Arsenal Football Club",
+            "country": "England",
+            "category": 2,
+            "stadium": "Emirates Stadium",
+            "colors": [
+                "Red"
+            ],
+            "nickname": [
+                "The Gunners"
+            ]
+        },
+        {
+            "name": "Tottenham Hotspur",
+            "full_name": "Tottenham Hotspur Football Club",
+            "country": "England",
+            "category": 2,
+            "stadium": "Tottenham Hotspur Stadium",
+            "colors": [
+                "White",
+                "Navy Blue"
+            ],
+            "nickname": [
+                "Spurs"
+            ]
+        },
+        {
+            "name": "Newcastle United",
+            "full_name": "Newcastle United Football Club",
+            "country": "England",
+            "category": 3,
+            "stadium": "St James' Park",
+            "colors": [
+                "Black",
+                "White"
+            ],
+            "nickname": [
+                "The Magpies"
+            ]
+        },
+        {
+            "name": "Everton FC",
+            "full_name": "Everton Football Club",
+            "country": "England",
+            "category": 4,
+            "stadium": "Goodison Park",
+            "colors": [
+                "Blue",
+                "White"
+            ],
+            "nickname": [
+                "The Toffees"
+            ]
+        },
+        {
+            "name": "Bayern Munich",
+            "full_name": "FC Bayern München",
+            "country": "Germany",
+            "category": 1,
+            "stadium": "Allianz Arena",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Die Bayern"
+            ]
+        },
+        {
+            "name": "Borussia Dortmund",
+            "full_name": "Ballspielverein Borussia 09 e.V. Dortmund",
+            "country": "Germany",
+            "category": 2,
+            "stadium": "Signal Iduna Park",
+            "colors": [
+                "Yellow",
+                "Black"
+            ],
+            "nickname": [
+                "BVB",
+                "Die Schwarzgelben"
+            ]
+        },
+        {
+            "name": "RB Leipzig",
+            "full_name": "RasenBallsport Leipzig e.V.",
+            "country": "Germany",
+            "category": 3,
+            "stadium": "Red Bull Arena",
+            "colors": [
+                "White",
+                "Red"
+            ],
+            "nickname": [
+                "Die Roten Bullen"
+            ]
+        },
+        {
+            "name": "Bayer Leverkusen",
+            "full_name": "Bayer 04 Leverkusen Fußball GmbH",
+            "country": "Germany",
+            "category": 3,
+            "stadium": "BayArena",
+            "colors": [
+                "Red",
+                "Black"
+            ],
+            "nickname": [
+                "Die Werkself"
+            ]
+        },
+        {
+            "name": "Borussia Mönchengladbach",
+            "full_name": "Borussia VfL 1900 Mönchengladbach GmbH",
+            "country": "Germany",
+            "category": 4,
+            "stadium": "Stadion im Borussia-Park",
+            "colors": [
+                "Black",
+                "White",
+                "Green"
+            ],
+            "nickname": [
+                "Die Fohlen"
+            ]
+        },
+        {
+            "name": "VfL Wolfsburg",
+            "full_name": "Verein für Leibesübungen Wolfsburg-Fußball GmbH",
+            "country": "Germany",
+            "category": 4,
+            "stadium": "Volkswagen Arena",
+            "colors": [
+                "Green",
+                "White"
+            ],
+            "nickname": [
+                "Die Wölfe"
+            ]
+        },
+        {
+            "name": "Union Berlin",
+            "full_name": "1. FC Union Berlin e. V.",
+            "country": "Germany",
+            "category": 5,
+            "stadium": "Stadion An der Alten Försterei",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Die Eisernen"
+            ]
+        },
+        {
+            "name": "Juventus",
+            "full_name": "Juventus Football Club",
+            "country": "Italy",
+            "category": 2,
+            "stadium": "Allianz Stadium",
+            "colors": [
+                "Black",
+                "White"
+            ],
+            "nickname": [
+                "Juve",
+                "The Old Lady"
+            ]
+        },
+        {
+            "name": "Inter Milan",
+            "full_name": "FC Internazionale Milano",
+            "country": "Italy",
+            "category": 2,
+            "stadium": "San Siro",
+            "colors": [
+                "Blue",
+                "Black"
+            ],
+            "nickname": [
+                "Nerazzurri"
+            ]
+        },
+        {
+            "name": "AC Milan",
+            "full_name": "Associazione Calcio Milan",
+            "country": "Italy",
+            "category": 2,
+            "stadium": "San Siro",
+            "colors": [
+                "Red",
+                "Black"
+            ],
+            "nickname": [
+                "Rossoneri"
+            ]
+        },
+        {
+            "name": "AS Roma",
+            "full_name": "Associazione Sportiva Roma",
+            "country": "Italy",
+            "category": 3,
+            "stadium": "Stadio Olimpico",
+            "colors": [
+                "Maroon",
+                "Orange"
+            ],
+            "nickname": [
+                "Giallorossi"
+            ]
+        },
+        {
+            "name": "Napoli",
+            "full_name": "Società Sportiva Calcio Napoli",
+            "country": "Italy",
+            "category": 3,
+            "stadium": "Diego Armando Maradona Stadium",
+            "colors": [
+                "Sky Blue",
+                "White"
+            ],
+            "nickname": [
+                "Partenopei"
+            ]
+        },
+        {
+            "name": "Atalanta",
+            "full_name": "Atalanta Bergamasca Calcio",
+            "country": "Italy",
+            "category": 4,
+            "stadium": "Gewiss Stadium",
+            "colors": [
+                "Black",
+                "Blue"
+            ],
+            "nickname": [
+                "La Dea"
+            ]
+        },
+        {
+            "name": "Lazio",
+            "full_name": "Società Sportiva Lazio",
+            "country": "Italy",
+            "category": 4,
+            "stadium": "Stadio Olimpico",
+            "colors": [
+                "Sky Blue",
+                "White"
+            ],
+            "nickname": [
+                "Biancocelesti"
+            ]
+        },
+        {
+            "name": "Fiorentina",
+            "full_name": "ACF Fiorentina",
+            "country": "Italy",
+            "category": 4,
+            "stadium": "Stadio Artemio Franchi",
+            "colors": [
+                "Purple",
+                "White"
+            ],
+            "nickname": [
+                "Viola"
+            ]
+        },
+        {
+            "name": "PSG",
+            "full_name": "Paris Saint-Germain",
+            "country": "France",
+            "category": 2,
+            "stadium": "Parc des Princes",
+            "colors": [
+                "Blue",
+                "Red"
+            ],
+            "nickname": [
+                "Les Parisiens"
+            ]
+        },
+        {
+            "name": "Olympique de Marseille",
+            "full_name": "Olympique de Marseille",
+            "country": "France",
+            "category": 3,
+            "stadium": "Orange Vélodrome",
+            "colors": [
+                "Blue",
+                "White"
+            ],
+            "nickname": [
+                "Les Olympiens"
+            ]
+        },
+        {
+            "name": "Lyon",
+            "full_name": "Olympique Lyonnais",
+            "country": "France",
+            "category": 3,
+            "stadium": "Parc Olympique Lyonnais",
+            "colors": [
+                "Blue",
+                "White",
+                "Red"
+            ],
+            "nickname": [
+                "Les Gones"
+            ]
+        },
+        {
+            "name": "AS Monaco",
+            "full_name": "Association Sportive de Monaco Football Club",
+            "country": "France",
+            "category": 4,
+            "stadium": "Stade Louis II",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Les Monégasques"
+            ]
+        },
+        {
+            "name": "LOSC Lille",
+            "full_name": "Lille Olympique Sporting Club Métropole",
+            "country": "France",
+            "category": 4,
+            "stadium": "Stade Pierre-Mauroy",
+            "colors": [
+                "Red",
+                "White",
+                "Navy Blue"
+            ],
+            "nickname": [
+                "Les Dogues"
+            ]
+        },
+        {
+            "name": "Stade Rennais",
+            "full_name": "Stade Rennais Football Club",
+            "country": "France",
+            "category": 4,
+            "stadium": "Roazhon Park",
+            "colors": [
+                "Black",
+                "Red"
+            ],
+            "nickname": [
+                "Les Rouges et Noirs"
+            ]
+        },
+        {
+            "name": "FC Porto",
+            "full_name": "Futebol Clube do Porto",
+            "country": "Portugal",
+            "category": 3,
+            "stadium": "Estádio do Dragão",
+            "colors": [
+                "Blue",
+                "White"
+            ],
+            "nickname": [
+                "Os Dragoes"
+            ]
+        },
+        {
+            "name": "SL Benfica",
+            "full_name": "Sport Lisboa e Benfica",
+            "country": "Portugal",
+            "category": 3,
+            "stadium": "Estádio da Luz",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Os Encarnados"
+            ]
+        },
+        {
+            "name": "Sporting CP",
+            "full_name": "Sporting Clube de Portugal",
+            "country": "Portugal",
+            "category": 3,
+            "stadium": "Estádio José Alvalade",
+            "colors": [
+                "Green",
+                "White"
+            ],
+            "nickname": [
+                "Os Leões"
+            ]
+        },
+        {
+            "name": "SC Braga",
+            "full_name": "Sporting Clube de Braga",
+            "country": "Portugal",
+            "category": 4,
+            "stadium": "Estádio Municipal de Braga",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": [
+                "Os Arsenalistas"
+            ]
+        },
+        {
+            "name": "Ajax Amsterdam",
+            "full_name": "AFC Ajax",
+            "country": "Netherlands",
+            "category": 3,
+            "stadium": "Johan Cruyff Arena",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": "Godenzonen"
+        },
+        {
+            "name": "Galatasaray",
+            "full_name": "Galatasaray S.K.",
+            "country": "Turkey",
+            "category": 3,
+            "stadium": "Türk Telekom Stadium",
+            "colors": [
+                "Yellow",
+                "Red"
+            ],
+            "nickname": "Aslanlar"
+        },
+        {
+            "name": "Shakhtar Donetsk",
+            "full_name": "FC Shakhtar Donetsk",
+            "country": "Ukraine",
+            "category": 4,
+            "stadium": "Oblasny SportKomplex Metalist",
+            "colors": [
+                "Orange",
+                "Black"
+            ],
+            "nickname": "Hirnyky"
+        },
+        {
+            "name": "Dynamo Kyiv",
+            "full_name": "FC Dynamo Kyiv",
+            "country": "Ukraine",
+            "category": 5,
+            "stadium": "NSC Olimpiyskiy",
+            "colors": [
+                "White",
+                "Blue"
+            ],
+            "nickname": "Bilo-Syni"
+        },
+        {
+            "name": "Red Bull Salzburg",
+            "full_name": "FC Red Bull Salzburg",
+            "country": "Austria",
+            "category": 4,
+            "stadium": "Red Bull Arena",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": "Die Roten Bullen"
+        },
+        {
+            "name": "Club Brugge KV",
+            "full_name": "Club Brugge Koninklijke Voetbalvereniging",
+            "country": "Belgium",
+            "category": 4,
+            "stadium": "Jan Breydel Stadium",
+            "colors": [
+                "Blue",
+                "Black"
+            ],
+            "nickname": "Blauw-Zwart"
+        },
+        {
+            "name": "RSC Anderlecht",
+            "full_name": "Royal Sporting Club Anderlecht",
+            "country": "Belgium",
+            "category": 4,
+            "stadium": "Constant Vanden Stock Stadium",
+            "colors": [
+                "Purple",
+                "White"
+            ],
+            "nickname": "Paars-wit"
+        },
+        {
+            "name": "KRC Genk",
+            "full_name": "Koninklijke Racing Club Genk",
+            "country": "Belgium",
+            "category": 5,
+            "stadium": "Luminus Arena",
+            "colors": [
+                "Blue",
+                "White"
+            ],
+            "nickname": "De Smurfen"
+        },
+        {
+            "name": "PSV Eindhoven",
+            "full_name": "Philips Sport Vereniging Eindhoven",
+            "country": "Netherlands",
+            "category": 4,
+            "stadium": "Philips Stadion",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": "Boeren"
+        },
+        {
+            "name": "Feyenoord",
+            "full_name": "Feyenoord Rotterdam",
+            "country": "Netherlands",
+            "category": 4,
+            "stadium": "Stadion Feijenoord (De Kuip)",
+            "colors": [
+                "Red",
+                "White"
+            ],
+            "nickname": "De club aan de Maas"
+        },
+        {
+            "id": 53,
+            "name": "Fenerbahçe",
+            "full_name": "Fenerbahçe Spor Kulübü",
+            "country": "Turkey",
+            "category": 4,
+            "stadium": "Ülker Stadyumu",
+            "colors": [
+                "Yellow",
+                "Navy Blue"
+            ],
+            "nickname": "Sarı Kanaryalar"
+        },
+        {
+            "name": "Celtic FC",
+            "full_name": "Celtic Football Club",
+            "country": "Scotland",
+            "category": 4,
+            "stadium": "Celtic Park",
+            "colors": [
+                "Green",
+                "White"
+            ],
+            "nickname": "The Bhoys"
+        }
+    ]
+}
