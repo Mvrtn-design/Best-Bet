@@ -13,21 +13,6 @@ controller.getClubes = (req, res) => {
   });
 };
 
-controller.getClubById = (req, res) => {
-  const id = req.params.id;
-  req.getConnection((err, conn) => {
-    if (err) {
-      console.error("Error al establecer la conexion");
-    }
-    conn.query("SELECT * FROM club WHERE ID = ?", id, (err, club) => {
-      if (err) {
-        console.error("Fallo al get info club por : ", err);
-      }
-      console.log("Team found");
-      res.json(club);
-    });
-  });
-};
 
 controller.getClubByName = (req, res) => {
   const name = req.params.name;
@@ -39,7 +24,7 @@ controller.getClubByName = (req, res) => {
       if (err) {
         console.error("Fallo al get info club por : ", err);
       }
-      console.log("Team found: ");
+      console.log("Team found");
       res.json(club);
     });
   });

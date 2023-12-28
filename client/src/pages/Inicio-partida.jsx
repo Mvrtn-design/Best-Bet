@@ -36,8 +36,7 @@ const Inicio = () => {
         temporada: Competition_data.temporada,
         estado: Competition_data.estado,
       });
-      console.log("number: ", Competition_data.estado.split(".")[0]);
-
+      
       if (Competition_data.estado.split(".")[0] >= 1) {
         const teamsResponse = await axios.get(
           `http://localhost:3001/getSomeClubesByCategory/${32}`
@@ -46,6 +45,9 @@ const Inicio = () => {
       }
       if (Competition_data.estado.split(".")[0] > 1) {
         fetchGroups(Competition_data.ID);
+      }
+      if (Competition_data.estado.split(".")[0] > 2) {
+        fetchGroupMathes(Competition_data.ID);
       }
       setLoading(false);
     } catch (error) {
@@ -66,6 +68,17 @@ const Inicio = () => {
       return groups;
     }, {});
   }
+  function groupByJornada(partidos) {
+    const result = [];
+
+    const chunkSize = Math.ceil(partidos.length / 6);
+
+    for (let i = 0; i < partidos.length; i += chunkSize) {
+      const chunk = partidos.slice(i, i + chunkSize);
+      result.push(chunk);
+    }
+    return result;
+  }
 
   const fetchGroups = async (id_competicion) => {
     try {
@@ -81,8 +94,25 @@ const Inicio = () => {
       console.error("Error fetching groups:", error);
     }
   };
+
+  const fetchGroupMathes = async (id_competicion) => {
+    try {
+      const teamsResponse = await axios.get(
+        "http://localhost:3001/getMatchesByCompetition",
+        {
+          params: { value1: id_competicion, value2: "GROUP_STATE" },
+        }
+      );
+
+      const aaa = groupByJornada(teamsResponse.data);
+
+      setMatches(aaa);
+    } catch (error) {
+      console.error("Error fetching matches:", error);
+    }
+  };
+
   const handleMatches = async () => {
-    const matches = [];
     const order = [
       [0, 1, 2, 3],
       [1, 2, 0, 3],
@@ -94,51 +124,59 @@ const Inicio = () => {
 
     try {
       var fech = new Date("2023-09-12T21:00:00");
-      
-      const matchday = [];
+
       for (let i = 0; i < order.length; i++) {
-        const groupMatches = [];
-        Object.keys(groups).map((letra, index) => {
+        Object.keys(groups).map(async (letra) => {
           var localTeam = groups[letra][order[i][0]].name;
           var awayTeam = groups[letra][order[i][1]].name;
           var location = groups[letra][order[i][0]].country;
           var stadium = groups[letra][order[i][0]].stadium;
           var id_group = groups[letra][order[i][0]].id_grupo;
-          var fecha = fech.toString();
-          groupMatches.push({
-            localTeam,
-            awayTeam,
-            location,
-            stadium,
-            id_group,
-            fecha,
+
+          const formattedDate = fech
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+
+          await axios.post("http://localhost:3001/addMatch", {
+            local: groups[letra][order[i][0]].name,
+            visitante: groups[letra][order[i][1]].name,
+            fecha: formattedDate,
+            location: location,
+            stadium: stadium,
+            grupo: id_group,
           });
-          fech.setDate(fech.getDate()+1);
+          fech.setDate(fech.getDate() + 1);
 
           localTeam = groups[letra][order[i][2]].name;
           awayTeam = groups[letra][order[i][3]].name;
           location = groups[letra][order[i][2]].country;
           stadium = groups[letra][order[i][2]].stadium;
           id_group = groups[letra][order[i][2]].id_grupo;
-          var fecha = fech.toString();
 
-          groupMatches.push({
-            localTeam,
-            awayTeam,
-            location,
-            stadium,
-            id_group,
-            fecha,
+          const formattedDate2 = fech
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+
+          await axios.post("http://localhost:3001/addMatch", {
+            local: groups[letra][order[i][2]].name,
+            visitante: groups[letra][order[i][3]].name,
+            fecha: formattedDate2,
+            location: location,
+            stadium: stadium,
+            grupo: id_group,
           });
-          fech.setDate(fech.getDate()-1);
+          fech.setDate(fech.getDate() - 1);
         });
-        matchday.push(groupMatches);
-        fech.setDate(fech.getDate()+14);
-        
+        fech.setDate(fech.getDate() + 14);
       }
-      matches.push(matchday);
-      setMatches(matchday);
-      console.log(matchday);
+      await axios.put("http://localhost:3001/updateCompetitionState", {
+        value1: competition.ID,
+        value2: "3.MATCHED",
+      });
+
+      fetchCompetitionInfo();
     } catch (error) {
       console.log("no va: ", error);
     }
@@ -174,7 +212,7 @@ const Inicio = () => {
           //POST TEAM
           await axios.post("http://localhost:3001/addEquipoToGroup", {
             value1: response,
-            value2: team_aux.ID,
+            value2: team_aux.name,
           });
         }
         groupedTeams.push({
@@ -201,8 +239,9 @@ const Inicio = () => {
   ////////        EXECUTION         //////////////
 
   const renderContent = () => {
-    switch (currentSection) {
-      case "1.CREADO":
+    switch (currentSection.split(".")[0]) {
+      
+      case "1":
         return (
           <div>
             <h2>Teams:</h2>
@@ -221,7 +260,7 @@ const Inicio = () => {
           </div>
         );
 
-      case "2.GROUPED":
+      case "2":
         return (
           <div>
             <h2>Groups:</h2>
@@ -235,17 +274,29 @@ const Inicio = () => {
                 ))}
               </div>
             ))}
-            <button onClick={handleMatches} disabled={loading}>
+            <button onClick={handleMatches} disabled={loading || +competition?.estado.split(".")[0] > 2}>
               Another Button
-            </button>
+            </button>            
+          </div>
+        );
+
+        case "3":
+        return (
+          <div>
+            <h2>PARTIDOS:</h2>
+            
             {matches != [] &&
               matches.map((jornada, index) => (
                 <div key={index}>
-                  <h2>JORNADA {index+1}:</h2>
+                  <h2>JORNADA {index + 1}:</h2>
                   {jornada.map((match, index) => (
                     <div key={index}>
-                      <h3>{match.localTeam} - {match.awayTeam}</h3> 
-                      <p>- {match.stadium} in {match.location}</p>
+                      <h3>
+                        {match.club_local} - {match.club_visitante}
+                      </h3>
+                      <p>
+                        - {match.stadium} in {match.location}
+                      </p>
                       <p>- {match.fecha}</p>
                     </div>
                   ))}

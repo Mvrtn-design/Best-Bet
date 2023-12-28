@@ -10,6 +10,7 @@ import SetUp from "./pages/SetUp";
 import Users from "./pages/users";
 import Torneo from "./pages/NewTorneo";
 import Menu from "./pages/Inicio-partida";
+import Match_Info from "./pages/Match-Info";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/users" exact Component={Users}></Route>
           <Route path="/torneo" exact Component={Torneo}></Route>
           <Route path="/menu/:idPartida/:idCompeticion" element={<Menu />}></Route>
+          <Route path="/partido/:id_match" element={<Match_Info />}></Route>
         </Routes>
       </Router>
     </div>

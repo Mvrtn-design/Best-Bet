@@ -78,24 +78,64 @@ controller.getCompeticionByID = (req, res) => {
   });
 };
 
-controller.getGroupsByCompetition = (req, res) => {
-  const idd = req.query.value1;
-  const ronda = req.query.value2;
-
-  
-  console.log("PARAMMMS: ",idd,ronda);
+controller.getTeamNamesByIDpartido = (req, res) => {
+  const idd = req.params.id;
   req.getConnection((err, conn) => {
     if (err) {
       console.error("Error al establecer la conexion");
     }
     conn.query(
-      "select * from club join estadisticas on club.ID = estadisticas.id_equipo  join grupo on estadisticas.id_grupo = grupo.ID   join competicion on grupo.id_competicion = competicion.ID   where competicion.ID = ? and grupo.ronda = ?  order by grupo.letra",
+      "SELECT * FROM competicion WHERE ID = ?",
+      idd,
+      (err, partida) => {
+        if (err) {
+          console.error("Fallo al get competicion debido a: ", err);
+        }
+        console.log("Competicion encontrada");
+        res.json(partida);
+      }
+    );
+  });
+};
+
+controller.getGroupsByCompetition = (req, res) => {
+  const idd = req.query.value1;
+  const ronda = req.query.value2;
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.error("Error al establecer la conexion");
+    }
+    conn.query(
+      "select * from club join estadisticas on club.name = estadisticas.club_name  join grupo on estadisticas.id_grupo = grupo.ID   join competicion on grupo.id_competicion = competicion.ID   where competicion.ID = ? and grupo.ronda = ?  order by grupo.letra",
       [idd, ronda],
       (err, grupos) => {
         if (err) {
           console.error("Fallo al get competicion debido a: ", err);
         }
         console.log("Grupos encontrados");
+        res.json(grupos);
+      }
+    );
+  });
+};
+
+controller.getMatchesByCompetition = (req, res) => {
+  const idd = req.query.value1;
+  const ronda = req.query.value2;
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.error("Error al establecer la conexion");
+    }
+    conn.query(
+      "select * from partido join grupo on partido.id_group = grupo.ID join competicion on grupo.id_competicion = competicion.ID  where competicion.ID = ? and grupo.ronda = ?  order by bestbetdb.partido.fecha",
+      [idd, ronda],
+      (err, grupos) => {
+        if (err) {
+          console.error("Fallo al get partidos debido a: ", err);
+        }
+        console.log("Partidos encontrados");
         res.json(grupos);
       }
     );
@@ -127,17 +167,44 @@ controller.guardarGrupo = (req, res) => {
   });
 };
 
-controller.addEquipoToGroup = (req, res) => {
-  const id_grupo = req.body.value1;
-  const team_ID = req.body.value2;
+controller.guardarPartido = (req, res) => {
+  const local = req.body.local;
+  const visitante = req.body.visitante;
+  const fecha = req.body.fecha;
+  const location = req.body.location;
+  const stadium = req.body.stadium;
+  const grupo = req.body.grupo;
 
   req.getConnection((err, conn) => {
     if (err) {
       console.log(`Error al establecer la conexion: ${err}`);
     }
     conn.query(
-      "INSERT INTO estadisticas (id_grupo, id_equipo) VALUES (?, ?)",
-      [id_grupo, team_ID],
+      "INSERT INTO partido (club_local, club_visitante,fecha, location,stadium,id_group) VALUES (?, ?, ?,?,?,?)",
+      [local, visitante, fecha, location, stadium, grupo],
+      (errr, grupo) => {
+        if (errr) {
+          console.log(`Error al insertar el partido: ${errr}`);
+          res.json(errr);
+        }
+        console.log("PARTIDO CREADO");
+        res.json(grupo);
+      }
+    );
+  });
+};
+
+controller.addEquipoToGroup = (req, res) => {
+  const id_grupo = req.body.value1;
+  const team_name = req.body.value2;
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.log(`Error al establecer la conexion: ${err}`);
+    }
+    conn.query(
+      "INSERT INTO estadisticas (id_grupo, club_name) VALUES (?, ?)",
+      [id_grupo, team_name],
       (errr, grupo) => {
         if (errr) {
           console.log(`Error al insertar el equipo: ${errr}`);

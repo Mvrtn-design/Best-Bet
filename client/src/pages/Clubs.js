@@ -9,7 +9,7 @@ function Clubs() {
   const getClubInfo = async (value) => {
     try {
       const result = await axios.get(
-        `http://localhost:3001/getClubInfo/${value}`
+        `http://localhost:3001/getClubByName/${value}`
       );
       setClubInfo(
         <div className="card">
@@ -56,7 +56,7 @@ function Clubs() {
       {listaClubes.map((value, index) => {
         return (
           <div className="club" key={index}>
-            <p onClick={() => getClubInfo(value.ID)}>- {value.name}</p>
+            <p onClick={() => getClubInfo(value.name)}>- {value.name}</p>
           </div>
         );
       })}
