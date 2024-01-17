@@ -43,6 +43,37 @@ controller.updateCompetitionState = (req, res) => {
   });
 };
 
+controller.avanzarUnDia = (req, res) => {
+  const idd = req.body.value1;
+  console.log("id: ",idd);
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.log(`Error al establecer la conexion: ${err}`);
+    }
+    conn.query(
+      "UPDATE competicion  SET dia = DATE_ADD(dia, INTERVAL 1 DAY)   WHERE id = ?",
+      [idd],
+      (errr, estado) => {
+        if (errr) {
+          res.json(errr); //manejar los errores con next (mas profesional)
+        }
+        conn.query(
+          "SELECT idd FROM partido WHERE fecha = (SELECT dia FROM competicion WHERE id = ?)",
+          [idd],
+          (errr, estado) => {
+            if (errr) {
+              res.json(errr); //manejar los errores con next (mas profesional)
+            }
+            console.log("eeeee: ",estado);
+            res.json(estado);
+          }
+        );
+      }
+    );
+  });
+};
+
 controller.listaCompeticiones = (req, res) => {
   //getConnection es posible por el middleware creado en el archivo principal
   req.getConnection((err, conn) => {
@@ -174,14 +205,20 @@ controller.guardarPartido = (req, res) => {
   const location = req.body.location;
   const stadium = req.body.stadium;
   const grupo = req.body.grupo;
+  const cuotaLocal = req.body.cuota_local;
+  const cuotaEmpate = req.body.cuota_empate;
+  const cuotaVisitante = req.body.cuota_visitante;
+
+  console.log("cuotas: ",cuotaLocal,cuotaEmpate,cuotaVisitante);
+
 
   req.getConnection((err, conn) => {
     if (err) {
       console.log(`Error al establecer la conexion: ${err}`);
     }
     conn.query(
-      "INSERT INTO partido (club_local, club_visitante,fecha, location,stadium,id_group) VALUES (?, ?, ?,?,?,?)",
-      [local, visitante, fecha, location, stadium, grupo],
+      "INSERT INTO partido (club_local, club_visitante,fecha, location,stadium,id_group,cuota_local,cuota_empate,cuota_visitante) VALUES (?, ?, ?,?,?,?,?,?,?)",
+      [local, visitante, fecha, location, stadium, grupo,cuotaLocal,cuotaEmpate,cuotaVisitante],
       (errr, grupo) => {
         if (errr) {
           console.log(`Error al insertar el partido: ${errr}`);
@@ -244,7 +281,7 @@ controller.getCompeticionesByUser = (req, res) => {
       console.error("Error al establecer la conexion");
     }
     conn.query(
-      "SELECT * FROM competicion WHERE competicion.partida = (SELECT ID FROM partida WHERE usuario = ? limit 1)",
+      "SELECT competicion.ID,competicion.nombre,competicion.estado,competicion.temporada, competicion.partida FROM competicion JOIN partida ON competicion.partida = partida.ID WHERE partida.usuario = ? limit 11",
       id_user,
       (err, competiciones) => {
         if (err) {

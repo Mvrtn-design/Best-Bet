@@ -18,6 +18,7 @@ router.post("/storeClubsJSON", main_controller.storeClubsJSON);
 router.post("/addPartida", partida_controller.crearPartida);
 router.get("/getPartidas", partida_controller.listaPartidas);
 router.get("/getPartida/:id", partida_controller.getPartidaByID);
+router.get("/getUSerByPartida/:id", partida_controller.getUSerByPartida);
 
 
 /////////       COMPETITION            ///////////
@@ -32,6 +33,7 @@ router.post("/addEquipoToGroup", competicion_controller.addEquipoToGroup);
 router.get("/getGroupsByCompetition", competicion_controller.getGroupsByCompetition);
 router.get("/getMatchesByCompetition", competicion_controller.getMatchesByCompetition);
 router.put("/updateCompetitionState", competicion_controller.updateCompetitionState);
+router.put("/avanzarUnDia", competicion_controller.avanzarUnDia);
 
 /////////       USUARIO            ///////////
 router.get("/login", usuario_controller.irInicioSesion);
@@ -44,6 +46,7 @@ router.get("/edit/:id", usuario_controller.verUsuarioEditar);
 router.post("/update/:id", usuario_controller.editarUsuario);
 
 /////////       PARTIDO            ///////////
-router.get("/getMatchByID/:id", match_controller.getMatchByID);
+router.get("/getPartidoById/:id", match_controller.getMatchByID);
+router.put("/partidoDisponible", match_controller.partidoDisponible);
 
 module.exports = router;

@@ -1,42 +1,59 @@
 import React from "react";
 import Layout from "./partials/Layout";
-import { useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 const Inicio = () => {
+  const navigate = useNavigate();
   const { idPartida } = useParams();
   const [competition, setCompetition] = useState({
     ID: 0,
-    estado: 0,
-    temporada: 0,
   });
   const [teams, setTeams] = useState([]);
+  const [user, setUSer] = useState({
+    ID: 0,
+    nombre_usuario: 0,
+    monedas: 0,
+  });
   const [matches, setMatches] = useState([]);
   const [groups, setGroups] = useState({});
   const [currentSection, setCurrentSection] = useState("1.CREADO");
   const [loading, setLoading] = useState(true);
+  const IdMatchesReadyToPlay = [];
 
   ////////              FUNCTIONS         ////////////
   useEffect(() => {
     fetchCompetitionInfo();
   }, [idPartida]);
+
   const fetchCompetitionInfo = async () => {
     console.log("GETTING INFO");
     try {
       setLoading(true);
+      const responseUser = await axios.get(
+        `http://localhost:3001/getUSerByPartida/${idPartida}`
+      );
       const response = await axios.get(
         `http://localhost:3001/getCompeticionByPartida/${idPartida}`
       );
-
+      const user_data = responseUser.data[0];
       const Competition_data = response.data[0];
+      console.log(Competition_data);
+
+      setUSer({
+        ID: user_data.id,
+        monedas: user_data.monedas,
+        nombre_usuario: user_data.nombre_usuario,
+      });
 
       setCompetition({
         ID: Competition_data.ID,
         temporada: Competition_data.temporada,
         estado: Competition_data.estado,
+        dia: Competition_data.dia,
       });
-      
+
       if (Competition_data.estado.split(".")[0] >= 1) {
         const teamsResponse = await axios.get(
           `http://localhost:3001/getSomeClubesByCategory/${32}`
@@ -48,6 +65,7 @@ const Inicio = () => {
       }
       if (Competition_data.estado.split(".")[0] > 2) {
         fetchGroupMathes(Competition_data.ID);
+        fetchMatches();
       }
       setLoading(false);
     } catch (error) {
@@ -112,6 +130,15 @@ const Inicio = () => {
     }
   };
 
+  function makeCuotas(local_cat, away_cat) {
+    const results = [];
+    for (let index = 0; index < 3; index++) {
+      let num = Math.random() * (1.9 - 1.1) + 1.1;
+      results.push(parseFloat(num).toFixed(2));
+    }
+    return results;
+  }
+
   const handleMatches = async () => {
     const order = [
       [0, 1, 2, 3],
@@ -127,11 +154,13 @@ const Inicio = () => {
 
       for (let i = 0; i < order.length; i++) {
         Object.keys(groups).map(async (letra) => {
-          var localTeam = groups[letra][order[i][0]].name;
-          var awayTeam = groups[letra][order[i][1]].name;
           var location = groups[letra][order[i][0]].country;
           var stadium = groups[letra][order[i][0]].stadium;
           var id_group = groups[letra][order[i][0]].id_grupo;
+          var cuotas = makeCuotas(
+            groups[letra][order[i][0]].category,
+            groups[letra][order[i][1]].category
+          );
 
           const formattedDate = fech
             .toISOString()
@@ -145,14 +174,18 @@ const Inicio = () => {
             location: location,
             stadium: stadium,
             grupo: id_group,
+            cuota_local: cuotas[0],
+            cuota_empate: cuotas[1],
+            cuota_visitante: cuotas[2],
           });
-          fech.setDate(fech.getDate() + 1);
 
-          localTeam = groups[letra][order[i][2]].name;
-          awayTeam = groups[letra][order[i][3]].name;
           location = groups[letra][order[i][2]].country;
           stadium = groups[letra][order[i][2]].stadium;
           id_group = groups[letra][order[i][2]].id_grupo;
+          cuotas = makeCuotas(
+            groups[letra][order[i][2]].category,
+            groups[letra][order[i][3]].category
+          );
 
           const formattedDate2 = fech
             .toISOString()
@@ -166,8 +199,10 @@ const Inicio = () => {
             location: location,
             stadium: stadium,
             grupo: id_group,
+            cuota_local: cuotas[0],
+            cuota_empate: cuotas[1],
+            cuota_visitante: cuotas[2],
           });
-          fech.setDate(fech.getDate() - 1);
         });
         fech.setDate(fech.getDate() + 14);
       }
@@ -179,6 +214,29 @@ const Inicio = () => {
       fetchCompetitionInfo();
     } catch (error) {
       console.log("no va: ", error);
+    }
+  };
+  const handleAdvance = async () => {
+    setLoading(true);
+    if (IdMatchesReadyToPlay <= 0) {
+      try {
+        console.log(competition);
+
+        const readies = await axios.put("http://localhost:3001/avanzarUnDia", {
+          value1: competition.ID,
+        });
+        IdMatchesReadyToPlay = readies.data;
+        for (let index = 0; index < IdMatchesReadyToPlay.length; index++) {
+          await axios.put("http://localhost:3001/partidoDisponible", {
+          value1: index,
+        });
+        }
+        fetchCompetitionInfo();
+      } catch (error) {
+        console.error(error);
+      }
+    } else {
+      alert("Quedan partidos por simular: ", IdMatchesReadyToPlay.length());
     }
   };
 
@@ -240,7 +298,6 @@ const Inicio = () => {
 
   const renderContent = () => {
     switch (currentSection.split(".")[0]) {
-      
       case "1":
         return (
           <div>
@@ -274,30 +331,46 @@ const Inicio = () => {
                 ))}
               </div>
             ))}
-            <button onClick={handleMatches} disabled={loading || +competition?.estado.split(".")[0] > 2}>
-              Another Button
-            </button>            
+            <button
+              onClick={handleMatches}
+              disabled={loading || +competition?.estado.split(".")[0] > 2}
+            >
+              Generar Partidos
+            </button>
           </div>
         );
 
-        case "3":
+      case "3":
         return (
           <div>
             <h2>PARTIDOS:</h2>
-            
+            <button
+              onClick={handleAdvance}
+              disabled={loading || +competition?.estado.split(".")[0] > 3}
+            >
+              Avanzar
+            </button>
             {matches != [] &&
               matches.map((jornada, index) => (
                 <div key={index}>
                   <h2>JORNADA {index + 1}:</h2>
                   {jornada.map((match, index) => (
                     <div key={index}>
-                      <h3>
-                        {match.club_local} - {match.club_visitante}
-                      </h3>
-                      <p>
-                        - {match.stadium} in {match.location}
-                      </p>
-                      <p>- {match.fecha}</p>
+                      <div
+                        onClick={() =>
+                          navigate(`/partido/${match.Idd}`, {
+                            state: { match: match.Idd, usuario: user },
+                          })
+                        }
+                      >
+                        <h3>
+                          {match.club_local} - {match.club_visitante}
+                        </h3>
+                        <p>
+                          - {match.stadium} in {match.location}
+                        </p>
+                        <p>- {match.fecha}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -318,7 +391,12 @@ const Inicio = () => {
       "2.GROUPED",
       "3.MATCHED",
       "4.GROUP-STATE DAY 1",
-      "10.GROUP-STATE DAY 6",
+      "5.GROUP-STATE DAY 2",
+      "6.GROUP-STATE DAY 3",
+      "7.GROUP-STATE DAY 4",
+      "8.GROUP-STATE DAY 5",
+      "9.GROUP-STATE DAY 6",
+      "10.MATCHED-2",
       "14.FINAL",
     ];
     return (
@@ -343,11 +421,20 @@ const Inicio = () => {
     <div>
       <Layout>
         {loading && <p>Loading...</p>}
+        {user && (
+          <div>
+            <p>Nombre: {user?.nombre_usuario}</p>
+            <p>Monedas: {user?.monedas}</p>
+          </div>
+        )}
 
         {competition && (
           <div>
             <p>Season: {competition?.temporada}</p>
             <p>State: {competition?.estado}</p>
+            <h2>
+              DIA: <p>{competition?.dia}</p>
+            </h2>
             {renderNavbar()}
             {renderContent()}
           </div>

@@ -20,6 +20,7 @@ function NewTorneo() {
         getCompeticionesByUser(response.data[0]).then((datosCompeticion) => {
           setCompeticiones(datosCompeticion);
         });
+        
       })
       .catch((error) => {
         console.error("Error fetching user:", error);
@@ -64,6 +65,7 @@ function NewTorneo() {
               <th>ID</th>
               <th>NOMBRE</th>
               <th>TEMPORADA</th>
+              <th>ESTADO</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -73,6 +75,7 @@ function NewTorneo() {
                 <td>{item.ID}</td>
                 <td>{item.nombre}</td>
                 <td>{item.temporada}</td>
+                <td>{item.estado}</td>
                 <td>
                   <Link to={`/menu/${item.partida}/${item.ID}`}> ENTRAR </Link>
                   <button>ELIMINAR</button>

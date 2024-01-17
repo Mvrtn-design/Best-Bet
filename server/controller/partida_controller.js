@@ -52,4 +52,20 @@ controller.getPartidaByID = (req, res) => {
   });
 };
 
+controller.getUSerByPartida = (req, res) => {
+  const idd = req.params.id;
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.error("Error al establecer la conexion");
+    }
+    conn.query("SELECT * FROM usuario WHERE ID = (SELECT usuario FROM partida WHERE ID = ?)", idd, (err, usuario) => {
+      if (err) {
+        console.error("Fallo al get usuario debido a: ", err);
+      }
+      console.log("Usuario encontrada");
+      res.json(usuario);
+    });
+  });
+};
+
 module.exports = controller;
