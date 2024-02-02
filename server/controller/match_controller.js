@@ -17,7 +17,7 @@ controller.getMatchByID = (req, res) => {
 };
 
 controller.partidoDisponible = (req, res) => {
-  const idd = req.body.value1.Idd;
+  const idd = req.body.value1;
   console.log("iiii: ", idd);
 
   req.getConnection((err, conn) => {
@@ -42,15 +42,15 @@ controller.updateResultadoPartido = (req, res) => {
   const idd = req.params.id;
   const golesLocal = req.body.value1;
   const golesVisitante = req.body.value2;
-  const estado_partido = req.body.value1;
-  console.log("valor de value1: ", golesLocal);
+  const estado_partido = req.body.value3;
+
   req.getConnection((err, conn) => {
     if (err) {
       console.error("Error al establecer la conexion");
     }
     conn.query(
-      `UPDATE estadisticas join partido on id_group = id_grupo where SET marcador_local = ? WHERE IDD = ? `,
-      [golesLocal,idd],
+      `UPDATE estadisticas join partido on id_group = id_grupo SET marcador_local = ?, marcador_visitante = ?, estado_partido = ? WHERE IDD = ? `,
+      [golesLocal, golesVisitante, estado_partido, idd],
       (err, partido) => {
         if (err) {
           console.error("Fallo al get partido debido a: ", err);
@@ -62,6 +62,37 @@ controller.updateResultadoPartido = (req, res) => {
   });
 };
 
+
+controller.updateEstadisticasEquipo = (req, res) => {
+  const club_name = req.params.club;
+  const id_grupo = req.params.id_group;
+
+  const ganados = req.body.ganados;
+  const empatados = req.body.empatados;
+  const perdidos = req.body.perdidos;
+  const marcados = req.body.marcados;
+  const encajados = req.body.encajados;
+  const puntos = req.body.puntos;
+  console.log("valor de value1: ", req.body);
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.error("Error al establecer la conexion");
+    }
+    conn.query(
+      `UPDATE estadisticas JOIN partido ON id_grupo = id_group set ganados = ganados + ?, empatados = empatados + ? , perdidos = perdidos + ?, goles_a_favor = goles_a_favor + ?, goles_en_contra = goles_en_contra + ?, puntos = puntos + ? where nombre_equipo = ? and id_grupo = ? `,
+      [ganados, empatados, perdidos, marcados, encajados, puntos, club_name, id_grupo],
+      (err, partido) => {
+        if (err) {
+          console.error("Fallo al get partido debido a: ", err);
+        }
+        console.log("ESTADISTICAS ACTUALIZADAS");
+        res.json(partido);
+      }
+    );
+  });
+};
+
+
 controller.checkPartidosDisponibles = (req, res) => {
   const idd = req.params.id;
   req.getConnection((err, conn) => {
@@ -69,13 +100,13 @@ controller.checkPartidosDisponibles = (req, res) => {
       console.error("Error al establecer la conexion");
     }
     conn.query(
-      "SELECT Idd FROM partido WHERE date(fecha) = (SELECT date(dia) FROM competicion WHERE ID = ?)",
+      "SELECT idd from partido join grupo on id_group = grupo.ID  join competicion on id_competicion = competicion.ID where id_competicion = ? and estado_partido = 'READY_TO_PLAY'",
       idd,
       (err, partido) => {
         if (err) {
           console.error("Fallo al get partido debido a: ", err);
         }
-        console.log("Partidos: ", partido);
+        console.log("ACTUALIZADO: ", partido);
         res.json(partido);
       }
     );

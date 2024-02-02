@@ -46,7 +46,7 @@ class MatchGenerator {
   }
 
   getResult() {
-    return this.marcador_local, this.marcador_visitante;
+    return (this.marcador_local, this.marcador_visitante);
   }
   
   getPreMatch() {

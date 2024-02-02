@@ -40,12 +40,7 @@ function Match_Info() {
         `http://localhost:3001/getPartidoById/${id_match}`
       );
       const match_info = await response.data[0];
-      var match_object = null;
-      if (match == null) {
-        match_object = new MatchGenerator(match_info);
-      } else {
-        match_object = matchTemp;
-      }
+
       setMatch(match_info);
       console.log(match_info);
       setPosibilities([
@@ -114,19 +109,53 @@ function Match_Info() {
     const marcador_visitante = Math.round(Math.random() * 4);
     const estado_partido = "ENDED";
 
-    axios.put(`http://localhost:3001/updateResultadoPartido/${id_match}`, {
-      value1: marcador_local,
-      value2: marcador_visitante,
-      value3: estado_partido,
-    });
-    // console.log("POST: ",matchTemp);
-    //actualiza partido, grupo y esstadisticas
-  }
-  const generateMatchResult = () => {
-    
-    return match;
-  };
+    await axios.put(
+      `http://localhost:3001/updateResultadoPartido/${id_match}`,
+      {
+        value1: marcador_local,
+        value2: marcador_visitante,
+        value3: estado_partido,
+      }
+    );
 
+    //Local
+    await axios.put(
+      `http://localhost:3001/updateEstadisticasEquipo/${match.club_local}/${match.id_group}`,
+      {
+        marcados: marcador_local,
+        encajados: marcador_visitante,
+        ganados: marcador_local > marcador_visitante ? 1 : 0,
+        empatados: marcador_local === marcador_visitante ? 1 : 0,
+        perdidos: marcador_local < marcador_visitante ? 1 : 0,
+        puntos:
+          marcador_local > marcador_visitante
+            ? 3
+            : marcador_local == marcador_visitante
+            ? 1
+            : 0,
+      }
+    );
+
+    //Visitante
+    await axios.put(
+      `http://localhost:3001/updateEstadisticasEquipo/${match.club_visitante}/${match.id_group}`,
+      {
+        marcados: marcador_visitante,
+        encajados: marcador_local,
+        ganados: marcador_local < marcador_visitante ? 1 : 0,
+        empatados: marcador_local === marcador_visitante ? 1 : 0,
+        perdidos: marcador_local > marcador_visitante ? 1 : 0,
+        puntos:
+          marcador_local < marcador_visitante
+            ? 3
+            : marcador_local == marcador_visitante
+            ? 1
+            : 0,
+      }
+    );
+
+    fetchMatchInfo();
+  }
   return (
     <Layout>
       {loading && <p>Loading...</p>}
@@ -160,7 +189,7 @@ function Match_Info() {
             JUGAR PARTIDO
           </button>
 
-          <h1>NEW</h1>
+          <h2>APUESTAS</h2>
           {posibilties.map((posibilty) => (
             <div key={posibilty.name}>
               <h2>

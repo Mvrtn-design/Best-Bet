@@ -6,7 +6,7 @@ controller.getGrupoByID = (req, res) => {
       if (err) {
         console.error("Error al establecer la conexion");
       }
-      conn.query("select * from club join estadisticas on club.name = estadisticas.nombre_equipo  join grupo on estadisticas.id_grupo = grupo.ID   where grupo.ID = ?", idd, (err, grupo) => {
+      conn.query("select * from club join estadisticas on club.name = estadisticas.nombre_equipo  join grupo on estadisticas.id_grupo = grupo.ID   where grupo.ID = ? order by puntos desc", idd, (err, grupo) => {
         if (err) {
           console.error("Fallo al get grupo debido a: ", err);
         }

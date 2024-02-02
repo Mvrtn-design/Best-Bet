@@ -50,7 +50,8 @@ router.post("/update/:id", usuario_controller.editarUsuario);
 router.get("/getPartidoById/:id", match_controller.getMatchByID);
 router.put("/partidoDisponible", match_controller.partidoDisponible);
 router.get("/checkPartidosDisponibles/:id", match_controller.checkPartidosDisponibles);
-router.put("/updateResultadoPartido/:id_match", match_controller.updateResultadoPartido);
+router.put("/updateResultadoPartido/:id", match_controller.updateResultadoPartido);
+router.put("/updateEstadisticasEquipo/:club/:id_group", match_controller.updateEstadisticasEquipo);
 
 /////////       GRUPO            ///////////
 router.get("/getGrupoById/:id", grupo_controller.getGrupoByID);

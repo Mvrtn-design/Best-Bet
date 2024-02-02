@@ -281,7 +281,7 @@ controller.getCompeticionesByUser = (req, res) => {
       console.error("Error al establecer la conexion");
     }
     conn.query(
-      "SELECT competicion.ID,competicion.nombre,competicion.estado,competicion.temporada, competicion.partida FROM competicion JOIN partida ON competicion.partida = partida.ID WHERE partida.usuario = ? limit 11",
+      "SELECT competicion.ID,competicion.nombre,competicion.estado,competicion.temporada, competicion.partida FROM competicion JOIN partida ON competicion.partida = partida.ID WHERE partida.usuario = ? limit 20",
       id_user,
       (err, competiciones) => {
         if (err) {

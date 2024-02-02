@@ -1,7 +1,6 @@
 import React from "react";
 import Layout from "./partials/Layout";
 import { useLocation } from "react-router-dom";
-import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -9,21 +8,20 @@ function Grupo() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [grupo, setGrupo] = useState(null);
-
+  const [ordenTabla, setOrdenTabla] = useState({ key: 'PUNTOS', direction: 'desc' })
   const location = useLocation();
   const groupId = location.state.group;
   const usuario = location.state.usuario;
 
   const fetchMatchInfo = async () => {
     console.log("GETTING INFO");
+    setLoading(true);
     try {
-      setLoading(true);
       setUser(usuario);
       const response = await axios.get(
         `http://localhost:3001/getGrupoById/${groupId}`
       );
-      setGrupo(await response.data);
-      console.log(response.data);
+      setGrupo(response.data);
       setLoading(false);
     } catch (error) {
       console.error("Error: ", error);
@@ -32,6 +30,21 @@ function Grupo() {
   useEffect(() => {
     fetchMatchInfo();
   }, [usuario]);
+
+  // useEffect(() => {
+  //   ordenarTabla(ordenTabla.key, ordenTabla.direction);
+  // }, [ordenTabla]);
+
+  // const ordenarTabla = (key, direction) => {
+  //   let tablaOrdenada;
+  //   if (direction === 'desc') {
+  //     tablaOrdenada = [...grupo].sort((a, b) => b[key] - a[key]);
+  //   } else {
+  //     tablaOrdenada = [...grupo].sort((a, b) => a[key] - b[key]);
+  //   }
+  //   setGrupo(tablaOrdenada);
+  //   setOrdenTabla({ key, direction })
+  // }
 
   return (
     <Layout>
@@ -43,14 +56,14 @@ function Grupo() {
           <table className="tabla_usuarios">
             <thead>
               <tr>
-                <th>NOMBRE</th>
-                <th>VICTORIAS</th>
-                <th>EMPATES</th>
-                <th>DERROTAS</th>
-                <th>GOLES MARCADOS </th>
-                <th>GOLES ENCAJADOS</th>
-                <th>DIFERENCIA</th>
-                <th>
+                <th onClick={() => ordenarTabla('name', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>NOMBRE</th>
+                <th onClick={() => ordenarTabla('ganados', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>VICTORIAS</th>
+                <th onClick={() => ordenarTabla('empatados', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>EMPATES</th>
+                <th onClick={() => ordenarTabla('perdidos', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>DERROTAS</th>
+                <th onClick={() => ordenarTabla('goles_a_favor', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>GOLES MARCADOS </th>
+                <th onClick={() => ordenarTabla('goles_en_contra', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>GOLES ENCAJADOS</th>
+                <th onClick={() => ordenarTabla('diferencia', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>DIFERENCIA</th>
+                <th onClick={() => ordenarTabla('puntos', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>
                   <strong>PUNTOS</strong>
                 </th>
               </tr>
