@@ -115,7 +115,7 @@ async function postCompetition(idPartida) {
   const formData = {
     nombre: "champions1",
     partida: idP,
-    temporada: "2022-2023",
+    temporada: "2023-2024",
   };
 
   try {

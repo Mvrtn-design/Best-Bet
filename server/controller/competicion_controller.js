@@ -59,7 +59,7 @@ controller.avanzarUnDia = (req, res) => {
           res.json(errr); //manejar los errores con next (mas profesional)
         }
         conn.query(
-          "SELECT idd FROM partido WHERE fecha = (SELECT dia FROM competicion WHERE id = ?)",
+          "SELECT Idd FROM partido WHERE date(fecha) = (SELECT date(dia) FROM competicion WHERE ID = ?)",
           [idd],
           (errr, estado) => {
             if (errr) {
@@ -138,7 +138,7 @@ controller.getGroupsByCompetition = (req, res) => {
       console.error("Error al establecer la conexion");
     }
     conn.query(
-      "select * from club join estadisticas on club.name = estadisticas.club_name  join grupo on estadisticas.id_grupo = grupo.ID   join competicion on grupo.id_competicion = competicion.ID   where competicion.ID = ? and grupo.ronda = ?  order by grupo.letra",
+      "select * from club join estadisticas on club.name = estadisticas.nombre_equipo  join grupo on estadisticas.id_grupo = grupo.ID   join competicion on grupo.id_competicion = competicion.ID   where competicion.ID = ? and grupo.ronda = ?  order by grupo.letra",
       [idd, ronda],
       (err, grupos) => {
         if (err) {
@@ -188,7 +188,7 @@ controller.guardarGrupo = (req, res) => {
       (errr, grupo, next) => {
         if (errr) {
           console.log(`Error al insertar el grupo: ${errr}`);
-          return next(errr);
+          return json(errr);
         }
         const ddd = grupo.insertId;
         console.log("GRUPO CREADO: ", ddd);
@@ -240,7 +240,7 @@ controller.addEquipoToGroup = (req, res) => {
       console.log(`Error al establecer la conexion: ${err}`);
     }
     conn.query(
-      "INSERT INTO estadisticas (id_grupo, club_name) VALUES (?, ?)",
+      "INSERT INTO estadisticas (id_grupo, nombre_equipo) VALUES (?, ?)",
       [id_grupo, team_name],
       (errr, grupo) => {
         if (errr) {

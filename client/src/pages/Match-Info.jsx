@@ -3,9 +3,11 @@ import Layout from "./partials/Layout";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import MatchGenerator from "../routes/route_match";
 
 function Match_Info() {
   const [match, setMatch] = useState(null);
+  const [matchTemp, setMatchTemp] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
@@ -37,43 +39,28 @@ function Match_Info() {
       const response = await axios.get(
         `http://localhost:3001/getPartidoById/${id_match}`
       );
-      const match_info = response.data[0];
+      const match_info = await response.data[0];
+      var match_object = null;
+      if (match == null) {
+        match_object = new MatchGenerator(match_info);
+      } else {
+        match_object = matchTemp;
+      }
       setMatch(match_info);
       console.log(match_info);
       setPosibilities([
-            { name: "local", price: match_info.cuota_local },
-            { name: "draw", price: match_info.cuota_empate },
-            { name: "away", price: match_info.cuota_visitante },
-          ]);
-
+        { name: "local", price: match_info.cuota_local },
+        { name: "draw", price: match_info.cuota_empate },
+        { name: "away", price: match_info.cuota_visitante },
+      ]);
       setLoading(false);
-      
-      
     } catch (error) {
-      console.error("Error: ",error);
+      console.error("Error: ", error);
     }
-  }
+  };
   useEffect(() => {
     fetchMatchInfo();
-  }, [id_match]);
-  
-
-  // const firstRead = (partido) => {
-  //   setUser(usuario);
-  //   setMatch(partido);
-  //   console.log(match);
-  //   setPosibilities([
-  //     { name: "local", price: partido.cuota_local },
-  //     { name: "draw", price: partido.cuota_empate },
-  //     { name: "away", price: partido.cuota_visitante },
-  //   ]);
-
-  //   setLoading(false);
-  // };
-
-  // useEffect(() => {
-  //   firstRead(partido);
-  // }, [id_match]);
+  }, [matchTemp]);
 
   const handleBet = (betResult) => {
     setFormCuota(match.cuota_empate);
@@ -122,9 +109,23 @@ function Match_Info() {
   const handleCancel = () => {
     setBetState(initialState);
   };
-  function playMatch(){
+  async function handlePlayMatch() {
+    const marcador_local = Math.round(Math.random() * 4);
+    const marcador_visitante = Math.round(Math.random() * 4);
+    const estado_partido = "ENDED";
+
+    axios.put(`http://localhost:3001/updateResultadoPartido/${id_match}`, {
+      value1: marcador_local,
+      value2: marcador_visitante,
+      value3: estado_partido,
+    });
+    // console.log("POST: ",matchTemp);
     //actualiza partido, grupo y esstadisticas
   }
+  const generateMatchResult = () => {
+    
+    return match;
+  };
 
   return (
     <Layout>
@@ -139,26 +140,25 @@ function Match_Info() {
       {match && (
         <div>
           <h1>
-            {match.club_local} {match.marcador_local == null && <i> </i>}-
-            {match.marcador_visitante == null && <i> </i>}
+            {match.club_local} {match.marcador_local}-{match.marcador_visitante}
             {match.club_visitante}
           </h1>
           <h2>{match.fecha}</h2>
           <p>
             - {match.stadium} in {match.location}
           </p>
+          <p>- {match.estado_partido}</p>
           <p>
-            - {match.estado_partido}
-          </p>
-          <p>
-            - 1: {match.cuota_local} 
+            - 1: {match.cuota_local}
             X: {match.cuota_empate}
             2: {match.cuota_visitante}
           </p>
-          <button onClick={() => playMatch()} disabled=
-              { loading ||match.estado_partido !== "AVALAIABLE" }>
-                JUGAR PARTIDO
-              </button>
+          <button
+            onClick={() => handlePlayMatch()}
+            disabled={loading || match.estado_partido !== "READY_TO_PLAY"}
+          >
+            JUGAR PARTIDO
+          </button>
 
           <h1>NEW</h1>
           {posibilties.map((posibilty) => (
@@ -175,8 +175,10 @@ function Match_Info() {
               <button onClick={() => increaseAmount(posibilty.name)}>
                 Increase Amount
               </button>
-              <button onClick={() => decreaseAmount(posibilty.name)} disabled=
-              {    loading ||betState[posibilty.name].amount <=0     }>
+              <button
+                onClick={() => decreaseAmount(posibilty.name)}
+                disabled={loading || betState[posibilty.name].amount <= 0}
+              >
                 Decrease Amount
               </button>
             </div>

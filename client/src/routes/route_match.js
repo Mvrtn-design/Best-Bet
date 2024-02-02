@@ -1,5 +1,5 @@
 const ESTADOS_PARTIDO = {
-  SIN_JUGAR: 0,
+  READY_TO_PLAY: 0,
   EN_JUEGO: 1,
   TERMINADO: 2,
 };
@@ -11,48 +11,44 @@ const ESTADOS_APUESTA = {
   PERDIDA: 3,
 };
 class MatchGenerator {
-  constructor(local, visitante,competicion="amistoso") {
-    this.local = local;
-    this.visitante = visitante;
-    this.stadium = local.stadium;
-    this.date = new Date();
-    this.matchResult = {};
-    this.competicion = competicion;
-    this.local_cuota = 0.0;
-    this.empate_cuota = 0.0;
-    this.visitante_cuota = 0.0;
-    this.estado = ESTADOS_PARTIDO.SIN_JUGAR;
-    this.bet_result = null;
-    this.generateBettingValues();
+  constructor(partido) {
+    this.club_local = partido.club_local;
+    this.club_visitante = partido.club_visitante;
+    this.stadium = partido.stadium;
+    this.location = partido.location;
+    this.date = partido.fecha;
+    this.marcador_local = partido.marcador_local;
+    this.marcador_visitante = partido.marcador_visitante;
+    this.cuota_local = partido.cuota_local;
+    this.cuota_empate = partido.cuota_empate;
+    this.cuota_visitante = partido.cuota_visitante;
+    this.estado_partido = partido.estado_partido;
+    this.id_group = partido.id_group;
+    this.ID = partido.Idd;
   }
 
   generateMatchResult() {
-    this.matchResult.localGoals = Math.round(Math.random() * 4);
-    this.matchResult.visitanteGoals = Math.round(Math.random() * 4);
+    this.marcador_local = Math.round(Math.random() * 4);
+    this.marcador_visitante = Math.round(Math.random() * 4);
+    this.estado_partido = "ENDED";
+    return this;
+  }
+
+  updateDatosBackend() {
+    
+    //get the data and make the put
   }
 
   generateBettingValues() {
-    this.local_cuota = (
-      1.01 +
-      Math.random() * (2.99 - 1.0)
-    ).toFixed(2);
-    this.empate_cuota = (
-      1.01 +
-      Math.random() * (2.99 - 1.0)
-    ).toFixed(2);
-    this.visitante_cuota = (
-      1.01 +
-      Math.random() * (2.99 - 1.0)
-    ).toFixed(2);
+    this.local_cuota = (1.01 + Math.random() * (2.99 - 1.0)).toFixed(2);
+    this.empate_cuota = (1.01 + Math.random() * (2.99 - 1.0)).toFixed(2);
+    this.visitante_cuota = (1.01 + Math.random() * (2.99 - 1.0)).toFixed(2);
   }
 
   getResult() {
-    this.generateMatchResult();
-    return {
-      match: { localGoals: 0, visitanteGoals: 0 },
-      bet: this.bettingValues,
-    };
+    return this.marcador_local, this.marcador_visitante;
   }
+  
   getPreMatch() {
     return {
       local: this.local.name,

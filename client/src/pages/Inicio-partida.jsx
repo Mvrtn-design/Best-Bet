@@ -20,7 +20,7 @@ const Inicio = () => {
   const [groups, setGroups] = useState({});
   const [currentSection, setCurrentSection] = useState("1.CREADO");
   const [loading, setLoading] = useState(true);
-  const IdMatchesReadyToPlay = [];
+  const [IdMatchesReadyToPlay, setIdMatchesReadyToPlay] = useState([]);
 
   ////////              FUNCTIONS         ////////////
   useEffect(() => {
@@ -65,7 +65,7 @@ const Inicio = () => {
       }
       if (Competition_data.estado.split(".")[0] > 2) {
         fetchGroupMathes(Competition_data.ID);
-        fetchMatches();
+        fetchPartidosDisponibles(Competition_data.ID);
       }
       setLoading(false);
     } catch (error) {
@@ -76,7 +76,7 @@ const Inicio = () => {
 
   function groupByLetra(equipos) {
     return equipos.reduce((groups, item) => {
-      const groupName = item.letra;
+      const groupName = [item.id_grupo, item.letra];
 
       if (!groups[groupName]) {
         groups[groupName] = [];
@@ -97,6 +97,22 @@ const Inicio = () => {
     }
     return result;
   }
+  const fetchPartidosDisponibles = async (id_competicion) => {
+    try {
+      const avaliables = await axios.get(
+        `http://localhost:3001/checkPartidosDisponibles/${id_competicion}`
+      );
+      setIdMatchesReadyToPlay(avaliables.data);
+      console.log("Readys: ", IdMatchesReadyToPlay);
+      for (let index = 0; index < IdMatchesReadyToPlay.length; index++) {
+        await axios.put("http://localhost:3001/partidoDisponible", {
+          value1: IdMatchesReadyToPlay[index],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const fetchGroups = async (id_competicion) => {
     try {
@@ -121,10 +137,14 @@ const Inicio = () => {
           params: { value1: id_competicion, value2: "GROUP_STATE" },
         }
       );
-
       const aaa = groupByJornada(teamsResponse.data);
-
       setMatches(aaa);
+
+      const avaliables = await axios.get(
+        `http://localhost:3001/checkPartidosDisponibles/${id_competicion}`
+      );
+      setIdMatchesReadyToPlay(avaliables.data);
+      console.log("Readys: ", IdMatchesReadyToPlay);
     } catch (error) {
       console.error("Error fetching matches:", error);
     }
@@ -220,23 +240,22 @@ const Inicio = () => {
     setLoading(true);
     if (IdMatchesReadyToPlay <= 0) {
       try {
-        console.log(competition);
-
         const readies = await axios.put("http://localhost:3001/avanzarUnDia", {
           value1: competition.ID,
         });
-        IdMatchesReadyToPlay = readies.data;
+        setIdMatchesReadyToPlay(readies.data);
+        console.log("Readys: ", IdMatchesReadyToPlay);
         for (let index = 0; index < IdMatchesReadyToPlay.length; index++) {
           await axios.put("http://localhost:3001/partidoDisponible", {
-          value1: index,
-        });
+            value1: IdMatchesReadyToPlay[index],
+          });
         }
         fetchCompetitionInfo();
       } catch (error) {
         console.error(error);
       }
     } else {
-      alert("Quedan partidos por simular: ", IdMatchesReadyToPlay.length());
+      alert("Quedan partidos por simular: ", IdMatchesReadyToPlay.length);
     }
   };
 
@@ -323,12 +342,20 @@ const Inicio = () => {
             <h2>Groups:</h2>
             {Object.keys(groups).map((letra, index) => (
               <div key={index}>
-                <h3>GRUPO {letra}:</h3>
-                {groups[letra].map((team, index) => (
-                  <div key={index}>
-                    - {team.name} - {team.country}
-                  </div>
-                ))}
+                <div
+                  onClick={() =>
+                    navigate(`/grupo/${letra.split(",")[0]}`, {
+                      state: { group: letra.split(",")[0], usuario: user },
+                    })
+                  }
+                >
+                  <h3>GRUPO {letra.split(",")[1]}:</h3>
+                  {groups[letra].map((team, index) => (
+                    <div key={index}>
+                      - {team.name} - {team.country}
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
             <button
@@ -343,7 +370,8 @@ const Inicio = () => {
       case "3":
         return (
           <div>
-            <h2>PARTIDOS:</h2>
+            <h2>PARTIDOS: </h2>
+            <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
             <button
               onClick={handleAdvance}
               disabled={loading || +competition?.estado.split(".")[0] > 3}
