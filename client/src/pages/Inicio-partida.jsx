@@ -12,13 +12,16 @@ const Inicio = () => {
     "4.ROUND_OF_16",
     "5.ROUND_OF_16-GROUPED",
     "6.ROUND_OF_16-MATCHED",
-    "7.ROUND_OF_8-TEAMS",
-    "8.ROUND_OF_8-MATCHED",
-    "9.SEMIFINALS-TEAMS",
-    "10.SEMIFINALS-MATCHED",
-    "11.FINAL-TEAMS",
-    "12.FINAL-MATCHED",
-    "14.ENDED",
+    "7.ROUND_OF_8",
+    "8.ROUND_OF_8_GROUPED",
+    "9.ROUND_OF_8-MATCHED",
+    "10.SEMIFINALS",
+    "11.SEMIFINALS-GROUPED",
+    "12.SEMIFINALS-MATCHED",
+    "13.FINAL",
+    "14.FINAL-TEAMS",
+    "15.FINAL-MATCHED",
+    "16.ENDED",
   ];
   const competition_rounds = [
     "Group_state",
@@ -26,6 +29,7 @@ const Inicio = () => {
     "Round_of_8",
     "Semifinals",
     "Final",
+    "Champion",
   ];
   const navigate = useNavigate();
   const { idPartida } = useParams();
@@ -38,14 +42,21 @@ const Inicio = () => {
     Round_of_8: [],
     Semifinals: [],
     Final: [],
-    Champions: [],
+    Champion: [],
   });
   const [user, setUSer] = useState({
     ID: 0,
     nombre_usuario: 0,
     monedas: 0,
   });
-  const [matches, setMatches] = useState([]);
+  const [matches, setMatches] = useState({
+    Group_state: [],
+    Round_of_16: [],
+    Round_of_8: [],
+    Semifinals: [],
+    Final: [],
+    Champion: [],
+  });
   const [groups, setGroups] = useState({
     Group_state: {},
     Round_of_16: {},
@@ -56,19 +67,24 @@ const Inicio = () => {
   const [currentSection, setCurrentSection] = useState(competition_statuses[0]);
   const [loading, setLoading] = useState(true);
   const [IdMatchesReadyToPlay, setIdMatchesReadyToPlay] = useState([]);
-  const fechaOctavos = new Date("2023-12-01T00:00:00")
-    .toISOString()
-    .slice(0, 24);
-
+  const fechas = {
+    octavos: new Date("2023-12-01T00:00:00").toISOString().slice(0, 24),
+    cuartos: new Date("2024-01-05T00:00:00").toISOString().slice(0, 24),
+    Semifinales: new Date("2024-01-20T00:00:00").toISOString().slice(0, 24),
+    final: new Date("2024-02-10T00:00:00").toISOString().slice(0, 24),
+    Champion: new Date("2024-03-01T00:00:00").toISOString().slice(0, 24),
+  };
   ////////              FUNCTIONS         ////////////
   useEffect(() => {
     fetchCompetitionInfo();
-  }, [loading]);
+  }, []);
 
   async function fetchCompetitionInfo() {
     console.log("GETTING COMPETITION INFO");
-    try {
+    if (loading == false) {
       setLoading(true);
+    }
+    try {
       const user_backend_data = await axios.get(
         `http://localhost:3001/getUSerByPartida/${idPartida}`
       );
@@ -92,9 +108,9 @@ const Inicio = () => {
       });
 
       ////////////////////////////////////////////////
-      ///   SEGÚN ESTADO DE LA COMPETICIÓN      //////
+      ///     SEGÚN ESTADO DE LA COMPETICIÓN      ////
       ////////////////////////////////////////////////
-
+      /// GRUPOS
       if (Competition_data.estado.split(".")[0] >= 1) {
         const teamsResponse = await axios.get(
           `http://localhost:3001/getSomeClubesByCategory/${32}`
@@ -105,11 +121,12 @@ const Inicio = () => {
         fetchGroups(Competition_data.ID, competition_rounds[0].toUpperCase());
       }
       if (Competition_data.estado.split(".")[0] > 2) {
-        fetchGroupMathes(Competition_data.ID);
+        fetchMathes(Competition_data.ID, competition_rounds[0].toUpperCase());
         fetchPartidosDisponibles(Competition_data.ID);
-        if (fechaOctavos == competition.dia) {
-          setRound16();
+        if (fechas.octavos == competition.dia) {
+          setNewRound(competition_statuses[3]);
         }
+        /// OCTAVOS
       }
       if (Competition_data.estado.split(".")[0] > 3) {
         const oct = await fetchOctavosFinal();
@@ -117,8 +134,65 @@ const Inicio = () => {
       }
       if (Competition_data.estado.split(".")[0] > 4) {
         fetchGroups(Competition_data.ID, competition_rounds[1].toUpperCase());
-        console.log(groups);
+        fetchMathes(Competition_data.ID, competition_rounds[1].toUpperCase());
       }
+      if (Competition_data.estado.split(".")[0] > 5) {
+        fetchPartidosDisponibles(Competition_data.ID);
+        if (fechas.cuartos == competition.dia) {
+          setNewRound(competition_statuses[6]);
+        }
+        //////  CUARTOS
+      }
+      if (Competition_data.estado.split(".")[0] > 6) {
+        const oct = await fetchClasificados(competition_rounds[1]);
+        setTeams((prevDict) => ({ ...prevDict, Round_of_8: oct }));
+      }
+      if (Competition_data.estado.split(".")[0] > 7) {
+        fetchGroups(Competition_data.ID, competition_rounds[2].toUpperCase());
+        fetchMathes(Competition_data.ID, competition_rounds[2].toUpperCase());
+      }
+      if (Competition_data.estado.split(".")[0] > 8) {
+        fetchPartidosDisponibles(Competition_data.ID);
+        if (fechas.Semifinales == competition.dia) {
+          setNewRound(competition_statuses[9]);
+        }
+        /// SEMIFINALES
+      }
+      if (Competition_data.estado.split(".")[0] > 9) {
+        const semis = await fetchClasificados(competition_rounds[2]);
+        setTeams((prevDict) => ({ ...prevDict, Semifinals: semis }));
+      }
+      if (Competition_data.estado.split(".")[0] > 10) {
+        fetchGroups(Competition_data.ID, competition_rounds[3].toUpperCase());
+        fetchMathes(Competition_data.ID, competition_rounds[3].toUpperCase());
+      }
+      if (Competition_data.estado.split(".")[0] > 11) {
+        fetchPartidosDisponibles(Competition_data.ID);
+        if (fechas.final == competition.dia) {
+          setNewRound(competition_statuses[12]);
+        }
+      }
+      //// FINAL
+      if (Competition_data.estado.split(".")[0] > 12) {
+        const semis = await fetchClasificados(competition_rounds[3]);
+        setTeams((prevDict) => ({ ...prevDict, Final: semis }));
+      }
+      if (Competition_data.estado.split(".")[0] > 13) {
+        fetchGroups(Competition_data.ID, competition_rounds[4].toUpperCase());
+        fetchMathes(Competition_data.ID, competition_rounds[4].toUpperCase());
+      }
+      if (Competition_data.estado.split(".")[0] > 14) {
+        fetchPartidosDisponibles(Competition_data.ID);
+        if (fechas.Champion == competition.dia) {
+          setNewRound(competition_statuses[15]);
+        }
+      }
+      //////// CHAMPION
+      if (Competition_data.estado.split(".")[0] > 15) {
+        const semis = await fetchClasificados(competition_rounds[4]);
+        setTeams((prevDict) => ({ ...prevDict, Champion: semis }));
+      }
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching competition info: ", error);
@@ -162,13 +236,50 @@ const Inicio = () => {
     }
     return equipos;
   };
+  const fetchClasificados = async (ronda) => {
+    var round_teams = {};
+    switch (ronda) {
+      case competition_rounds[0]:
+        round_teams = groups.Group_state;
+        break;
+      case competition_rounds[1]:
+        round_teams = groups.Round_of_16;
+        break;
+      case competition_rounds[2]:
+        round_teams = groups.Round_of_8;
+        break;
+      case competition_rounds[3]:
+        round_teams = groups.Semifinals;
+        break;
+      case competition_rounds[4]:
+        round_teams = groups.Final;
+        break;
 
-  const setRound16 = async () => {
+      default:
+        console.error(
+          "Número de equipos a agrupar erroneo: ",
+          ronda,
+          competition_statuses[6]
+        );
+        break;
+    }
+
+    var equipos = [];
+    for (let i in round_teams) {
+      const temp_grupo = i.split(",")[0];
+      const response = await axios.get(
+        `http://localhost:3001/getGrupoById/${temp_grupo}`
+      );
+      equipos.push(response.data[0]);
+    }
+    return equipos;
+  };
+
+  const setNewRound = async (ronda) => {
     await axios.put("http://localhost:3001/updateCompetitionState", {
       value1: competition.ID,
-      value2: "4.ROUND_OF_16",
+      value2: ronda,
     });
-    console.log("ESTAMOS EN OCTAVOS");
   };
 
   const fetchPartidosDisponibles = async (id_competicion) => {
@@ -177,14 +288,12 @@ const Inicio = () => {
         `http://localhost:3001/checkPartidosDisponibles/${id_competicion}`
       );
       setIdMatchesReadyToPlay(avaliables.data);
-      //console.log("Readys: ", IdMatchesReadyToPlay);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   const fetchGroups = async (id_competicion, round) => {
-    console.log("RONDA: ", round);
     try {
       const teamsResponse = await axios.get(
         "http://localhost:3001/getGroupsByCompetition",
@@ -195,48 +304,96 @@ const Inicio = () => {
           },
         }
       );
-      const aaa = groupByLetra(teamsResponse.data);
+
       switch (round) {
         case competition_rounds[0].toUpperCase():
-          setGroups((prevDict) => ({ ...prevDict, Group_state: aaa }));
+          setGroups((prevDict) => ({
+            ...prevDict,
+            Group_state: groupByLetra(teamsResponse.data),
+          }));
           break;
         case competition_rounds[1].toUpperCase():
-          setGroups((prevDict) => ({ ...prevDict, Round_of_16: aaa }));
+          setGroups((prevDict) => ({
+            ...prevDict,
+            Round_of_16: groupByLetra(teamsResponse.data),
+          }));
           break;
         case competition_rounds[2].toUpperCase():
-          setGroups((prevDict) => ({ ...prevDict, Round_of_8: aaa }));
+          setGroups((prevDict) => ({
+            ...prevDict,
+            Round_of_8: groupByLetra(teamsResponse.data),
+          }));
           break;
         case competition_rounds[3].toUpperCase():
-          setGroups((prevDict) => ({ ...prevDict, Semifinals: aaa }));
+          setGroups((prevDict) => ({
+            ...prevDict,
+            Semifinals: groupByLetra(teamsResponse.data),
+          }));
           break;
         case competition_rounds[4].toUpperCase():
-          setGroups((prevDict) => ({ ...prevDict, Final: aaa }));
+          setGroups((prevDict) => ({
+            ...prevDict,
+            Final: groupByLetra(teamsResponse.data),
+          }));
           break;
 
         default:
           console.error("Numero de equipos a agrupar erroneo");
           break;
       }
-
-      setGroups((prevDict) => ({ ...prevDict, Group_state: aaa }));
     } catch (error) {
-      console.error("Error generando los grupos:", error);
+      console.error("Error recuperando los grupos:", error);
     }
   };
 
-  const fetchGroupMathes = async (id_competicion) => {
+  const fetchMathes = async (id_competicion, ronda) => {
     try {
       const teamsResponse = await axios.get(
         "http://localhost:3001/getMatchesByCompetition",
         {
           params: {
             value1: id_competicion,
-            value2: competition_rounds[0].toUpperCase(),
+            value2: ronda,
           },
         }
       );
-      const backend_matches_group_states = groupByJornada(teamsResponse.data);
-      setMatches(backend_matches_group_states);
+
+      switch (ronda) {
+        case competition_rounds[0].toUpperCase():
+          setMatches((prevDict) => ({
+            ...prevDict,
+            Group_state: groupByJornada(teamsResponse.data),
+          }));
+          break;
+        case competition_rounds[1].toUpperCase():
+          setMatches((prevDict) => ({
+            ...prevDict,
+            Round_of_16: teamsResponse.data,
+          }));
+          break;
+        case competition_rounds[2].toUpperCase():
+          setMatches((prevDict) => ({
+            ...prevDict,
+            Round_of_8: teamsResponse.data,
+          }));
+          break;
+        case competition_rounds[3].toUpperCase():
+          setMatches((prevDict) => ({
+            ...prevDict,
+            Semifinals: teamsResponse.data,
+          }));
+          break;
+        case competition_rounds[4].toUpperCase():
+          setMatches((prevDict) => ({
+            ...prevDict,
+            Final: teamsResponse.data,
+          }));
+          break;
+
+        default:
+          console.error("Numero de equipos a agrupar erroneo");
+          break;
+      }
       await fetchPartidosDisponibles(id_competicion);
     } catch (error) {
       console.error("Error generando los partidos:", error);
@@ -250,6 +407,75 @@ const Inicio = () => {
     }
     return results;
   }
+
+  const handleMatches2 = async (ronda) => {
+    let round_teams = {};
+    let fechaPartidosRonda = new Date("2023-12-20T00:00:00");
+    try {
+      switch (ronda) {
+        case competition_rounds[0].toUpperCase():
+          round_teams = groups.Group_state;
+          break;
+        case competition_rounds[1].toUpperCase():
+          round_teams = groups.Round_of_16;
+          fechaPartidosRonda = new Date("2023-12-20T00:00:00");
+          break;
+        case competition_rounds[2].toUpperCase():
+          round_teams = groups.Round_of_8;
+          fechaPartidosRonda = new Date("2024-01-10T00:00:00");
+          break;
+        case competition_rounds[3].toUpperCase():
+          round_teams = groups.Semifinals;
+          fechaPartidosRonda = new Date("2024-02-01T00:00:00");
+          break;
+        case competition_rounds[4].toUpperCase():
+          round_teams = groups.Final;
+          fechaPartidosRonda = new Date("2024-02-15T00:00:00");
+          break;
+
+        default:
+          console.error("Número de equipos a agrupar erroneo");
+          break;
+      }
+      const d = [
+        [0, 1],
+        [1, 0],
+      ];
+      for (let i = 0; i < 2 /*ida y vuelta */; i++) {
+        Object.keys(round_teams).map((letra) => {
+          var cuotas = makeCuotas(
+            round_teams[letra][d[i][0]].category,
+            round_teams[letra][d[i][1]].category
+          );
+          const formattedDate = fechaPartidosRonda
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+
+          axios.post("http://localhost:3001/addMatch", {
+            local: round_teams[letra][d[i][0]].name,
+            visitante: round_teams[letra][d[i][1]].name,
+            fecha: formattedDate,
+            location: round_teams[letra][d[i][0]].country,
+            stadium: round_teams[letra][d[i][0]].stadium,
+            grupo: round_teams[letra][d[i][0]].id_grupo,
+            cuota_local: cuotas[0],
+            cuota_empate: cuotas[1],
+            cuota_visitante: cuotas[2],
+          });
+        });
+        fechaPartidosRonda.setDate(fechaPartidosRonda.getDate() + 7);
+      }
+      await axios.put("http://localhost:3001/updateCompetitionState", {
+        value1: competition.ID,
+        value2: competition_statuses[competition.estado.split(".")[0]],
+      });
+
+      fetchCompetitionInfo();
+    } catch (error) {
+      console.error("Error al crear los partidos: ", error);
+    }
+  };
 
   const handleMatches = async () => {
     const order = [
@@ -314,18 +540,16 @@ const Inicio = () => {
 
       fetchCompetitionInfo();
     } catch (error) {
-      console.log("no va: ", error);
+      console.error("no va: ", error);
     }
   };
   const handleAdvance = async () => {
-    setLoading(true);
     if (IdMatchesReadyToPlay <= 0) {
       try {
         const readies = await axios.put("http://localhost:3001/avanzarUnDia", {
           value1: competition.ID,
         });
         setIdMatchesReadyToPlay(readies.data);
-        console.log("Readys: ", readies.data);
         readies.data.forEach(async (element) => {
           await axios.put("http://localhost:3001/partidoDisponible", {
             value1: element.Idd,
@@ -397,7 +621,7 @@ const Inicio = () => {
     switch (teamsInRound) {
       case 32:
         round_teams = teams.Group_state;
-        ronda = "GROUP_STATES";
+        ronda = "GROUP_STATE";
         break;
       case 16:
         round_teams = teams.Round_of_16;
@@ -422,7 +646,6 @@ const Inicio = () => {
     }
     try {
       //TODO: Asegurarse de que el teamsInRound es una ronda
-      setLoading(true);
       // Randomly sort the teams and group them into 8 groups with 4 teams each
 
       const shuffledTeams = round_teams.sort(() => 0.5 - Math.random());
@@ -488,7 +711,6 @@ const Inicio = () => {
         value1: competition.ID,
         value2: competition_statuses[competition.estado.split(".")[0]],
       });
-
       fetchCompetitionInfo();
     } catch (error) {
       console.error("Error grouping teams:", error);
@@ -510,7 +732,7 @@ const Inicio = () => {
             ))}
 
             <button
-              onClick={() => handleGroupTeams("Group_state", 4)}
+              onClick={() => handleGroupTeams(32, 4)}
               disabled={loading || +competition?.estado.split(".")[0] > 1}
             >
               Hacer Grupos
@@ -556,12 +778,16 @@ const Inicio = () => {
             <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
             <button
               onClick={handleAdvance}
-              disabled={loading || +competition?.estado.split(".")[0] !== 3}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 3 ||
+                IdMatchesReadyToPlay.length != 0
+              }
             >
               Avanzar
             </button>
-            {matches != [] &&
-              matches.map((jornada, index) => (
+            {matches.Group_state != [] &&
+              matches.Group_state.map((jornada, index) => (
                 <div key={index}>
                   <h2>JORNADA {index + 1}:</h2>
                   {jornada.map((match, index) => (
@@ -645,11 +871,386 @@ const Inicio = () => {
               </div>
             ))}
             <button
-              onClick={handleMatches}
-              disabled={loading || +competition?.estado.split(".")[0] > 4}
+              onClick={() =>
+                handleMatches2(competition_rounds[1].toUpperCase())
+              }
+              disabled={loading || +competition?.estado.split(".")[0] < 4}
             >
               Generar Partidos
             </button>
+          </div>
+        );
+      case "6":
+        return (
+          <div>
+            <h2>PARTIDOS: </h2>
+            <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
+            <button
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 6 ||
+                IdMatchesReadyToPlay.length != 0
+              }
+            >
+              Avanzar
+            </button>
+            {matches.Round_of_16 != [] &&
+              matches.Round_of_16.map((match, index) => (
+                <div key={index}>
+                  <div
+                    onClick={() =>
+                      navigate(`/partido/${match.Idd}`, {
+                        state: { match: match.Idd, usuario: user },
+                      })
+                    }
+                  >
+                    <h3>
+                      {match.club_local} {match.marcador_local} -{" "}
+                      {match.marcador_visitante} {match.club_visitante}
+                    </h3>
+                  </div>
+                  <p>
+                    - {match.stadium} in {match.location}
+                  </p>
+                  <p>- {match.fecha}</p>
+                  <button
+                    onClick={() =>
+                      handleSimular(
+                        match.Idd,
+                        match.club_local,
+                        match.club_visitante,
+                        match.id_group
+                      )
+                    }
+                    disabled={
+                      loading || match.estado_partido !== "READY_TO_PLAY"
+                    }
+                  >
+                    JUGAR PARTIDO
+                  </button>
+                </div>
+              ))}
+          </div>
+        );
+      case "7":
+        return (
+          <div>
+            <h2>Teams cuartos:</h2>
+            {teams.Round_of_8.map((team) => (
+              <p key={team.id}>
+                {team.name}, {team.country}
+              </p>
+            ))}
+
+            <button
+              onClick={() => handleGroupTeams(8, 2)}
+              disabled={loading || +competition?.estado.split(".")[0] != 7}
+            >
+              Sorteo Eliminatorias
+            </button>
+          </div>
+        );
+      case "8":
+        return (
+          <div>
+            <h2>CUARTOS de final:</h2>
+            {Object.keys(groups.Round_of_8).map((letra, index) => (
+              <div key={index}>
+                <div
+                  onClick={() =>
+                    navigate(`/grupo/${letra.split(",")[0]}`, {
+                      state: { group: letra.split(",")[0], usuario: user },
+                    })
+                  }
+                >
+                  <h3>Octavos {letra.split(",")[1]}:</h3>
+                  {groups.Round_of_8[letra].map((team, index) => (
+                    <div key={index}>
+                      - {team.name} - {team.country}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() =>
+                handleMatches2(competition_rounds[2].toUpperCase())
+              }
+              disabled={loading || +competition?.estado.split(".")[0] != 8}
+            >
+              Generar Partidos
+            </button>
+          </div>
+        );
+      case "9":
+        return (
+          <div>
+            <h2>PARTIDOS: </h2>
+            <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
+            <button
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 9 ||
+                IdMatchesReadyToPlay.length != 0
+              }
+            >
+              Avanzar
+            </button>
+            {matches.Round_of_8 != [] &&
+              matches.Round_of_8.map((match, index) => (
+                <div key={index}>
+                  <div
+                    onClick={() =>
+                      navigate(`/partido/${match.Idd}`, {
+                        state: { match: match.Idd, usuario: user },
+                      })
+                    }
+                  >
+                    <h3>
+                      {match.club_local} {match.marcador_local} -{" "}
+                      {match.marcador_visitante} {match.club_visitante}
+                    </h3>
+                  </div>
+                  <p>
+                    - {match.stadium} in {match.location}
+                  </p>
+                  <p>- {match.fecha}</p>
+                  <button
+                    onClick={() =>
+                      handleSimular(
+                        match.Idd,
+                        match.club_local,
+                        match.club_visitante,
+                        match.id_group
+                      )
+                    }
+                    disabled={
+                      loading || match.estado_partido !== "READY_TO_PLAY"
+                    }
+                  >
+                    JUGAR PARTIDO
+                  </button>
+                </div>
+              ))}
+          </div>
+        );
+      case "10":
+        return (
+          <div>
+            <h2>Teams Semifinales:</h2>
+            {teams.Semifinals.map((team) => (
+              <p key={team.id}>
+                {team.name}, {team.country}
+              </p>
+            ))}
+
+            <button
+              onClick={() => handleGroupTeams(4, 2)}
+              disabled={loading || +competition?.estado.split(".")[0] != 10}
+            >
+              Sorteo Semifinales
+            </button>
+          </div>
+        );
+      case "11":
+        return (
+          <div>
+            <h2>SEMIFINALES:</h2>
+            {Object.keys(groups.Semifinals).map((letra, index) => (
+              <div key={index}>
+                <div
+                  onClick={() =>
+                    navigate(`/grupo/${letra.split(",")[0]}`, {
+                      state: { group: letra.split(",")[0], usuario: user },
+                    })
+                  }
+                >
+                  <h3>Octavos {letra.split(",")[1]}:</h3>
+                  {groups.Semifinals[letra].map((team, index) => (
+                    <div key={index}>
+                      - {team.name} - {team.country}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() =>
+                handleMatches2(competition_rounds[3].toUpperCase())
+              }
+              disabled={loading || +competition?.estado.split(".")[0] !== 11}
+            >
+              Generar Partidos
+            </button>
+          </div>
+        );
+      case "12":
+        return (
+          <div>
+            <h2>PARTIDOS: </h2>
+            <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
+            <button
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 12 ||
+                IdMatchesReadyToPlay.length != 0
+              }
+            >
+              Avanzar
+            </button>
+            {matches.Semifinals != [] &&
+              matches.Semifinals.map((match, index) => (
+                <div key={index}>
+                  <div
+                    onClick={() =>
+                      navigate(`/partido/${match.Idd}`, {
+                        state: { match: match.Idd, usuario: user },
+                      })
+                    }
+                  >
+                    <h3>
+                      {match.club_local} {match.marcador_local} -{" "}
+                      {match.marcador_visitante} {match.club_visitante}
+                    </h3>
+                  </div>
+                  <p>
+                    - {match.stadium} in {match.location}
+                  </p>
+                  <p>- {match.fecha}</p>
+                  <button
+                    onClick={() =>
+                      handleSimular(
+                        match.Idd,
+                        match.club_local,
+                        match.club_visitante,
+                        match.id_group
+                      )
+                    }
+                    disabled={
+                      loading || match.estado_partido !== "READY_TO_PLAY"
+                    }
+                  >
+                    JUGAR PARTIDO
+                  </button>
+                </div>
+              ))}
+          </div>
+        );
+      case "13":
+        return (
+          <div>
+            <h2>Teams Final:</h2>
+            {teams.Final.map((team) => (
+              <p key={team.id}>
+                {team.name}, {team.country}
+              </p>
+            ))}
+
+            <button
+              onClick={() => handleGroupTeams(2, 2)}
+              disabled={loading || +competition?.estado.split(".")[0] != 13}
+            >
+              Sorteo Final
+            </button>
+          </div>
+        );
+      case "14":
+        return (
+          <div>
+            <h2>FINAL:</h2>
+            {Object.keys(groups.Final).map((letra, index) => (
+              <div key={index}>
+                <div
+                  onClick={() =>
+                    navigate(`/grupo/${letra.split(",")[0]}`, {
+                      state: { group: letra.split(",")[0], usuario: user },
+                    })
+                  }
+                >
+                  <h3>FINAL {letra.split(",")[1]}:</h3>
+                  {groups.Final[letra].map((team, index) => (
+                    <div key={index}>
+                      - {team.name} - {team.country}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={() =>
+                handleMatches2(competition_rounds[4].toUpperCase())
+              }
+              disabled={loading || +competition?.estado.split(".")[0] !== 14}
+            >
+              Generar Partidos
+            </button>
+          </div>
+        );
+      case "15":
+        return (
+          <div>
+            <h2>PARTIDOS: </h2>
+            <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
+            <button
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 15 ||
+                IdMatchesReadyToPlay.length != 0
+              }
+            >
+              Avanzar
+            </button>
+            {matches.Final != [] &&
+              matches.Final.map((match, index) => (
+                <div key={index}>
+                  <div
+                    onClick={() =>
+                      navigate(`/partido/${match.Idd}`, {
+                        state: { match: match.Idd, usuario: user },
+                      })
+                    }
+                  >
+                    <h3>
+                      {match.club_local} {match.marcador_local} -{" "}
+                      {match.marcador_visitante} {match.club_visitante}
+                    </h3>
+                  </div>
+                  <p>
+                    - {match.stadium} in {match.location}
+                  </p>
+                  <p>- {match.fecha}</p>
+                  <button
+                    onClick={() =>
+                      handleSimular(
+                        match.Idd,
+                        match.club_local,
+                        match.club_visitante,
+                        match.id_group
+                      )
+                    }
+                    disabled={
+                      loading || match.estado_partido !== "READY_TO_PLAY"
+                    }
+                  >
+                    JUGAR PARTIDO
+                  </button>
+                </div>
+              ))}
+          </div>
+        );
+      case "16":
+        return (
+          <div>
+            <h2>CHAMPIONS:</h2>
+            {teams.Champion.map((team) => (
+              <p key={team.id}>
+                {team.name}, {team.country}
+              </p>
+            ))}
           </div>
         );
 

@@ -16,7 +16,7 @@ controller.crearCompeticion = (req, res) => {
         }
         const idd = competicion.insertId;
         res.json(idd);
-        console.log("COMPETICION CREADA");
+        console.log("COMPETICIÓN CREADA");
       }
     );
   });
@@ -45,7 +45,7 @@ controller.updateCompetitionState = (req, res) => {
 
 controller.avanzarUnDia = (req, res) => {
   const idd = req.body.value1;
-  console.log("id: ",idd);
+  console.log("id: ", idd);
 
   req.getConnection((err, conn) => {
     if (err) {
@@ -63,9 +63,10 @@ controller.avanzarUnDia = (req, res) => {
           [idd],
           (errr, estado) => {
             if (errr) {
+              console.error("Error al cambiar de fecha");
               res.json(errr); //manejar los errores con next (mas profesional)
             }
-            console.log("eeeee: ",estado);
+            console.log("eeeee: ", estado);
             res.json(estado);
           }
         );
@@ -122,7 +123,7 @@ controller.getTeamNamesByIDpartido = (req, res) => {
         if (err) {
           console.error("Fallo al get competicion debido a: ", err);
         }
-        console.log("Competicion encontrada");
+        console.log("Nombre de equipos encontrados");
         res.json(partida);
       }
     );
@@ -188,7 +189,7 @@ controller.guardarGrupo = (req, res) => {
       (errr, grupo, next) => {
         if (errr) {
           console.log(`Error al insertar el grupo: ${errr}`);
-          return json(errr);
+          res.json(errr);
         }
         const ddd = grupo.insertId;
         console.log("GRUPO CREADO: ", ddd);
@@ -209,7 +210,7 @@ controller.guardarPartido = (req, res) => {
   const cuotaEmpate = req.body.cuota_empate;
   const cuotaVisitante = req.body.cuota_visitante;
 
-  console.log("cuotas: ",cuotaLocal,cuotaEmpate,cuotaVisitante);
+  console.log("cuotas: ", cuotaLocal, cuotaEmpate, cuotaVisitante);
 
 
   req.getConnection((err, conn) => {
@@ -218,7 +219,7 @@ controller.guardarPartido = (req, res) => {
     }
     conn.query(
       "INSERT INTO partido (club_local, club_visitante,fecha, location,stadium,id_group,cuota_local,cuota_empate,cuota_visitante) VALUES (?, ?, ?,?,?,?,?,?,?)",
-      [local, visitante, fecha, location, stadium, grupo,cuotaLocal,cuotaEmpate,cuotaVisitante],
+      [local, visitante, fecha, location, stadium, grupo, cuotaLocal, cuotaEmpate, cuotaVisitante],
       (errr, grupo) => {
         if (errr) {
           console.log(`Error al insertar el partido: ${errr}`);
