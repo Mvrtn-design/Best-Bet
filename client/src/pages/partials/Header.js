@@ -1,7 +1,10 @@
-import React from "react";
+import { React, useContext } from "react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../helpers/AuthContext";
+
 
 function Header() {
+  const { authState } = useContext(AuthContext);
   return (
     <header>
       <nav className="header">
@@ -16,7 +19,7 @@ function Header() {
             INICIO
           </Link>
           <Link to="/clubs">CLUBS</Link>
-          <Link to="/login">USUARIO</Link>
+          {authState.status ? <Link to="/profile">{authState.username}</Link> : <Link to="/login">INICIAR SESIÓN</Link>}
         </div>
       </nav>
     </header>

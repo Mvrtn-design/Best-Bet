@@ -1,8 +1,11 @@
 import React from "react";
+import Popup from "./partials/Popup";
 import Layout from "./partials/Layout";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
+
+import "../Appp.css";
 
 const Inicio = () => {
   const competition_statuses = [
@@ -19,7 +22,7 @@ const Inicio = () => {
     "11.SEMIFINALS-GROUPED",
     "12.SEMIFINALS-MATCHED",
     "13.FINAL",
-    "14.FINAL-TEAMS",
+    "14.FINAL-GROUPED",
     "15.FINAL-MATCHED",
     "16.ENDED",
   ];
@@ -44,7 +47,7 @@ const Inicio = () => {
     Final: [],
     Champion: [],
   });
-  const [user, setUSer] = useState({
+  const [user, setUser] = useState({
     ID: 0,
     nombre_usuario: 0,
     monedas: 0,
@@ -64,9 +67,24 @@ const Inicio = () => {
     Semifinals: {},
     Final: {},
   });
+  const [sidebar, setSidebar] = useState({
+    open: false,
+    match: null,
+    coinBet: 0,
+    odd: 0,
+    betChoice: null,
+  });
+  const [notifications, setNotificaction] = useState({
+    apuestas_ganadas: 0,
+    apuestas_perdidas: 0,
+    apuestas_sin_finalizar: 0,
+  });
   const [currentSection, setCurrentSection] = useState(competition_statuses[0]);
   const [loading, setLoading] = useState(true);
   const [IdMatchesReadyToPlay, setIdMatchesReadyToPlay] = useState([]);
+  const [bets, setBets] = useState([]);
+  const [openPopup, setopenPopup] = useState(false);
+  const [betCard, setBetCart] = useState(false);
   const fechas = {
     octavos: new Date("2023-12-01T00:00:00").toISOString().slice(0, 24),
     cuartos: new Date("2024-01-05T00:00:00").toISOString().slice(0, 24),
@@ -86,119 +104,229 @@ const Inicio = () => {
     }
     try {
       const user_backend_data = await axios.get(
-        `http://localhost:3001/getUSerByPartida/${idPartida}`
+        `http://localhost:3001/getUSerByPartida/${idPartida}`,
+        { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
       );
       const response = await axios.get(
         `http://localhost:3001/getCompeticionByPartida/${idPartida}`
       );
+      if (user_backend_data.data.error) {
+        alert(user_backend_data.data.error);
+        console.error(user_backend_data.error);
+        navigate("/");
+      } else {
+        const Competition_data = response.data[0];
 
-      const Competition_data = response.data[0];
+        setUser({
+          ID: user_backend_data.data[0].id,
+          monedas: user_backend_data.data[0].monedas,
+          nombre_usuario: user_backend_data.data[0].nombre_usuario,
+        });
 
-      setUSer({
-        ID: user_backend_data.data[0].id,
-        monedas: user_backend_data.data[0].monedas,
-        nombre_usuario: user_backend_data.data[0].nombre_usuario,
-      });
+        setCompetition({
+          ID: Competition_data.ID,
+          temporada: Competition_data.temporada,
+          estado: Competition_data.estado,
+          dia: Competition_data.dia,
+        });
 
-      setCompetition({
-        ID: Competition_data.ID,
-        temporada: Competition_data.temporada,
-        estado: Competition_data.estado,
-        dia: Competition_data.dia,
-      });
+        ////////////////////////////////////////////////
+        ///     SEGÚN ESTADO DE LA COMPETICIÓN      ////
+        ////////////////////////////////////////////////
+        /// GRUPOS
+        if (Competition_data.estado.split(".")[0] >= 1) {
+          const teamsResponse = await axios.get(
+            `http://localhost:3001/getSomeClubesByCategory/${32}`
+          );
+          setTeams({ Group_state: teamsResponse.data });
+        }
+        if (Competition_data.estado.split(".")[0] > 1) {
+          fetchGroups(Competition_data.ID, competition_rounds[0].toUpperCase());
+        }
+        if (Competition_data.estado.split(".")[0] > 2) {
+          fetchMathes(Competition_data.ID, competition_rounds[0].toUpperCase());
+          fetchPartidosDisponibles(Competition_data.ID);
+          if (fechas.octavos == competition.dia) {
+            setNewRound(competition_statuses[3]);
+          }
+          /// OCTAVOS
+        }
+        if (Competition_data.estado.split(".")[0] > 3) {
+          const oct = await fetchOctavosFinal();
+          setTeams((prevDict) => ({ ...prevDict, Round_of_16: oct }));
+        }
+        if (Competition_data.estado.split(".")[0] > 4) {
+          fetchGroups(Competition_data.ID, competition_rounds[1].toUpperCase());
+          fetchMathes(Competition_data.ID, competition_rounds[1].toUpperCase());
+        }
+        if (Competition_data.estado.split(".")[0] > 5) {
+          fetchPartidosDisponibles(Competition_data.ID);
+          if (fechas.cuartos == competition.dia) {
+            setNewRound(competition_statuses[6]);
+          }
+          //////  CUARTOS
+        }
+        if (Competition_data.estado.split(".")[0] > 6) {
+          const oct = await fetchClasificados(competition_rounds[1]);
+          setTeams((prevDict) => ({ ...prevDict, Round_of_8: oct }));
+        }
+        if (Competition_data.estado.split(".")[0] > 7) {
+          fetchGroups(Competition_data.ID, competition_rounds[2].toUpperCase());
+          fetchMathes(Competition_data.ID, competition_rounds[2].toUpperCase());
+        }
+        if (Competition_data.estado.split(".")[0] > 8) {
+          fetchPartidosDisponibles(Competition_data.ID);
+          if (fechas.Semifinales == competition.dia) {
+            setNewRound(competition_statuses[9]);
+          }
+          /// SEMIFINALES
+        }
+        if (Competition_data.estado.split(".")[0] > 9) {
+          const semis = await fetchClasificados(competition_rounds[2]);
+          setTeams((prevDict) => ({ ...prevDict, Semifinals: semis }));
+        }
+        if (Competition_data.estado.split(".")[0] > 10) {
+          fetchGroups(Competition_data.ID, competition_rounds[3].toUpperCase());
+          fetchMathes(Competition_data.ID, competition_rounds[3].toUpperCase());
+        }
+        if (Competition_data.estado.split(".")[0] > 11) {
+          fetchPartidosDisponibles(Competition_data.ID);
+          if (fechas.final == competition.dia) {
+            setNewRound(competition_statuses[12]);
+          }
+        }
+        //// FINAL
+        if (Competition_data.estado.split(".")[0] > 12) {
+          const semis = await fetchClasificados(competition_rounds[3]);
+          setTeams((prevDict) => ({ ...prevDict, Final: semis }));
+        }
+        if (Competition_data.estado.split(".")[0] > 13) {
+          fetchGroups(Competition_data.ID, competition_rounds[4].toUpperCase());
+          fetchMathes(Competition_data.ID, competition_rounds[4].toUpperCase());
+        }
+        if (Competition_data.estado.split(".")[0] > 14) {
+          fetchPartidosDisponibles(Competition_data.ID);
+          if (fechas.Champion == competition.dia) {
+            setNewRound(competition_statuses[15]);
+          }
+        }
+        //////// CHAMPION
+        if (Competition_data.estado.split(".")[0] > 15) {
+          const semis = await fetchClasificados(competition_rounds[4]);
+          setTeams((prevDict) => ({ ...prevDict, Champion: semis }));
+        }
 
-      ////////////////////////////////////////////////
-      ///     SEGÚN ESTADO DE LA COMPETICIÓN      ////
-      ////////////////////////////////////////////////
-      /// GRUPOS
-      if (Competition_data.estado.split(".")[0] >= 1) {
-        const teamsResponse = await axios.get(
-          `http://localhost:3001/getSomeClubesByCategory/${32}`
-        );
-        setTeams({ Group_state: teamsResponse.data });
+        setLoading(false);
       }
-      if (Competition_data.estado.split(".")[0] > 1) {
-        fetchGroups(Competition_data.ID, competition_rounds[0].toUpperCase());
-      }
-      if (Competition_data.estado.split(".")[0] > 2) {
-        fetchMathes(Competition_data.ID, competition_rounds[0].toUpperCase());
-        fetchPartidosDisponibles(Competition_data.ID);
-        if (fechas.octavos == competition.dia) {
-          setNewRound(competition_statuses[3]);
-        }
-        /// OCTAVOS
-      }
-      if (Competition_data.estado.split(".")[0] > 3) {
-        const oct = await fetchOctavosFinal();
-        setTeams((prevDict) => ({ ...prevDict, Round_of_16: oct }));
-      }
-      if (Competition_data.estado.split(".")[0] > 4) {
-        fetchGroups(Competition_data.ID, competition_rounds[1].toUpperCase());
-        fetchMathes(Competition_data.ID, competition_rounds[1].toUpperCase());
-      }
-      if (Competition_data.estado.split(".")[0] > 5) {
-        fetchPartidosDisponibles(Competition_data.ID);
-        if (fechas.cuartos == competition.dia) {
-          setNewRound(competition_statuses[6]);
-        }
-        //////  CUARTOS
-      }
-      if (Competition_data.estado.split(".")[0] > 6) {
-        const oct = await fetchClasificados(competition_rounds[1]);
-        setTeams((prevDict) => ({ ...prevDict, Round_of_8: oct }));
-      }
-      if (Competition_data.estado.split(".")[0] > 7) {
-        fetchGroups(Competition_data.ID, competition_rounds[2].toUpperCase());
-        fetchMathes(Competition_data.ID, competition_rounds[2].toUpperCase());
-      }
-      if (Competition_data.estado.split(".")[0] > 8) {
-        fetchPartidosDisponibles(Competition_data.ID);
-        if (fechas.Semifinales == competition.dia) {
-          setNewRound(competition_statuses[9]);
-        }
-        /// SEMIFINALES
-      }
-      if (Competition_data.estado.split(".")[0] > 9) {
-        const semis = await fetchClasificados(competition_rounds[2]);
-        setTeams((prevDict) => ({ ...prevDict, Semifinals: semis }));
-      }
-      if (Competition_data.estado.split(".")[0] > 10) {
-        fetchGroups(Competition_data.ID, competition_rounds[3].toUpperCase());
-        fetchMathes(Competition_data.ID, competition_rounds[3].toUpperCase());
-      }
-      if (Competition_data.estado.split(".")[0] > 11) {
-        fetchPartidosDisponibles(Competition_data.ID);
-        if (fechas.final == competition.dia) {
-          setNewRound(competition_statuses[12]);
-        }
-      }
-      //// FINAL
-      if (Competition_data.estado.split(".")[0] > 12) {
-        const semis = await fetchClasificados(competition_rounds[3]);
-        setTeams((prevDict) => ({ ...prevDict, Final: semis }));
-      }
-      if (Competition_data.estado.split(".")[0] > 13) {
-        fetchGroups(Competition_data.ID, competition_rounds[4].toUpperCase());
-        fetchMathes(Competition_data.ID, competition_rounds[4].toUpperCase());
-      }
-      if (Competition_data.estado.split(".")[0] > 14) {
-        fetchPartidosDisponibles(Competition_data.ID);
-        if (fechas.Champion == competition.dia) {
-          setNewRound(competition_statuses[15]);
-        }
-      }
-      //////// CHAMPION
-      if (Competition_data.estado.split(".")[0] > 15) {
-        const semis = await fetchClasificados(competition_rounds[4]);
-        setTeams((prevDict) => ({ ...prevDict, Champion: semis }));
-      }
-
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching competition info: ", error);
       setLoading(false);
     }
   }
+  const handleBetIncrease = () => {
+    if (user.monedas > 0) {
+      setSidebar((prevSidebar) => ({
+        ...prevSidebar,
+        coinBet: sidebar.coinBet + 1,
+      }));
+    }
+  };
+  const handleBetDecrease = () => {
+    if (sidebar.coinBet > 0) {
+      setSidebar((prevSidebar) => ({
+        ...prevSidebar,
+        coinBet: sidebar.coinBet - 1,
+      }));
+    }
+  };
+  const handleBetClose = () => {
+    setSidebar({
+      open: false,
+      matchId: null,
+      coinBet: 0,
+      odd: 0,
+      betChoice: null,
+    });
+  };
+  const handleBetSubmit = (temp_bar) => {
+    const bet_status = "ON_GOING"; // ON_GOING | WINNER | LOOSER
+    const newBet = {
+      match: temp_bar.match,
+      amount_bet: temp_bar.coinBet,
+      choice: temp_bar.betChoice,
+      odd: temp_bar.odd,
+      estado_partido: bet_status,
+    };
+    setBets((prevBets) => [...prevBets, newBet]);
+    setSidebar({
+      open: false,
+      matchId: null,
+      coinBet: 0,
+      odd: 0,
+      betChoice: null,
+    });
+
+    setUser({ ...user, monedas: user.monedas - temp_bar.coinBet });
+  };
+  const openBetCard = () => {
+    setBetCart(true);
+  };
+  const closeBetCard = () => {
+    setBetCart(false);
+  };
+  const checkBetResults = () => {
+    const temp_notification = {
+      apuestas_ganadas: 0,
+      apuestas_perdidas: 0,
+      apuestas_sin_finalizar: 0,
+    };
+
+    let cash_won = 0;
+
+    for (let i = 0; i < bets.length; i++) {
+      const match_aux = findMatchById(bets[i].match.Idd, bets[i].match.ronda);
+
+      if (match_aux.estado_partido === "FINISHED") {
+        console.log("Match  finished");
+
+        let match_result = "";
+        if (match_aux.localGoals > match_aux.awayGoals) {
+          match_result = "Local";
+        } else if (match_aux.localGoals < match_aux.awayGoals) {
+          match_result = "Away";
+        } else {
+          match_result = "Draw";
+        }
+        let decitiion = "";
+        if (bets[i].choice === match_result) {
+          temp_notification.apuestas_ganadas++;
+          decitiion = `WINNER (+ ${bets[i].amount_bet * bets[i].odd})`;
+          cash_won += bets[i].amount_bet * bets[i].odd;
+        } else {
+          decitiion = "LOOSER";
+          temp_notification.apuestas_perdidas++;
+        }
+        const newBets = [...bets];
+        newBets[i].estado_partido = decitiion;
+        setBets(newBets);
+      } else {
+        temp_notification.apuestas_sin_finalizar++;
+      }
+    }
+
+    setNotificaction((prevNotifications) => ({
+      ...prevNotifications,
+      apuestas_sin_finalizar: temp_notification.apuestas_sin_finalizar,
+      apuestas_ganadas: temp_notification.apuestas_ganadas,
+      apuestas_perdidas: temp_notification.apuestas_perdidas,
+    }));
+    setopenPopup(true);
+
+    setUser({
+      ...user,
+      monedas: user.monedas + cash_won,
+    });
+  };
 
   function groupByLetra(equipos) {
     return equipos.reduce((grupos, item) => {
@@ -212,9 +340,9 @@ const Inicio = () => {
       return grupos;
     }, {});
   }
+
   function groupByJornada(partidos) {
     const result = [];
-
     const chunkSize = Math.ceil(partidos.length / 6);
 
     for (let i = 0; i < partidos.length; i += chunkSize) {
@@ -276,10 +404,14 @@ const Inicio = () => {
   };
 
   const setNewRound = async (ronda) => {
-    await axios.put("http://localhost:3001/updateCompetitionState", {
-      value1: competition.ID,
-      value2: ronda,
-    });
+    await axios.put(
+      "http://localhost:3001/updateCompetitionState",
+      { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+      {
+        value1: competition.ID,
+        value2: ronda,
+      }
+    );
   };
 
   const fetchPartidosDisponibles = async (id_competicion) => {
@@ -407,6 +539,52 @@ const Inicio = () => {
     }
     return results;
   }
+  const findMatchById = (id, ronda) => {
+    console.log("DATOS: ", id, ronda);
+    switch (ronda) {
+      case competition_rounds[0].toUpperCase():
+        console.log("gruuu");
+        console.log(matches.Group_state);
+        return matches.Group_state.find((match) => match.Idd === id) || null;
+        break;
+      case competition_rounds[1].toUpperCase():
+        return matches.Round_of_16.find((match) => match.Idd === id) || null;
+        break;
+      case competition_rounds[2].toUpperCase():
+        return matches.Round_of_8.find((match) => match.Idd === id) || null;
+        break;
+      case competition_rounds[3].toUpperCase():
+        return matches.Semifinals.find((match) => match.Idd === id) || null;
+        break;
+      case competition_rounds[4].toUpperCase():
+        return matches.Final.find((match) => match.Idd === id) || null;
+        break;
+      default:
+        console.error("Error al encotrar el partido");
+        return null;
+        break;
+    }
+  };
+
+  const handleBet = (match, bet_choice) => {
+    var odd = 0;
+    switch (bet_choice) {
+      case "Local":
+        odd = match.cuota_local;
+        break;
+      case "Draw":
+        odd = match.cuota_empate;
+        break;
+      case "Away":
+        odd = match.cuota_visitante;
+        break;
+
+      default:
+        console.error("WARNING: Tipo apuesta no encontrada");
+        break;
+    }
+    setSidebar({ open: true, match, coinBet: 0, odd, betChoice: bet_choice });
+  };
 
   const handleMatches2 = async (ronda) => {
     let round_teams = {};
@@ -452,24 +630,32 @@ const Inicio = () => {
             .slice(0, 19)
             .replace("T", " ");
 
-          axios.post("http://localhost:3001/addMatch", {
-            local: round_teams[letra][d[i][0]].name,
-            visitante: round_teams[letra][d[i][1]].name,
-            fecha: formattedDate,
-            location: round_teams[letra][d[i][0]].country,
-            stadium: round_teams[letra][d[i][0]].stadium,
-            grupo: round_teams[letra][d[i][0]].id_grupo,
-            cuota_local: cuotas[0],
-            cuota_empate: cuotas[1],
-            cuota_visitante: cuotas[2],
-          });
+          axios.post(
+            "http://localhost:3001/addMatch",
+            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+            {
+              local: round_teams[letra][d[i][0]].name,
+              visitante: round_teams[letra][d[i][1]].name,
+              fecha: formattedDate,
+              location: round_teams[letra][d[i][0]].country,
+              stadium: round_teams[letra][d[i][0]].stadium,
+              grupo: round_teams[letra][d[i][0]].id_grupo,
+              cuota_local: cuotas[0],
+              cuota_empate: cuotas[1],
+              cuota_visitante: cuotas[2],
+            }
+          );
         });
         fechaPartidosRonda.setDate(fechaPartidosRonda.getDate() + 7);
       }
-      await axios.put("http://localhost:3001/updateCompetitionState", {
-        value1: competition.ID,
-        value2: competition_statuses[competition.estado.split(".")[0]],
-      });
+      await axios.put(
+        "http://localhost:3001/updateCompetitionState",
+        { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+        {
+          value1: competition.ID,
+          value2: competition_statuses[competition.estado.split(".")[0]],
+        }
+      );
 
       fetchCompetitionInfo();
     } catch (error) {
@@ -502,41 +688,53 @@ const Inicio = () => {
             .slice(0, 19)
             .replace("T", " ");
 
-          axios.post("http://localhost:3001/addMatch", {
-            local: groups.Group_state[letra][order[i][0]].name,
-            visitante: groups.Group_state[letra][order[i][1]].name,
-            fecha: formattedDate,
-            location: groups.Group_state[letra][order[i][0]].country,
-            stadium: groups.Group_state[letra][order[i][0]].stadium,
-            grupo: groups.Group_state[letra][order[i][0]].id_grupo,
-            cuota_local: cuotas[0],
-            cuota_empate: cuotas[1],
-            cuota_visitante: cuotas[2],
-          });
+          axios.post(
+            "http://localhost:3001/addMatch",
+            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+            {
+              local: groups.Group_state[letra][order[i][0]].name,
+              visitante: groups.Group_state[letra][order[i][1]].name,
+              fecha: formattedDate,
+              location: groups.Group_state[letra][order[i][0]].country,
+              stadium: groups.Group_state[letra][order[i][0]].stadium,
+              grupo: groups.Group_state[letra][order[i][0]].id_grupo,
+              cuota_local: cuotas[0],
+              cuota_empate: cuotas[1],
+              cuota_visitante: cuotas[2],
+            }
+          );
 
           cuotas = makeCuotas(
             groups.Group_state[letra][order[i][2]].category,
             groups.Group_state[letra][order[i][3]].category
           );
 
-          axios.post("http://localhost:3001/addMatch", {
-            local: groups.Group_state[letra][order[i][2]].name,
-            visitante: groups.Group_state[letra][order[i][3]].name,
-            fecha: formattedDate,
-            location: groups.Group_state[letra][order[i][2]].country,
-            stadium: groups.Group_state[letra][order[i][2]].stadium,
-            grupo: groups.Group_state[letra][order[i][2]].id_grupo,
-            cuota_local: cuotas[0],
-            cuota_empate: cuotas[1],
-            cuota_visitante: cuotas[2],
-          });
+          axios.post(
+            "http://localhost:3001/addMatch",
+            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+            {
+              local: groups.Group_state[letra][order[i][2]].name,
+              visitante: groups.Group_state[letra][order[i][3]].name,
+              fecha: formattedDate,
+              location: groups.Group_state[letra][order[i][2]].country,
+              stadium: groups.Group_state[letra][order[i][2]].stadium,
+              grupo: groups.Group_state[letra][order[i][2]].id_grupo,
+              cuota_local: cuotas[0],
+              cuota_empate: cuotas[1],
+              cuota_visitante: cuotas[2],
+            }
+          );
         });
         fech.setDate(fech.getDate() + 14);
       }
-      await axios.put("http://localhost:3001/updateCompetitionState", {
-        value1: competition.ID,
-        value2: "3.MATCHED",
-      });
+      await axios.put(
+        "http://localhost:3001/updateCompetitionState",
+        { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+        {
+          value1: competition.ID,
+          value2: "3.MATCHED",
+        }
+      );
 
       fetchCompetitionInfo();
     } catch (error) {
@@ -546,14 +744,22 @@ const Inicio = () => {
   const handleAdvance = async () => {
     if (IdMatchesReadyToPlay <= 0) {
       try {
-        const readies = await axios.put("http://localhost:3001/avanzarUnDia", {
-          value1: competition.ID,
-        });
+        const readies = await axios.put(
+          "http://localhost:3001/avanzarUnDia",
+          { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+          {
+            value1: competition.ID,
+          }
+        );
         setIdMatchesReadyToPlay(readies.data);
         readies.data.forEach(async (element) => {
-          await axios.put("http://localhost:3001/partidoDisponible", {
-            value1: element.Idd,
-          });
+          await axios.put(
+            "http://localhost:3001/partidoDisponible",
+            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+            {
+              value1: element.Idd,
+            }
+          );
         });
         fetchCompetitionInfo();
       } catch (error) {
@@ -571,6 +777,7 @@ const Inicio = () => {
 
     await axios.put(
       `http://localhost:3001/updateResultadoPartido/${id_match}`,
+      { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
       {
         value1: marcador_local,
         value2: marcador_visitante,
@@ -581,6 +788,7 @@ const Inicio = () => {
     //Local
     await axios.put(
       `http://localhost:3001/updateEstadisticasEquipo/${local}/${id_group}`,
+      { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
       {
         marcados: marcador_local,
         encajados: marcador_visitante,
@@ -598,6 +806,7 @@ const Inicio = () => {
     //Visitante
     await axios.put(
       `http://localhost:3001/updateEstadisticasEquipo/${visitante}/${id_group}`,
+      { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
       {
         marcados: marcador_visitante,
         encajados: marcador_local,
@@ -659,6 +868,7 @@ const Inicio = () => {
         //POST GROUP
         const groupResponse = await axios.post(
           "http://localhost:3001/addGroup",
+          { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
           {
             value1: competition.ID,
             value2: ronda,
@@ -671,10 +881,14 @@ const Inicio = () => {
           const team_aux = shuffledTeams[index * groupSize + j];
 
           //POST TEAM
-          await axios.post("http://localhost:3001/addEquipoToGroup", {
-            value1: backend_id_group,
-            value2: team_aux.name,
-          });
+          await axios.post(
+            "http://localhost:3001/addEquipoToGroup",
+            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+            {
+              value1: backend_id_group,
+              value2: team_aux.name,
+            }
+          );
         }
         groupedTeams.push({
           letra,
@@ -707,10 +921,14 @@ const Inicio = () => {
           break;
       }
 
-      await axios.put("http://localhost:3001/updateCompetitionState", {
-        value1: competition.ID,
-        value2: competition_statuses[competition.estado.split(".")[0]],
-      });
+      await axios.put(
+        "http://localhost:3001/updateCompetitionState",
+        { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
+        {
+          value1: competition.ID,
+          value2: competition_statuses[competition.estado.split(".")[0]],
+        }
+      );
       fetchCompetitionInfo();
     } catch (error) {
       console.error("Error grouping teams:", error);
@@ -719,6 +937,15 @@ const Inicio = () => {
 
   ////////        EXECUTION         //////////////
 
+  if (openPopup) {
+    return (
+      <Popup trigger={openPopup} setTrigger={setopenPopup}>
+        <p>- Ganadas: {notifications.apuestas_ganadas} </p>
+        <p>- Perdidas: {notifications.apuestas_perdidas}</p>
+        <p>- Sin finalizar: {notifications.apuestas_sin_finalizar} </p>
+      </Popup>
+    );
+  }
   const renderContent = () => {
     switch (currentSection.split(".")[0]) {
       case "1":
@@ -791,38 +1018,107 @@ const Inicio = () => {
                 <div key={index}>
                   <h2>JORNADA {index + 1}:</h2>
                   {jornada.map((match, index) => (
-                    <div key={index}>
-                      <div
-                        onClick={() =>
-                          navigate(`/partido/${match.Idd}`, {
-                            state: { match: match.Idd, usuario: user },
-                          })
-                        }
-                      >
-                        <h3>
-                          {match.club_local} {match.marcador_local} -{" "}
-                          {match.marcador_visitante} {match.club_visitante}
-                        </h3>
+                    <div
+                      key={index}
+                      className="match-short-container"
+                      onClick={() =>
+                        navigate(`/partido/${match.Idd}`, {
+                          state: { match: match.Idd, usuario: user },
+                        })
+                      }
+                    >
+                      <div className="match-short-header">
+                        <div className="match-short-place">
+                          {match.stadium} in {match.location}
+                        </div>
+                        <div className="match-short-date">{match.fecha}</div>
                       </div>
-                      <p>
-                        - {match.stadium} in {match.location}
-                      </p>
-                      <p>- {match.fecha}</p>
-                      <button
-                        onClick={() =>
-                          handleSimular(
-                            match.Idd,
-                            match.club_local,
-                            match.club_visitante,
-                            match.id_group
-                          )
-                        }
-                        disabled={
-                          loading || match.estado_partido !== "READY_TO_PLAY"
-                        }
-                      >
-                        JUGAR PARTIDO
-                      </button>
+
+                      <div className="match-short-body">
+                        <div className="match-short-column">
+                          <div className="team-short-name">{match.club_local}</div>
+                        </div>
+
+                        <div className="match-short-column">
+                          <div className="match-short-score">
+                            {match.marcador_local} - {match.marcador_visitante}
+                          </div>
+                        </div>
+
+                        <div className="match-short-column">
+                          <div className="team-short-name">
+                            {match.club_visitante}
+                          </div>
+                        </div>
+
+                        <div className="match-short-column">
+                          <div className="match-short-bet-options">
+                            <div className="match-short-bet-option">
+                              1
+                              <button
+                                onClick={() =>
+                                  handleBet(
+                                    match,
+                                    "Local",
+                                    competition_rounds[0]
+                                  )
+                                }
+                                disabled={match.estado_partido === "ENDED"}
+                              >
+                                {match.cuota_local}
+                              </button>
+                            </div>
+                            <div className="match-short-bet-option">
+                              X
+                              <button
+                                onClick={() =>
+                                  handleBet(
+                                    match,
+                                    "Draw",
+                                    competition_rounds[0]
+                                  )
+                                }
+                                disabled={match.estado_partido === "ENDED"}
+                              >
+                                {match.cuota_empate}
+                              </button>
+                            </div>
+                            <div className="match-short-bet-option">
+                              2
+                              <button
+                                onClick={() =>
+                                  handleBet(
+                                    match,
+                                    "Away",
+                                    competition_rounds[0]
+                                  )
+                                }
+                                disabled={match.estado_partido === "ENDED"}
+                              >
+                                {match.cuota_visitante}
+                              </button>
+                            </div>
+                          </div>
+                          <div className="match-short-simulate">
+                            <button
+                              onClick={() =>
+                                handleSimular(
+                                  match.Idd,
+                                  match.club_local,
+                                  match.club_visitante,
+                                  match.id_group
+                                )
+                              }
+                              disabled={
+                                loading ||
+                                match.estado_partido !== "READY_TO_PLAY"
+                              }
+                            >
+                              JUGAR PARTIDO
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1293,6 +1589,30 @@ const Inicio = () => {
                 <p>Monedas: {user?.monedas}</p>
               </div>
             )}
+            <button onClick={openBetCard}>Ver Apuestas</button>
+            {betCard && (
+              <div className="popup">
+                <div className="popup-inner">
+                  <div className="bets">
+                    {bets.map((bet, index) => (
+                      <div key={index} className="bet">
+                        <h2>
+                          Match: {bet.match.club_local} vs{" "}
+                          {bet.match.club_visitante}
+                        </h2>
+                        <p>Bet Amount: {bet.amount_bet}</p>
+                        <p>
+                          Choice: {bet.choice} ({bet.odd})
+                        </p>
+                        <p>Estado apuesta: {bet.estado_partido}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={checkBetResults}>CHECK BET RESULTS</button>
+                  <button onClick={closeBetCard}>CERRAR</button>
+                </div>
+              </div>
+            )}
 
             {competition && (
               <div>
@@ -1306,6 +1626,31 @@ const Inicio = () => {
               </div>
             )}
           </>
+        )}
+        {sidebar.open && (
+          <div className="popup">
+            <div className="popup-inner">
+              <h2>
+                En partido: {sidebar.match.club_local} vs{" "}
+                {sidebar.match.club_visitante}
+              </h2>
+              <p>Bet Amount: {sidebar.coinBet}</p>
+              <p>
+                {" "}
+                CHOICE: {sidebar.betChoice} ({sidebar.odd}){" "}
+              </p>
+              <button onClick={handleBetIncrease}>+</button>
+              <button onClick={handleBetDecrease}>-</button>
+              <p>Potential win: {sidebar.coinBet * sidebar.odd}</p>
+              <button
+                onClick={() => handleBetSubmit(sidebar)}
+                disabled={sidebar.match.estado_partido === "ENDED"}
+              >
+                Confirm Bet
+              </button>
+              <button onClick={handleBetClose}>Cancel</button>
+            </div>
+          </div>
         )}
       </Layout>
     </div>

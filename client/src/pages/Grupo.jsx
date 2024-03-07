@@ -56,14 +56,14 @@ function Grupo() {
           <table className="tabla_usuarios">
             <thead>
               <tr>
-                <th onClick={() => ordenarTabla('name', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>NOMBRE</th>
-                <th onClick={() => ordenarTabla('ganados', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>VICTORIAS</th>
-                <th onClick={() => ordenarTabla('empatados', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>EMPATES</th>
-                <th onClick={() => ordenarTabla('perdidos', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>DERROTAS</th>
-                <th onClick={() => ordenarTabla('goles_a_favor', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>GOLES MARCADOS </th>
-                <th onClick={() => ordenarTabla('goles_en_contra', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>GOLES ENCAJADOS</th>
-                <th onClick={() => ordenarTabla('diferencia', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>DIFERENCIA</th>
-                <th onClick={() => ordenarTabla('puntos', ordenTable.direction === 'desc' ? 'asc' : 'desc')}>
+                <th >NOMBRE</th>
+                <th >VICTORIAS</th>
+                <th >EMPATES</th>
+                <th >DERROTAS</th>
+                <th >GOLES MARCADOS </th>
+                <th >GOLES ENCAJADOS</th>
+                <th >DIFERENCIA</th>
+                <th >
                   <strong>PUNTOS</strong>
                 </th>
               </tr>

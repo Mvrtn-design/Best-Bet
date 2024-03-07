@@ -11,11 +11,11 @@ function Match() {
     TERMINADO: 2,
   };
 
-  const [clubNames, setClubNames] = useState([]);
-  const [equipoLocal, setEquipoLocal] = useState([]);
   const [equipoVisitante, setEquipoVisitante] = useState([]);
   const [selectedButton, setSelectedButton] = useState(null);
   const [buttonColor, setButtonColor] = useState('blue');
+  const [equipoLocal, setEquipoLocal] = useState([]);
+  const [clubNames, setClubNames] = useState([]);
 
   useEffect(() => {
     // This effect will run whenever selectedButton changes
@@ -41,7 +41,7 @@ function Match() {
     empate_couta: 0.0,
     visitante_cuota: 0.0,
   });
-  
+
   const [partidoHTML, setPartidoHTML] = useState("");
 
   useEffect(() => {
@@ -55,15 +55,15 @@ function Match() {
   const EstablecerEquipoVisitante = (event) => {
     setEquipoVisitante(JSON.parse(event.target.value));
   };
-  
+
 
   const ShowMatch = () => {
-    
+
     if (equipoLocal.id === equipoVisitante.id) {
       setPartidoHTML(<h2>NO SE PUEDEN ELEGIR EL EQUIPO</h2>);
 
     } else {
-      const match_info = new MatchGenerator(equipoLocal, equipoVisitante);     
+      const match_info = new MatchGenerator(equipoLocal, equipoVisitante);
       setPartidoInfo(match_info.getPreMatch());
       console.log(partidoInfo);
       const playMatch = () => {
@@ -114,18 +114,18 @@ function Match() {
                   </div>
                   <div className="partido-apuestas">
                     <button className="partido-apuestas-local"
-                    style={{ backgroundColor: buttonColor }}
-                    onClick={() => handleButtonClick(1)}>
+                      style={{ backgroundColor: buttonColor }}
+                      onClick={() => handleButtonClick(1)}>
                       {partidoInfo.local_cuota}
                     </button>
                     <button className="partido-apuestas-empate"
-                    style={{ backgroundColor: buttonColor }}
-                    onClick={() => handleButtonClick(2)}>
+                      style={{ backgroundColor: buttonColor }}
+                      onClick={() => handleButtonClick(2)}>
                       {partidoInfo.empate_couta}
                     </button>
                     <button className="partido-apuestas-visitante"
-                    style={{ backgroundColor: buttonColor }}
-                    onClick={() => handleButtonClick(3)}>
+                      style={{ backgroundColor: buttonColor }}
+                      onClick={() => handleButtonClick(3)}>
                       {partidoInfo.visitante_cuota}
                     </button>
                   </div>
@@ -149,7 +149,7 @@ function Match() {
           <p id="partido-apuesta-veredicto"></p>
         </div>
       );
-      }
+    }
   };
 
   useEffect(() => {
@@ -202,7 +202,5 @@ function Match() {
     </Layout>
   );
 }
-
-
 
 export default Match;

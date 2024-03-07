@@ -11,20 +11,25 @@ function NewTorneo() {
   });
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/get1user")
-      .then((response) => {
-        const userData = response.data[0];
-        setUser(userData);
-        setForm({ ...form, usuario: userData.id });
-        getCompeticionesByUser(response.data[0]).then((datosCompeticion) => {
-          setCompeticiones(datosCompeticion);
+    axios.get("http://localhost:3001/getLogUser",{ headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } })      
+        .then((response) => {
+          if (response.data.error) {
+            alert(response.data.error);
+            navigate("/logIn");
+          } else {
+            const userData = response.data[0];
+            setUser(userData);
+            setForm({ ...form, usuario: userData.id });
+            getCompeticionesByUser(response.data[0]).then(
+              (datosCompeticion) => {
+                setCompeticiones(datosCompeticion);
+              }
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching user:", error);
         });
-        
-      })
-      .catch((error) => {
-        console.error("Error fetching user:", error);
-      });
   }, [form]);
 
   const navigate = useNavigate();
@@ -45,7 +50,7 @@ function NewTorneo() {
       }
       const datos = await response.json();
 
-      postCompetition(datos).then((datosCompeticion) => {        
+      postCompetition(datos).then((datosCompeticion) => {
         //crearCompeticion();
         navigate(`/menu/${datos}/${datosCompeticion.data}`);
       });

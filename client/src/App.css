@@ -3,7 +3,7 @@
   --color-texto-secundario: #067000;
   --color-texto-error: #c00000;
   --color-fondo-primario: #deeeee;
-  --color-fondo-oscuro-primario: #00000f;
+  --color-fondo-oscuro-primario: #060418;
   --color-fondo-oscuro-primario-suave: #000020;
   --color-fondo-oscuro-primario-resaltado: #000030;
   --sombra: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -12,16 +12,27 @@
 body {
   background-color: var(--color-fondo-oscuro-primario);
   color: var(--color-texto-primario);
-  font-family: "Bahnschrift", sans-serif;
+  font-family: "Verdana", Times, sans-serif, bold;
   line-height: 1.5;
 }
 
+a {
+  color: var(--color-texto-primario);
+  text-decoration: none;
+  transition: all 0.7s ease;
+}
+
+a:hover {
+  color: var(--color-texto-secundario);
+}
+
 h1 {
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-family: Tahoma, sans-serif;
   font-size: 50px;
   text-align: center;
   padding: 10px;
 }
+
 table {
   margin: 30px;
   padding: 20px;
@@ -31,15 +42,35 @@ table {
   width: 50%;
   border-collapse: collapse;
 }
+
 table,
 th,
 td {
   border: 1px solid;
 }
+
+/* BUTTON */
+
 button {
   padding: 5px;
+  margin: 2px;
   text-align: center;
   border-radius: 20%;
+  transition: 0.2s;
+  box-shadow: #3b6126 0px 3px 2px, #000 0px 8px 5px;
+}
+
+button:hover {
+  color: #656565;
+}
+
+button:active {
+  top: 4px;
+  box-shadow: #00ff3b 0px 3px 2px, #000 0px 3px 5px;
+}
+
+button:disabled {
+  box-shadow: #761211 0px 3px 2px, #000 0px 3px 5px;
 }
 
 .eliminar {
@@ -60,14 +91,14 @@ button {
 .header a {
   float: left;
   color: #777777;
-
   padding: 10px;
   border-radius: 100px;
 }
 
 .header-titulo {
-  font-family: "Jazz LET", fantasy;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 50px;
+  font-weight: 600;
   text-align: center;
   position: absolute;
   top: 50%;
@@ -81,7 +112,7 @@ button {
   color: #208534;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   font-size: 120%;
-  transition: 2s ease;
+  transition: 1s ease;
 }
 
 .header-derecha {
@@ -116,14 +147,179 @@ button {
 
 /*****      PIE DE PAGINA       *****/
 footer {
-  background-color: #000020;
+  margin: 100px 0 0 0;
+  box-sizing: border-box;
+  width: 100%;
+  line-height: 1.5;
 }
+
+.footer {
+  background: linear-gradient(
+    135deg,
+    #00000f,
+    var(--color-fondo-oscuro-primario-suave),
+    #000000
+  );
+}
+
+ul {
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.footer-col {
+  width: 30%;
+  padding: 0 0 0 15px;
+}
+
+.footer-col h4 {
+  font-size: 18px;
+  color: #ffffff;
+  text-transform: capitalize;
+  margin-bottom: 30px;
+  font-weight: 700;
+  position: relative;
+}
+
+.footer-col h4::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  background-color: var(--color-texto-secundario);
+  height: 2px;
+  box-sizing: border-box;
+  width: 50%;
+}
+
+.footer-col ul li:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+footer a {
+  font-size: 16px;
+  text-transform: capitalize;
+  text-decoration: none;
+  font-weight: 300;
+  color: #bbbbbb;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+footer a:hover {
+  color: var(--color-fondo-primario);
+  margin-left: 8px;
+}
+
+.footer-col .social-links a {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background-color: var(--color-texto-primario);
+  margin: 0px 5px 5px 0;
+  color: var(--color-texto-secundario);
+  transition: all 0.5s ease;
+  border-radius: 30%;
+  text-align: center;
+}
+
+.footer-col .social-links a:hover {
+  color: var(--color-texto-primario);
+  background-color: var(--color-texto-secundario);
+}
+
+hr {
+  color: white !important;
+  width: 100%;
+}
+
+.footer-below {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 0.1rem;
+}
+
+.footer-below-links {
+  display: flex;
+  flex-direction: row;
+}
+
+.footer-below-links a {
+  font-size: 13px;
+  line-height: 15px;
+  margin-left: 2rem;
+  font-weight: 600;
+}
+
+.footer-copyright {
+  font-size: 13px;
+  line-height: 5px;
+  color: var(--color-texto-primario);
+  font-weight: 500;
+  padding-left: 20px;
+}
+
+@media (max-width: 20px) {
+  .footer-col {
+    width: calc(100 / 3);
+    margin-bottom: 0px;
+  }
+}
+
+@media (max-width: 500px) {
+  .footer-col {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 850px) {
+  .sb_footer-heading h1 {
+    font-size: 44px;
+    line-height: 50px;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .footer-below {
+    flex-direction: colum;
+    justify-content: left;
+  }
+
+  .footer-below-links {
+    flex-direction: column;
+    margin-left: 100px;
+  }
+
+  .footer-below-links a {
+    margin: 5px 0;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .sb_footer-heading h1 {
+    font-size: 27px;
+    line-height: 38px;
+  }
+}
+
+/*******************/
 
 .container {
   width: 90%;
   margin-inline: auto;
   padding: 1px 1px;
-  background: linear-gradient(135deg, #00005b, #000000);
+  background: linear-gradient(
+    135deg,
+    #00000f,
+    var(--color-fondo-oscuro-primario-suave),
+    #000000
+  );
+  border-radius: 20px;
   box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -222,6 +418,209 @@ footer {
   transition: flex 1s, opacity 2s;
 }
 
+/*******  COMPETICION    PARTIDO   ********/
+.match-short-container {
+  margin: 50px 0;
+  border: 1px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  border: solid 0.1rem #414741;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    #00003b,
+    var(--color-fondo-oscuro-primario-suave),
+    #000000
+  );
+}
+
+.match-short-header {
+  height: calc(100% / 2);
+  display: flex;
+}
+
+.match-short-body {
+  display: flex;
+  position: relative;
+}
+
+.match-short-place {
+  margin: 2px 0 0 10px;
+  font-size: 10px;
+  display: flex;
+  left: -10;
+  align-items: left;
+  color: #ffffff;
+}
+
+.match-short-date {
+  font-size: 10px;
+  display: flex;
+  color: var(--color-texto-secundario);
+  margin: 2px 0 0 200px;
+}
+
+.match-short-column {
+  padding: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% / 4);
+}
+
+.team-short-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--color-texto-primario);
+  text-transform: uppercase;
+}
+.match-short-score {
+  color: #ffffff;
+  font-size: x-large;
+}
+
+.match-short-bet-options {
+  display: flex;
+  margin-top: 5px;
+}
+
+.match-short-bet-option {
+  text-align: center;
+  font-weight: 600;
+}
+
+.match-short-simulate {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.match-short-simulate button {
+  color: var(--color-fondo-oscuro-primario-resaltado);
+  font-weight: 800;
+}
+
+/****************   PARTIDA MATCH BIG   ************/
+.match-container {
+  margin: 50px 0;
+  border: 1px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  border: solid 0.1rem #414741;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    #0000b0,
+    var(--color-fondo-oscuro-primario-suave),
+    #000000
+  );
+}
+.match-status {
+  width: 100px;
+  height: 10px;
+  background-color: #c00000;
+  color: var(--color-texto-primario);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  line-height: 1;
+  margin-right: auto;
+  &:before {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 5px;
+    background-color: currentColor;
+    border-radius: 50%;
+    margin-right: 5px;
+  }
+}
+.match-body {
+	display: flex;
+	position: relative;
+}
+.match-column {
+	padding: 5px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: calc(100% / 3);
+}
+.match-bet-options {
+	display: flex;
+	margin-top: 8px;
+	padding-bottom: 8px;
+}
+
+.match-bet-option {
+	margin-left: 4px;
+	margin-right: 4px;
+	border: 1px solid var(--color-text-icon);
+	background-color: #F9f9f9;
+	border-radius: 2px;
+	color: var(--color-text-secondary);
+	font-size: 14px;
+	font-weight: 600;
+	padding: 4px 8px;
+}
+
+.match-team {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	color: var(--color-text-secondary);
+}
+
+.match-short-column {
+  padding: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% / 4);
+}
+
+.team-short-name {
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;
+  color: var(--color-texto-primario);
+  text-transform: uppercase;
+}
+.match-short-score {
+  color: #ffffff;
+  font-size: x-large;
+}
+
+.match-short-bet-options {
+  display: flex;
+  margin-top: 5px;
+}
+
+.match-short-bet-option {
+  text-align: center;
+  font-weight: 600;
+}
+
+.match-simulate {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.match-simulate button {
+  color: var(--color-fondo-oscuro-primario-resaltado);
+  font-weight: 800;
+}
+
+
 /********       PARTIDO           *******/
 button,
 input,
@@ -245,43 +644,10 @@ strong {
   border-radius: 10px;
 }
 
-.card-cabecera {
+.match-header {
   display: flex;
   padding: 10px;
   border-bottom: 2px solid rgba(0, 0, 0, 0.87);
-}
-
-.partido-estado {
-  display: flex;
-  height: 50%;
-  background-color: #ceb0b0;
-  color: var(--color-texto-error);
-  padding: 10px;
-  border-radius: 6px;
-  /*grosor de letra*/
-  font-weight: 500;
-  align-items: center;
-  line-height: 1;
-  margin-right: auto;
-  box-shadow: var(--sombra);
-
-  &:before {
-    content: "";
-    display: block;
-    width: 6px;
-    height: 6px;
-    background-color: currentColor;
-    border-radius: 50px;
-    margin: 5px;
-  }
-}
-
-.partido-competicion {
-  align-items: center;
-  display: flex;
-  top: 50%;
-  left: 50%;
-  text-align: center;
 }
 
 .partido-competicion img {
@@ -313,15 +679,8 @@ strong {
   position: relative;
 }
 
-.columna {
-  padding: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: calc(100% / 3);
-}
 
-.equipo {
+.match-team {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -337,6 +696,7 @@ strong {
   background-color: var(--color-fondo-primario);
   box-shadow: 0 0 20px 10px #aaaaaa;
 }
+
 
 .equipo-logo img {
   width: 80px;
@@ -357,7 +717,7 @@ strong {
   text-align: center;
 }
 
-.partido-marcador {
+.partido-score {
   color: #000000;
   margin: 10px 0px;
   font-size: 60px;
@@ -369,13 +729,13 @@ strong {
   font-weight: 500;
 }
 
-.partido-apuestas {
+.match-bet-options {
   display: flex;
   height: 50px;
   margin: 4px;
 }
 
-.partido-apuestas-opcion {
+.match-bet-option {
   text-align: center;
   align-content: center;
   align-items: center;
@@ -390,7 +750,7 @@ strong {
   box-shadow: var(--sombra);
 }
 
-.partido-apuestas-hacer {
+.match-simulated {
   position: absolute;
   bottom: -20px;
   left: 50%;

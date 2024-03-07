@@ -1,103 +1,80 @@
 import React from "react";
-import Layout from "./partials/Layout";
+import App from "../App";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { Field, Form, Formik } from "formik";
+import * as Yup from "yup";
+
 
 function SetUp() {
-  const [form, setForm] = useState({
-    nombre: "",
-    nombre_usuario: "",
-    correo_electronico: "",
-    clave: "",
+  const setUpSchema = Yup.object().shape({
+    nombre_usuario: Yup.string().min(3).max(15).required()
+      .required('El nombre de usuario es obligatorio [Minimo 3 caracteres y maximo 15]'),
+    clave: Yup.string()
+      .min(4, 'La contraseña debe tener al menos 4 caracteres')
+      .required('La contraseña es obligatoria'),
   });
-  const navigate = useNavigate();
-  function handleSubmit(event) {
-    event.preventDefault();
 
+  const handleSave = async (values, { setSubmitting }) => {
     try {
-      fetch("http://localhost:3001/add", {
+      const response = await fetch("http://localhost:3001/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(values),
       });
-      console.log("Success");
-      navigate("/users");
+      setSubmitting(false); // Set submitting to false when the request is successful
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error: ", error);
+      setSubmitting(false); // Set submitting to false in case of an error
     }
-  }
+  };
 
   return (
-    <Layout>
+    <App>
       <h1>Registrarse</h1>
       <div className="container">
-        <div className="row">
-          <div className="col-md-12">
-            <div className="section-heading">
-              <div className="line-dec"></div>
-              <h2>Formulario de registro</h2>
-
-              <form onSubmit={handleSubmit}>
-                <label>Nombre: </label>
-                <label>
-                  <input
-                    type="text"
-                    name="nombre"
-                    placeholder="Nombre"
-                    autocomplete="on"
-                    value={form.nombre}
-                    required
-                    onChange={(e) =>
-                      setForm({ ...form, nombre: e.target.value })
-                    }
-                  />
-                </label>
+        <h2>Formulario de registro</h2>
+        <Formik initialValues={{ nombre: "", nombre_usuario: "", correo_electronico: "", clave: "" }} validationSchema={setUpSchema} onSubmit={handleSave}>
+          {({ isSubmitting }) => (
+            <Form>
+              <label>
+                Nombre:
+                <Field type="text"
+                  name="nombre"
+                  placeholder="Nombre"
+                  autocomplete="on"
+                  required />
+              </label>
+              <label>
                 Nombre Usuario:
-                <input
-                  type="text"
+                <Field type="text"
                   name="nombre_usuario"
                   placeholder="Ej: nombre_2343"
-                  value={form.nombre_usuario}
-                  required
-                  onChange={(e) =>
-                    setForm({ ...form, nombre_usuario: e.target.value })
-                  }
-                />
+                  required />
+              </label>
+              <label>
                 Correo electronico:
-                <input
-                  type="email"
+                <Field type="email"
                   name="correo_electronico"
                   placeholder="Introduzca correo electronico"
-                  value={form.correo_electronico}
-                  required
-                  onChange={(e) =>
-                    setForm({ ...form, correo_electronico: e.target.value })
-                  }
-                />
-                Contraseña:
-                <input
-                  type="password"
-                  name="clave"
-                  placeholder="Contraseña"
-                  required
-                  value={form.clave}
-                  onChange={(e) => setForm({ ...form, clave: e.target.value })}
-                />
-                <button type="submit" value="Registrar">
-                  Registrar
-                </button>
-              </form>
-
-              <p>
-                Ya tengo un cuenta, <Link to="/logIn">Iniciar Sesion</Link>
-              </p>
-            </div>
-          </div>
-        </div>
+                  required />
+              </label>
+              <label>
+                Contraseña: <Field type="password" name="clave" autoComplete="off" placeholder="Contraseña" required />
+              </label>
+              <button type="submit" disabled={isSubmitting}>
+                REGISTRAR
+              </button>
+            </Form>
+          )}
+        </Formik>
+        <p>
+          Ya tengo un cuenta, <Link to="/logIn">Iniciar Sesion</Link>
+        </p>
       </div>
-    </Layout>
+    </App >
   );
 }
 

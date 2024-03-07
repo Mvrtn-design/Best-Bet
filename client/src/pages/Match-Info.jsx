@@ -167,27 +167,44 @@ function Match_Info() {
       )}
 
       {match && (
-        <div>
-          <h1>
-            {match.club_local} {match.marcador_local}-{match.marcador_visitante}
-            {match.club_visitante}
-          </h1>
-          <h2>{match.fecha}</h2>
-          <p>
-            - {match.stadium} in {match.location}
-          </p>
-          <p>- {match.estado_partido}</p>
-          <p>
-            - 1: {match.cuota_local}
-            X: {match.cuota_empate}
-            2: {match.cuota_visitante}
-          </p>
-          <button
-            onClick={() => handlePlayMatch()}
-            disabled={loading || match.estado_partido !== "READY_TO_PLAY"}
-          >
-            JUGAR PARTIDO
-          </button>
+        <>
+          <div className="match-container">
+            <div className="match">
+              <div className="match-header">
+                <button>Estadisticas</button>
+                <button>Alertas</button>
+                <div className="match-date">{match.fecha}</div>
+                <div className="match-location">
+                  {match.stadium} in {match.location}{" "}
+                </div>
+                <div className="match-status">{match.estado_partido}</div>
+              </div>
+              <div className="match-body"></div>
+              <div className="match-column"></div>
+              <div className="match-column"></div>
+              <div className="match-column"></div>
+
+              <h1>
+                {match.club_local} {match.marcador_local}-
+                {match.marcador_visitante}
+                {match.club_visitante}
+              </h1>
+
+              <div>
+                - 1: {match.cuota_local}
+                X: {match.cuota_empate}
+                2: {match.cuota_visitante}
+              </div>
+              <div className="match-simulate">
+                <button
+                  onClick={() => handlePlayMatch()}
+                  disabled={loading || match.estado_partido !== "READY_TO_PLAY"}
+                >
+                  JUGAR PARTIDO
+                </button>
+              </div>
+            </div>
+          </div>
 
           <h2>APUESTAS</h2>
           {posibilties.map((posibilty) => (
@@ -225,7 +242,7 @@ function Match_Info() {
               ) : null
             )}
           </ul>
-        </div>
+        </>
       )}
     </Layout>
   );

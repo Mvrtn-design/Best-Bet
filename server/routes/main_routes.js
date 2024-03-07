@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const { tokenValido } = require("../middleware/middleAutentication");
+
 const main_controller = require("../controller/main_controller");
 const usuario_controller = require("../controller/user_controller");
 const partida_controller = require("../controller/partida_controller");
@@ -19,7 +21,7 @@ router.post("/storeClubsJSON", main_controller.storeClubsJSON);
 router.post("/addPartida", partida_controller.crearPartida);
 router.get("/getPartidas", partida_controller.listaPartidas);
 router.get("/getPartida/:id", partida_controller.getPartidaByID);
-router.get("/getUSerByPartida/:id", partida_controller.getUSerByPartida);
+router.get("/getUSerByPartida/:id", tokenValido, partida_controller.getUSerByPartida);
 
 
 /////////       COMPETITION            ///////////
@@ -40,11 +42,14 @@ router.put("/avanzarUnDia", competicion_controller.avanzarUnDia);
 router.get("/login", usuario_controller.irInicioSesion);
 router.get("/setIn", usuario_controller.irRegistrarse);
 router.get("/getUsers", usuario_controller.listaUsuarios);
-router.get("/get1user", usuario_controller.unUsuario);
+router.get("/get1user",tokenValido, usuario_controller.unUsuario);
+router.get("/getLogUser",tokenValido, usuario_controller.usuario_logueado);
 router.get("/delete/:id", usuario_controller.eliminarUsuario);
 router.get("/edit/:id", usuario_controller.verUsuarioEditar);
 router.post("/add", usuario_controller.guardarUsuario);
 router.post("/update/:id", usuario_controller.editarUsuario);
+router.get("/check", usuario_controller.checkUsuario);
+router.get("/auth", tokenValido, usuario_controller.usuario_autenticado);
 
 /////////       PARTIDO            ///////////
 router.get("/getPartidoById/:id", match_controller.getMatchByID);
