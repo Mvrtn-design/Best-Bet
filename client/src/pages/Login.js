@@ -17,7 +17,7 @@ const loginSchema = Yup.object().shape({
 
 export default function Login() {
   let navigate = useNavigate();
-  const {authState, setAuthState } = useContext(AuthContext);
+  const { authState, setAuthState } = useContext(AuthContext);
 
   const handleSearch = async (valuess) => {
     try {
@@ -28,8 +28,8 @@ export default function Login() {
       });
       if (!teamsResponse.data.error) {
         console.log(teamsResponse.data);
-        setAuthState({...authState, status: true, username: teamsResponse.data.username, id: teamsResponse.data.id});
-        localStorage.setItem("tokenAcceso", teamsResponse.data.token);        
+        setAuthState({ ...authState, status: true, username: teamsResponse.data.username, id: teamsResponse.data.id });
+        localStorage.setItem("tokenAcceso", teamsResponse.data.token);
         navigate("/");
       } else {
         console.warn(teamsResponse.data.error);
@@ -42,46 +42,53 @@ export default function Login() {
 
   return (
     <Layout>
-      <div className="container">
-        <h1>Inicio sesión</h1>
-        <Formik
-          initialValues={{ nombre_usuario: "", clave: "" }}
-          validationSchema={loginSchema}
-          onSubmit={handleSearch}
-        >
-          {({ isSubmitting, errors, touched }) => (
-            <Form>
-              <label>
-                Nombre:
-                <Field
-                  type="text"
-                  name="nombre_usuario"
-                  placeholder="Nombre de usuario"
-                  autoComplete="on"
-                  required
-                />
-                {errors.nombre_usuario && touched.nombre_usuario && (
-                  <div className="error">{errors.nombre_usuario}</div>
-                )}
-              </label>
-              <label>
-                Clave: <Field type="password" name="clave" autoComplete="off" placeholder="Introduzca su contraseña" required />
-                {errors.clave && touched.clave && (
-                  <div className="error">{errors.clave}</div>
-                )}
-              </label>
-              <button type="submit">
-                BUSCAR
-              </button>
-              <button type="reset" >
-                BORRAR
-              </button>
-            </Form>
-          )}
-        </Formik>
-        <p>
-          Ya tengo una cuenta, <Link to="/setUp">Crear cuenta</Link>
-        </p>
+      <div className="user-container">
+        <div className="user-form">
+          <p class="heading">INICIO SESIÓN</p>
+          <p class="paragraph">Introduzca sus credenciales</p>
+          <Formik
+            initialValues={{ nombre_usuario: "", clave: "" }}
+            validationSchema={loginSchema}
+            onSubmit={handleSearch}
+          >
+            {({ isSubmitting, errors, touched }) => (
+              <Form>
+                <div className="input-group">
+                  <label >
+                    Nombre:
+                    <Field
+                      type="text"
+                      name="nombre_usuario"
+                      placeholder="Nombre de usuario"
+                      autoComplete="on"
+                      required
+                    />
+                    {errors.nombre_usuario && touched.nombre_usuario && (
+                      <div className="error">{errors.nombre_usuario}</div>
+                    )}
+                  </label>
+                </div>
+                <div className="input-group">
+                  <label >
+                    Clave: <Field type="password" name="clave" autoComplete="off" placeholder="Introduzca su contraseña" required />
+                    {errors.clave && touched.clave && (
+                      <div className="error">{errors.clave}</div>
+                    )}
+                  </label>
+                </div>
+                <button type="submit">
+                  BUSCAR
+                </button>
+                <button type="reset" >
+                  BORRAR
+                </button>
+              </Form>
+            )}
+          </Formik>
+          <p className="bottom-text">
+            No tengo ninguna cuenta, <Link to="/setUp">Crear cuenta</Link>
+          </p>
+        </div>
       </div>
     </Layout >
   );

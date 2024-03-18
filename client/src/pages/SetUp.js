@@ -1,5 +1,5 @@
 import React from "react";
-import App from "../App";
+import Layout from "./partials/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Field, Form, Formik } from "formik";
@@ -32,49 +32,62 @@ function SetUp() {
   };
 
   return (
-    <App>
-      <h1>Registrarse</h1>
-      <div className="container">
-        <h2>Formulario de registro</h2>
-        <Formik initialValues={{ nombre: "", nombre_usuario: "", correo_electronico: "", clave: "" }} validationSchema={setUpSchema} onSubmit={handleSave}>
-          {({ isSubmitting }) => (
-            <Form>
-              <label>
-                Nombre:
-                <Field type="text"
-                  name="nombre"
-                  placeholder="Nombre"
-                  autocomplete="on"
-                  required />
-              </label>
-              <label>
-                Nombre Usuario:
-                <Field type="text"
-                  name="nombre_usuario"
-                  placeholder="Ej: nombre_2343"
-                  required />
-              </label>
-              <label>
-                Correo electronico:
-                <Field type="email"
-                  name="correo_electronico"
-                  placeholder="Introduzca correo electronico"
-                  required />
-              </label>
-              <label>
-                Contraseña: <Field type="password" name="clave" autoComplete="off" placeholder="Contraseña" required />
-              </label>
-              <button type="submit" disabled={isSubmitting}>
-                REGISTRAR
-              </button>
-            </Form>
-          )}
-        </Formik>
-        <p>
-          Ya tengo un cuenta, <Link to="/logIn">Iniciar Sesion</Link>
-        </p>
+    <Layout>
+      <div className="user-container">
+        <div className="user-form">
+          <p class="heading">Registrarse </p>
+          <p class="paragraph">Rellene estos parámetros para registrarse</p>
+          <Formik initialValues={{ nombre: "", nombre_usuario: "", correo_electronico: "", clave: "" }} validationSchema={setUpSchema} onSubmit={handleSave}>
+            {({ isSubmitting }) => (
+              <Form>
+                <div className="input-group">
+                  <label >
+                    Nombre:
+                    <Field type="text"
+                      name="nombre"
+                      placeholder="Nombre"
+                      autocomplete="on"
+                      required />
+                  </label>
+                </div>
+                <div className="input-group">
+                  <label >
+                    Nombre Usuario:
+                    <Field type="text"
+                      name="nombre_usuario"
+                      placeholder="Ej: nombre_2343"
+                      required />
+                  </label>
+                </div>
+                <div className="input-group">
+                  <label>
+                    Correo electronico:
+                    <Field type="email"
+                      name="correo_electronico"
+                      placeholder="nombre@mail.com"
+                      required />
+                  </label>
+                </div>
+                <div className="input-group">
+                  <label>
+                    Contraseña: <Field type="password" name="clave" autoComplete="off" placeholder="Contraseña" required />
+                  </label>
+                </div>
+                <button type="submit" disabled={isSubmitting}>
+                  REGISTRARSE
+                </button>
+                <button type="reset" >
+                  BORRAR
+                </button>
+              </Form>
+            )}
+          </Formik>
+          <p className="bottom-text">
+            Ya tengo un cuenta, <Link to="/logIn">Iniciar Sesion</Link>
+          </p>
+        </div>
       </div>
-    </App >
+    </Layout >
   );
 }
 

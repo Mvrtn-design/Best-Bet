@@ -18,6 +18,7 @@ import Grupo from "./pages/Grupo";
 import Tempp from "./pages/Tempp";
 import CreatePost from "./pages/CreatePost";
 import Profile from "./pages/Profile";
+import PageNotFound from "./pages/PageNotFound";
 
 function App() {
   const [authState, setAuthState] = useState({username: "",id: 0, status:false});
@@ -53,6 +54,7 @@ function App() {
             <Route path="/menu/:idPartida/:idCompeticion" element={<Menu />}></Route>
             <Route path="/partido/:id_match" element={<Match_Info />}></Route>
             <Route path="/grupo/:id_group" element={<Grupo />}></Route>
+            <Route path="*"exact Component={PageNotFound}></Route>
           </Routes>
         </Router>
       </div>

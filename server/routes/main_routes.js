@@ -9,6 +9,7 @@ const partida_controller = require("../controller/partida_controller");
 const competicion_controller = require("../controller/competicion_controller");
 const match_controller = require('../controller/match_controller');
 const grupo_controller = require('../controller/grupo_controller');
+const club_controller  = require('../controller/club_controller' );
 
 /////////       MAIN            ///////////
 router.get("/getClubes", main_controller.getClubes);
@@ -16,6 +17,11 @@ router.get("/getClubNames", main_controller.getClubNames);
 router.get("/getClubByName/:name", main_controller.getClubByName);
 router.get("/getSomeClubesByCategory/:cantidadClubes", main_controller.getSomeClubesByCategory);
 router.post("/storeClubsJSON", main_controller.storeClubsJSON);
+
+/////////       CLUB            ///////////
+router.get("/getClubsByCountry", club_controller.clubsByCountry);
+router.get("/getOtherClubs", club_controller.otherClubs);
+router.get("/getClubsByCompetition", club_controller.getClubsByCompetition);
 
 /////////       PARTIDA            ///////////
 router.post("/addPartida", partida_controller.crearPartida);
@@ -37,6 +43,7 @@ router.post("/addEquipoToGroup", competicion_controller.addEquipoToGroup);
 router.post("/addCompeticion", competicion_controller.crearCompeticion);
 router.put("/updateCompetitionState", competicion_controller.updateCompetitionState);
 router.put("/avanzarUnDia", competicion_controller.avanzarUnDia);
+router.put("/getClubesByCompetition", competicion_controller.getClubesByCompetition);
 
 /////////       USUARIO            ///////////
 router.get("/login", usuario_controller.irInicioSesion);

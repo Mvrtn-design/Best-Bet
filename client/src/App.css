@@ -6,6 +6,12 @@
   --color-fondo-oscuro-primario: #060418;
   --color-fondo-oscuro-primario-suave: #000020;
   --color-fondo-oscuro-primario-resaltado: #000030;
+  --color-linear-primero: linear-gradient(
+    135deg,
+    #00003b,
+    var(--color-fondo-oscuro-primario-suave),
+    #000000
+  );
   --sombra: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
@@ -35,7 +41,6 @@ h1 {
 
 table {
   margin: 30px;
-  padding: 20px;
   background-color: var(--color-fondo-primario);
   color: var(--color-fondo-oscuro-primario-suave);
   text-align: center;
@@ -502,6 +507,77 @@ hr {
   color: var(--color-fondo-oscuro-primario-resaltado);
   font-weight: 800;
 }
+/****************     GROUP SHORT       ************/
+.group-short-container {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  font: bold 15px/150% sans-serif;
+  gap: 10px;
+  border-radius: 10px;
+}
+.group-short {
+  border-radius: 5px;
+  margin-inline: 3px;
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  box-shadow: 0 1.5px 0 0 rgba(0, 0, 0, 0.686);
+
+  gap: 10px;
+  background-color: #ffffff00;
+  padding: 10px;
+  border-radius: 10px;
+  transition: ease 2s;
+}
+.group-short-head {
+  background: linear-gradient(
+    135deg,
+    #0000b0,
+    #000000,
+    var(--color-fondo-oscuro-primario-resaltado)
+  );
+  padding: 5px;
+  border-radius: 10px;
+  margin: 0;
+  color: var(--color-texto-primario);
+  text-align: center;
+  align-items: center;
+
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-texto-primario);
+}
+.group-short:hover {
+  border: 4px #0000b0 solid;
+  transform: scale(1.05);
+}
+
+.group-short-body {
+  padding: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 10px;
+  text-align: justify;
+  align-items: justify;
+  border-radius: 5px;
+}
+.group-short-team {
+  color: var(--color-fondo-oscuro-primario);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(#ffffff, #6f6f6f);
+  padding: 5px;
+  border-radius: 5px;
+  flex: 11 0 45%;
+}
+
+.group-short-team:nth-child(even) {
+  background-color: #d10101;
+}
 
 /****************   PARTIDA MATCH BIG   ************/
 .match-container {
@@ -543,39 +619,39 @@ hr {
   }
 }
 .match-body {
-	display: flex;
-	position: relative;
+  display: flex;
+  position: relative;
 }
 .match-column {
-	padding: 5px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: calc(100% / 3);
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% / 3);
 }
 .match-bet-options {
-	display: flex;
-	margin-top: 8px;
-	padding-bottom: 8px;
+  display: flex;
+  margin-top: 8px;
+  padding-bottom: 8px;
 }
 
 .match-bet-option {
-	margin-left: 4px;
-	margin-right: 4px;
-	border: 1px solid var(--color-text-icon);
-	background-color: #F9f9f9;
-	border-radius: 2px;
-	color: var(--color-text-secondary);
-	font-size: 14px;
-	font-weight: 600;
-	padding: 4px 8px;
+  margin-left: 4px;
+  margin-right: 4px;
+  border: 1px solid var(--color-text-icon);
+  background-color: #f9f9f9;
+  border-radius: 2px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 8px;
 }
 
 .match-team {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	color: var(--color-text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--color-text-secondary);
 }
 
 .match-short-column {
@@ -619,9 +695,183 @@ hr {
   color: var(--color-fondo-oscuro-primario-resaltado);
   font-weight: 800;
 }
+/*******        SORT BET/         *******/
 
+/*******        SHORT PROFILE/         *******/
 
-/********       PARTIDO           *******/
+.profile-short-container:hover {
+  transform: scale(1.05);
+}
+
+.profile-short-container .top-section {
+  height: 150px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(45deg, rgb(0, 91, 2) 0%, rgb(49, 49, 49) 100%);
+  position: relative;
+}
+
+.profile-short-container .top-section .border {
+  border-bottom-right-radius: 5px;
+  height: 30px;
+  width: 130px;
+  background: white;
+  background: var(--color-linear-primero);
+  position: relative;
+  transform: skew(-40deg);
+}
+
+.profile-short-container .top-section .border::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  top: 0;
+  right: -15px;
+  border-top-left-radius: 10px;
+}
+
+.profile-short-container .top-section::before {
+  content: "";
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: rgba(255, 255, 255, 0);
+  height: 15px;
+  width: 15px;
+  border-top-left-radius: 15px;
+  box-shadow: -5px -5px 0 2px #1b233d;
+}
+
+.profile-short-container .top-section .icons {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-short-container .top-section .icons .logo .top-section {
+  height: 100%;
+}
+
+.profile-short-container .top-section .icons .social-media {
+  height: 100%;
+  padding: 8px 15px;
+  display: flex;
+  gap: 7px;
+}
+
+.profile-short-container .bottom-section {
+  margin-top: 15px;
+  padding: 10px 5px;
+}
+
+.profile-short-container .bottom-section .title {
+  display: block;
+  font-size: 17px;
+  font-weight: bolder;
+  color: white;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.profile-short-container .bottom-section .row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.profile-short-container .bottom-section .row .item {
+  flex: 30%;
+  text-align: center;
+  padding: 5px;
+  color: rgba(170, 222, 243, 0.721);
+}
+
+.profile-short-container .bottom-section .row .item .big-text {
+  font-size: 12px;
+  display: block;
+}
+
+.profile-short-container .bottom-section .row .item .regular-text {
+  font-size: 9px;
+}
+
+.profile-short-container .bottom-section .row .item:nth-child(2) {
+  border-left: 1px solid rgba(255, 255, 255, 0.126);
+  border-right: 1px solid rgba(255, 255, 255, 0.126);
+}
+
+/*******/
+.profile-short-container {
+  position: relative;
+  width: calc(100%/4);
+  height: 150px;
+  border-radius: 20px;
+  z-index: 10;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 20px;
+  padding: 10px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 20px 0px;
+  transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bg {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  z-index: 2;
+  background: var(--color-linear-primero);
+  backdrop-filter: blur(24px);
+  border-radius: 20px;
+  overflow: hidden;
+  outline: 2px solid  var(--color-texto-primario);
+}
+
+.blob {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  width: 100px;
+  height: 150px;
+  border-radius: 50px;
+  background-color: var(--color-texto-secundario);
+  opacity: 1;
+  filter: blur(20px);
+  animation: blob-bounce 20s infinite ease;
+}
+
+@keyframes blob-bounce {
+  0% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+
+  25% {
+    transform: translate(-100%, -100%) translate3d(100%, 0, 0);
+  }
+
+  50% {
+    transform: translate(-100%, -100%) translate3d(100%, 100%, 0);
+  }
+
+  75% {
+    transform: translate(-100%, -100%) translate3d(0, 100%, 0);
+  }
+
+  100% {
+    transform: translate(-100%, -100%) translate3d(0, 0, 0);
+  }
+}
+
+/********       PARTIDO          *******/
 button,
 input,
 select,
@@ -679,7 +929,6 @@ strong {
   position: relative;
 }
 
-
 .match-team {
   display: flex;
   flex-direction: column;
@@ -696,7 +945,6 @@ strong {
   background-color: var(--color-fondo-primario);
   box-shadow: 0 0 20px 10px #aaaaaa;
 }
-
 
 .equipo-logo img {
   width: 80px;
@@ -787,4 +1035,106 @@ html.is-changing .animacion-fade {
 /* Define the styles for the unloaded pages */
 html.is-animating .animacion-fade {
   opacity: 0;
+}
+
+
+/***********      LOG IN      SET UP   ************/
+.user-container {
+  background: var(--color-linear-primero);
+  border-radius: 10px;
+  box-shadow: rgb(31 31 31 / 17%) 0px -23px 25px 0px inset,
+    rgb(108 108 108 / 23%) 0px -36px 30px 0px inset,
+    rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px,
+    rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px,
+    rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  margin: 50px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.user-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.heading {
+  text-transform: uppercase;
+  text-align: center;
+  align-items: center;
+  color:var(--color-texto-primario);
+  font-size: 2rem;
+  line-height: 1.0;
+  letter-spacing: -0.1;
+  font-weight: 700;
+  font-size: 40px;
+  margin-bottom: 0px;
+}
+
+.paragraph {  
+  text-align: center;
+  align-items: center;
+  color: #ffffff;
+  line-height: 1.0;
+  letter-spacing: -0.1;
+  font-weight: 400;
+  font-size: 20px;
+  margin-bottom: 50px;
+}
+
+.input-group {
+  margin-bottom: 30px;
+}
+
+.input-group input {
+  background: none;
+  border: 1px solid #353535;
+  padding: 15px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  color: #ffffff;
+  width: 80%;
+  box-shadow: rgb(136 136 136 / 17%) 0px -23px 25px 0px inset,
+    rgb(81 81 81 / 23%) 0px -36px 30px 0px inset,
+    rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px,
+    rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px,
+    rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
+}
+
+.input-group input:focus {
+  border-color: #ffffff;
+  outline: none;
+}
+
+.user-container button{
+  background: var(--color-linear-primero);
+  color: #ffffff;
+  transition: 0.6s ease-in;
+  cursor: pointer;
+  margin: 25px 20px;
+  width: calc(100%/3);
+}
+
+.user-container button:hover {
+  background: var(--color-texto-secundario);
+}
+
+.bottom-text {
+  text-align: center;
+  margin-top: 30px;
+  color: #ffffff;
+}
+
+.bottom-text a {
+  color: var(--color-texto-secundario);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.bottom-text a:hover {
+  color: var(--color-fondo-primario);
 }

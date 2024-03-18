@@ -34,11 +34,18 @@ const Inicio = () => {
     "Final",
     "Champion",
   ];
+  const teamsByCountry = {
+    spain: 4,
+    england: 4,
+    germany: 4,
+    italy: 3,
+    france: 3,
+    portugal: 2,
+    turkey: 2,
+  };
   const navigate = useNavigate();
   const { idPartida } = useParams();
-  const [competition, setCompetition] = useState({
-    ID: 0,
-  });
+  const [competition, setCompetition] = useState(null);
   const [teams, setTeams] = useState({
     Group_state: [],
     Round_of_16: [],
@@ -117,30 +124,27 @@ const Inicio = () => {
       } else {
         const Competition_data = response.data[0];
 
+        setCompetition({
+          ID: response.data[0].ID,
+          temporada: response.data[0].temporada,
+          estado: response.data[0].estado,
+          dia: response.data[0].dia,
+        });
+
         setUser({
           ID: user_backend_data.data[0].id,
           monedas: user_backend_data.data[0].monedas,
           nombre_usuario: user_backend_data.data[0].nombre_usuario,
         });
 
-        setCompetition({
-          ID: Competition_data.ID,
-          temporada: Competition_data.temporada,
-          estado: Competition_data.estado,
-          dia: Competition_data.dia,
-        });
-
         ////////////////////////////////////////////////
         ///     SEGÚN ESTADO DE LA COMPETICIÓN      ////
         ////////////////////////////////////////////////
         /// GRUPOS
-        if (Competition_data.estado.split(".")[0] >= 1) {
-          const teamsResponse = await axios.get(
-            `http://localhost:3001/getSomeClubesByCategory/${32}`
-          );
-          setTeams({ Group_state: teamsResponse.data });
-        }
-        if (Competition_data.estado.split(".")[0] > 1) {
+        if (Competition_data.estado.split(".")[0] <= 1) {
+          //meter clubes
+          fetchTeams();
+        } else if (Competition_data.estado.split(".")[0] > 1) {
           fetchGroups(Competition_data.ID, competition_rounds[0].toUpperCase());
         }
         if (Competition_data.estado.split(".")[0] > 2) {
@@ -273,6 +277,25 @@ const Inicio = () => {
   };
   const closeBetCard = () => {
     setBetCart(false);
+  };
+  const fetchTeams = async () => {
+    try {
+      const teamss = [];
+      for (let country in teamsByCountry) {
+        const response = await axios.get(
+          "http://localhost:3001/getClubsByCountry",
+          { params: { value1: country, value2: teamsByCountry[country] } }
+        );
+        teamss.push(...response.data);
+      }
+      const response = await axios.get("http://localhost:3001/getOtherClubs", {
+        params: { value1: Object.keys(teamsByCountry), value2: 10 },
+      });
+      teamss.push(...response.data);
+      setTeams({ Group_state: teamss.sort((a, b) => a.category - b.category) });
+    } catch (error) {
+      console.warn("Error fetching teams: ", error);
+    }
   };
   const checkBetResults = () => {
     const temp_notification = {
@@ -439,6 +462,10 @@ const Inicio = () => {
 
       switch (round) {
         case competition_rounds[0].toUpperCase():
+          setTeams((prevDict) => ({
+            ...prevDict,
+            Group_state: teamsResponse.data,
+          }));
           setGroups((prevDict) => ({
             ...prevDict,
             Group_state: groupByLetra(teamsResponse.data),
@@ -663,7 +690,7 @@ const Inicio = () => {
     }
   };
 
-  const handleMatches = async () => {
+  const handleGroupMatches = async () => {
     const order = [
       [0, 1, 2, 3],
       [1, 2, 0, 3],
@@ -678,64 +705,38 @@ const Inicio = () => {
 
       for (let i = 0; i < order.length; i++) {
         Object.keys(groups.Group_state).map((letra) => {
-          var cuotas = makeCuotas(
-            groups.Group_state[letra][order[i][0]].category,
-            groups.Group_state[letra][order[i][1]].category
-          );
+          for (let j = 0; j < 2; j++) {
+            const cuotas = makeCuotas(
+              groups.Group_state[letra][order[i][j]].category,
+              groups.Group_state[letra][order[i][j + 1]].category
+            );
+            const formattedDate = fech
+              .toISOString()
+              .slice(0, 19)
+              .replace("T", " ");
 
-          const formattedDate = fech
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " ");
-
-          axios.post(
-            "http://localhost:3001/addMatch",
-            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
-            {
-              local: groups.Group_state[letra][order[i][0]].name,
-              visitante: groups.Group_state[letra][order[i][1]].name,
+            axios.post("http://localhost:3001/addMatch", {
+              local: groups.Group_state[letra][order[i][j]].name,
+              visitante: groups.Group_state[letra][order[i][j + 1]].name,
               fecha: formattedDate,
-              location: groups.Group_state[letra][order[i][0]].country,
-              stadium: groups.Group_state[letra][order[i][0]].stadium,
-              grupo: groups.Group_state[letra][order[i][0]].id_grupo,
+              location: groups.Group_state[letra][order[i][j]].country,
+              stadium: groups.Group_state[letra][order[i][j]].stadium,
+              grupo: groups.Group_state[letra][order[i][j]].id_grupo,
               cuota_local: cuotas[0],
               cuota_empate: cuotas[1],
               cuota_visitante: cuotas[2],
-            }
-          );
-
-          cuotas = makeCuotas(
-            groups.Group_state[letra][order[i][2]].category,
-            groups.Group_state[letra][order[i][3]].category
-          );
-
-          axios.post(
-            "http://localhost:3001/addMatch",
-            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
-            {
-              local: groups.Group_state[letra][order[i][2]].name,
-              visitante: groups.Group_state[letra][order[i][3]].name,
-              fecha: formattedDate,
-              location: groups.Group_state[letra][order[i][2]].country,
-              stadium: groups.Group_state[letra][order[i][2]].stadium,
-              grupo: groups.Group_state[letra][order[i][2]].id_grupo,
-              cuota_local: cuotas[0],
-              cuota_empate: cuotas[1],
-              cuota_visitante: cuotas[2],
-            }
-          );
+            });
+          }
         });
         fech.setDate(fech.getDate() + 14);
       }
       await axios.put(
         "http://localhost:3001/updateCompetitionState",
-        { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
         {
           value1: competition.ID,
           value2: "3.MATCHED",
         }
       );
-
       fetchCompetitionInfo();
     } catch (error) {
       console.error("no va: ", error);
@@ -823,8 +824,83 @@ const Inicio = () => {
     );
     fetchCompetitionInfo();
   };
+  const groupTeams = (numberGroups) => {
+    const groups_aux = Array.from({ length: numberGroups }, () => []);
+    const countries_aux = Array.from({ length: numberGroups }, () => []);
 
-  const handleGroupTeams = async (teamsInRound, teamsPerGroup) => {
+    teams.Group_state.forEach((team, i) => {
+      const country = team.country;
+      let teamSet = false;
+
+      let groupNumber = i % numberGroups;
+      let tries = 0;
+      while (!teamSet && tries < numberGroups) {
+        if (
+          (groups_aux[groupNumber].length < 1) |
+          (!countries_aux[groupNumber].includes(country) &&
+            groups_aux[groupNumber].length < 4)
+        ) {
+          groups_aux[groupNumber].push(team);
+          countries_aux[groupNumber].push(country);
+          teamSet = true;
+        } else {
+          groupNumber = (groupNumber + 1) % numberGroups;
+          tries++;
+          if (tries >= 8) {
+            return null;
+          }
+        }
+      }
+    });
+    return groups_aux;
+  };
+
+  const handleGroupTeams = async () => {
+    var d = null;
+    try {
+      do {
+        d = groupTeams(Math.ceil(teams.Group_state.length / 4));
+      } while (d === null);
+      console.log("hecho group: ", d);
+
+      for (let i = 0; i < d.length; i++) {
+        let letra = String.fromCharCode(65 + i);
+
+        //POST GROUP
+        const groupResponse = await axios.post(
+          "http://localhost:3001/addGroup",
+          {
+            value1: competition.ID,
+            value2: competition_rounds[0].toUpperCase(),
+            value3: letra,
+          }
+        );
+        const backend_id_group = groupResponse.data;
+        d[i].forEach(async (team) => {
+          //POST TEAM
+          await axios.post("http://localhost:3001/addEquipoToGroup", {
+            value1: backend_id_group,
+            value2: team.name,
+          });
+        });
+      }
+      setGroups((prevDict) => ({ ...prevDict, Group_state: d }));
+
+      console.log(
+        "competition: ",
+        competition_statuses[competition.estado.split(".")[0]]
+      );
+
+      await axios.put("http://localhost:3001/updateCompetitionState", {
+        value1: competition.ID,
+        value2: competition_statuses[competition.estado.split(".")[1]],
+      });
+      fetchCompetitionInfo();
+    } catch (error) {
+      console.error("Error grouping teams:", error);
+    }
+  };
+  const handleKnockOutTeams = async (teamsInRound, teamsPerGroup) => {
     let round_teams = [];
     let ronda = "";
     switch (teamsInRound) {
@@ -959,7 +1035,7 @@ const Inicio = () => {
             ))}
 
             <button
-              onClick={() => handleGroupTeams(32, 4)}
+              onClick={() => handleGroupTeams()}
               disabled={loading || +competition?.estado.split(".")[0] > 1}
             >
               Hacer Grupos
@@ -970,27 +1046,34 @@ const Inicio = () => {
       case "2":
         return (
           <div>
-            <h2>Groups:</h2>
-            {Object.keys(groups.Group_state).map((letra, index) => (
-              <div key={index}>
-                <div
-                  onClick={() =>
-                    navigate(`/grupo/${letra.split(",")[0]}`, {
-                      state: { group: letra.split(",")[0], usuario: user },
-                    })
-                  }
-                >
-                  <h3>GRUPO {letra.split(",")[1]}:</h3>
-                  {groups.Group_state[letra].map((team, index) => (
-                    <div key={index}>
-                      - {team.name} - {team.country}
-                    </div>
-                  ))}
+            <h2>Groups</h2>
+            <div className="group-short-container">
+              {Object.keys(groups.Group_state).map((letra, index) => (
+                <div key={index}>
+                  <table
+                    className="group-short"
+                    onClick={() =>
+                      navigate(`/grupo/${letra.split(",")[0]}`, {
+                        state: { group: letra.split(",")[0], usuario: user },
+                      })
+                    }
+                  >
+                    <thead className="group-short-head">
+                      GRUPO {letra.split(",")[1]}
+                    </thead>
+                    <tbody className="group-short-body">
+                      {groups.Group_state[letra].map((team, index) => (
+                        <div key={index} className="group-short-team">
+                          {team.name} ({team.country})
+                        </div>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
             <button
-              onClick={handleMatches}
+              onClick={handleGroupMatches}
               disabled={loading || +competition?.estado.split(".")[0] > 2}
             >
               Generar Partidos
@@ -1036,7 +1119,9 @@ const Inicio = () => {
 
                       <div className="match-short-body">
                         <div className="match-short-column">
-                          <div className="team-short-name">{match.club_local}</div>
+                          <div className="team-short-name">
+                            {match.club_local}
+                          </div>
                         </div>
 
                         <div className="match-short-column">
@@ -1550,8 +1635,6 @@ const Inicio = () => {
           </div>
         );
 
-      // Add cases for other states...
-
       default:
         return <p>NO INFO TO SHOW YET</p>;
     }
@@ -1579,14 +1662,30 @@ const Inicio = () => {
   return (
     <div>
       <Layout>
+        <button onClick={() => navigate(-1)}>Back</button>
         {loading ? (
           <p>Loading...</p>
         ) : (
           <>
             {user && (
-              <div>
-                <p>Nombre: {user?.nombre_usuario}</p>
-                <p>Monedas: {user?.monedas}</p>
+              <div class="profile-short-container">
+                <div class="bg">
+                  <div class="bottom-section">
+                    <span class="profile">PERFIL</span>
+                    <span class="title">{user?.nombre_usuario}</span>
+                    <div class="row row1">
+                      <div class="item">
+                        <span class="big-text">{user?.monedas}</span>
+                        <span class="regular-text">Monedas</span>
+                      </div>
+                      <div class="item">
+                        <span class="big-text">0</span>
+                        <span class="regular-text">Apuestas</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="blob"></div>
               </div>
             )}
             <button onClick={openBetCard}>Ver Apuestas</button>

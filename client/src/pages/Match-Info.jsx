@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import MatchGenerator from "../routes/route_match";
+import { useNavigate} from "react-router-dom";
 
 function Match_Info() {
   const [match, setMatch] = useState(null);
@@ -30,6 +31,8 @@ function Match_Info() {
 
   const id_match = location.state.match;
   const usuario = location.state.usuario;
+
+  let navigate = useNavigate();
 
   const fetchMatchInfo = async () => {
     console.log("GETTING INFO");
@@ -165,6 +168,7 @@ function Match_Info() {
           <p>Monedas: {user?.monedas}</p>
         </div>
       )}
+      <button onClick={() => navigate(-1)}>Back</button> 
 
       {match && (
         <>

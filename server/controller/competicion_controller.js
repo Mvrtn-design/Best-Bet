@@ -22,9 +22,32 @@ controller.crearCompeticion = (req, res) => {
   });
 };
 
+controller.getClubesByCompetition = (req, res) => {
+  const idd = req.query.value1;
+  const ronda = req.query.value2;
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.error("Error al establecer la conexion");
+    }
+    conn.query(
+      "select * from club join estadisticas on club.name = estadisticas.nombre_equipo  join grupo on estadisticas.id_grupo = grupo.ID   join competicion on grupo.id_competicion = competicion.ID   where competicion.ID = ? and grupo.ronda = ?  order by grupo.letra",
+      [idd, ronda],
+      (err, grupos) => {
+        if (err) {
+          console.error("Fallo al get competicion debido a: ", err);
+        }
+        console.log("Grupos encontrados");
+        res.json(grupos);
+      }
+    );
+  });
+};
+
 controller.updateCompetitionState = (req, res) => {
   const idd = req.body.value1;
   const estadoo = req.body.value2;
+  console.log(idd,estadoo);
 
   req.getConnection((err, conn) => {
     if (err) {
