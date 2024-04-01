@@ -9,7 +9,8 @@ const partida_controller = require("../controller/partida_controller");
 const competicion_controller = require("../controller/competicion_controller");
 const match_controller = require('../controller/match_controller');
 const grupo_controller = require('../controller/grupo_controller');
-const club_controller  = require('../controller/club_controller' );
+const club_controller = require('../controller/club_controller');
+const bet_controller = require('../controller/bet_controller');
 
 /////////       MAIN            ///////////
 router.get("/getClubes", main_controller.getClubes);
@@ -17,6 +18,12 @@ router.get("/getClubNames", main_controller.getClubNames);
 router.get("/getClubByName/:name", main_controller.getClubByName);
 router.get("/getSomeClubesByCategory/:cantidadClubes", main_controller.getSomeClubesByCategory);
 router.post("/storeClubsJSON", main_controller.storeClubsJSON);
+
+/////////       BET             ///////////
+router.post("/addTicket", bet_controller.addTicket);
+router.post("/addBet", bet_controller.addBet);
+router.put("/updateEstadoTicket", bet_controller.cambiarEstadoTicket);
+router.get("/getLiveBetsByCompeticion/:id", bet_controller.getLiveBetsByCompeticion);
 
 /////////       CLUB            ///////////
 router.get("/getClubsByCountry", club_controller.clubsByCountry);
@@ -49,14 +56,15 @@ router.put("/getClubesByCompetition", competicion_controller.getClubesByCompetit
 router.get("/login", usuario_controller.irInicioSesion);
 router.get("/setIn", usuario_controller.irRegistrarse);
 router.get("/getUsers", usuario_controller.listaUsuarios);
-router.get("/get1user",tokenValido, usuario_controller.unUsuario);
-router.get("/getLogUser",tokenValido, usuario_controller.usuario_logueado);
+router.get("/get1user", tokenValido, usuario_controller.unUsuario);
+router.get("/getLogUser", tokenValido, usuario_controller.usuario_logueado);
 router.get("/delete/:id", usuario_controller.eliminarUsuario);
 router.get("/edit/:id", usuario_controller.verUsuarioEditar);
 router.post("/add", usuario_controller.guardarUsuario);
 router.post("/update/:id", usuario_controller.editarUsuario);
 router.get("/check", usuario_controller.checkUsuario);
 router.get("/auth", tokenValido, usuario_controller.usuario_autenticado);
+router.put("/setUserCoins/:id", usuario_controller.actualizarMonedas);
 
 /////////       PARTIDO            ///////////
 router.get("/getPartidoById/:id", match_controller.getMatchByID);

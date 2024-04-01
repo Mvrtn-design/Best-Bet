@@ -20,6 +20,28 @@ controller.listaUsuarios = (req, res) => {
   });
 };
 
+controller.actualizarMonedas = (req, res) => {
+  const id = req.params.id;
+  const estadoo = req.body.value1;
+
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.log(`Error al establecer la conexion: ${err}`);
+    }
+    conn.query(
+      `UPDATE usuario SET monedas = ? WHERE id = ? `,
+      [estadoo, id],
+      (errr, estado) => {
+        if (errr) {
+          console.error(errr);
+          res.json(errr); //manejar los errores con next (mas profesional)
+        }
+        console.log("Monedero actualizado");
+        res.json(estado);
+      }
+    );
+  });
+};
 
 controller.usuario_autenticado = (req, res) => {
   res.json(req.user);
@@ -48,9 +70,10 @@ controller.usuario_logueado = (req, res) => {
     const id_user = req.user.id;
     conn.query("SELECT * FROM usuario WHERE id = ?", [id_user], (err, usuario) => {
       if (err) {
-        res.json(err); //manejar los errores con next (mas profesional)
+        res.json("Error".err); //manejar los errores con next (mas profesional)
       }
-      res.json(usuario);
+      console.log("Usuario encontrado");
+      res.send(usuario[0]);
     });
   });
 };
@@ -125,8 +148,8 @@ controller.checkUsuario = (req, res) => {
             //LOGUEADO CORRECTAMENTE
             //TODO: generar de forma segura
             const tokenAcceso = sign({ username: usuario[0].nombre_usuario, id: usuario[0].id }, "importantsecret");
-            console.log("TODO OK: ",usuario);
-            res.json({username: usuario[0].nombre_usuario, id: usuario[0].id ,token: tokenAcceso});
+            console.log("TODO OK: ", usuario);
+            res.json({ username: usuario[0].nombre_usuario, id: usuario[0].id, token: tokenAcceso });
           }
         });
       } else if (usuario.length == 0) {

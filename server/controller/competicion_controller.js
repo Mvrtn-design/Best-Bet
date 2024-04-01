@@ -47,7 +47,6 @@ controller.getClubesByCompetition = (req, res) => {
 controller.updateCompetitionState = (req, res) => {
   const idd = req.body.value1;
   const estadoo = req.body.value2;
-  console.log(idd,estadoo);
 
   req.getConnection((err, conn) => {
     if (err) {
@@ -60,6 +59,7 @@ controller.updateCompetitionState = (req, res) => {
         if (errr) {
           res.json(errr); //manejar los errores con next (mas profesional)
         }
+        console.log("Estado actualizado");
         res.json(estado);
       }
     );

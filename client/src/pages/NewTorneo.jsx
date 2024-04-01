@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "./partials/Layout";
 
@@ -7,32 +7,34 @@ function NewTorneo() {
   const [user, setUser] = useState({});
   const [competiciones, setCompeticiones] = useState([]);
   const [form, setForm] = useState({
-    usuario: "",
+    id_usuario: "",
   });
+  const inicio_temporada = 2023;
+  const temporada_actual = `${inicio_temporada}-${inicio_temporada + 1}`;
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get("http://localhost:3001/getLogUser",{ headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } })      
-        .then((response) => {
-          if (response.data.error) {
-            alert(response.data.error);
-            navigate("/logIn");
-          } else {
-            const userData = response.data[0];
-            setUser(userData);
-            setForm({ ...form, usuario: userData.id });
-            getCompeticionesByUser(response.data[0]).then(
-              (datosCompeticion) => {
-                setCompeticiones(datosCompeticion);
-              }
-            );
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching user:", error);
-        });
-  }, [form]);
-
-  const navigate = useNavigate();
+    axios
+      .get("http://localhost:3001/getLogUser", {
+        headers: { tokenAcceso: localStorage.getItem("tokenAcceso") },
+      })
+      .then((response) => {
+        if (response.data.error) {
+          alert(response.data.error);
+          navigate("/logIn");
+        } else {
+          const userData = response.data;
+          setUser(userData);
+          setForm({ ...form, id_usuario: userData.id });
+          getCompeticionesByUser(response.data.id).then((datosCompeticion) => {
+            setCompeticiones(datosCompeticion);
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching user:", error);
+      });
+  }, []);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -51,7 +53,6 @@ function NewTorneo() {
       const datos = await response.json();
 
       postCompetition(datos).then((datosCompeticion) => {
-        //crearCompeticion();
         navigate(`/menu/${datos}/${datosCompeticion.data}`);
       });
     } catch (error) {
@@ -59,91 +60,92 @@ function NewTorneo() {
     }
   }
 
+  async function postCompetition(idPartida) {
+    const formData = {
+      nombre: "champions1",
+      partida: idPartida,
+      temporada: temporada_actual,
+    };
+
+    try {
+      const responseCompeticion = await axios.post(
+        "http://localhost:3001/addCompeticion",
+        formData
+      );
+      return responseCompeticion;
+    } catch (error) {
+      console.error("Error posting competition:", error);
+    }
+  }
+
+  async function getCompeticionesByUser(id_usuario) {
+    try {
+      const responseCompeticion = await axios.get(
+        `http://localhost:3001/getCompeticionByUser/${id_usuario}`
+      );
+      return responseCompeticion.data;
+    } catch (error) {
+      console.error("Error getting competitions:", error);
+    }
+  }
+
   return (
-    <>
-      <Layout>
-        <h1>TORNEO</h1>
-        <h2>TORNEOS GUARDADOS</h2>
-        <table className="tabla_usuarios">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>NOMBRE</th>
-              <th>TEMPORADA</th>
-              <th>ESTADO</th>
-              <th>Actions</th>
+    <Layout>
+      <h1>TORNEO</h1>
+      <h2>TORNEOS GUARDADOS</h2>
+      <table className="tabla_usuarios">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>NOMBRE</th>
+            <th>TEMPORADA</th>
+            <th>ESTADO</th>
+            <th>Accioness</th>
+          </tr>
+        </thead>
+        <tbody>
+          {competiciones.map((item) => (
+            <tr key={item.ID}>
+              <td>{item.ID}</td>
+              <td>{item.nombre}</td>
+              <td>{item.temporada}</td>
+              <td>{item.estado}</td>
+              <td>
+                <button
+                  onClick={() => navigate(`/menu/${item.partida}/${item.ID}`)}
+                >
+                  ENTRAR
+                </button>
+                <button>ELIMINAR</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {competiciones.map((item) => (
-              <tr key={item.ID}>
-                <td>{item.ID}</td>
-                <td>{item.nombre}</td>
-                <td>{item.temporada}</td>
-                <td>{item.estado}</td>
-                <td>
-                  <Link to={`/menu/${item.partida}/${item.ID}`}> ENTRAR </Link>
-                  <button>ELIMINAR</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <h2>NUEVO TORNEO</h2>
-        <form onSubmit={handleSubmit}>
-          <label>Temporada: </label>
-          <label>
-            <input
-              type="text"
-              name="nombre"
-              value={"2023-2024"}
-              readOnly
-            ></input>
-          </label>
-          <label>Nombre usuario: </label>
-          <label>
-            <input
-              type="text"
-              name="nombre_usuario"
-              value={user.nombre_usuario}
-              readOnly
-            ></input>
-          </label>
-          <input type="submit" value="COMENZAR"></input>
-        </form>
-      </Layout>
-    </>
+          ))}
+        </tbody>
+      </table>
+      <h2>NUEVO TORNEO</h2>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Temporada:
+          <input
+            type="text"
+            name="nombre"
+            value={temporada_actual}
+            readOnly
+          ></input>
+        </label>
+        <div>
+          Nombre usuario:
+          <input
+            type="text"
+            name="nombre_usuario"
+            defaultValue={user.nombre_usuario}
+            readOnly
+          ></input>
+        </div>
+        <button type="submit">COMENZAR NUEVA COMPETICION</button>
+      </form>
+    </Layout>
   );
-}
-async function postCompetition(idPartida) {
-  const idP = idPartida;
-  const formData = {
-    nombre: "champions1",
-    partida: idP,
-    temporada: "2023-2024",
-  };
-
-  try {
-    const responseCompeticion = await axios.post(
-      "http://localhost:3001/addCompeticion",
-      formData
-    );
-    return responseCompeticion;
-  } catch (error) {
-    console.error("Error posting competition:", error);
-  }
-}
-
-async function getCompeticionesByUser(idUser) {
-  const idP = idUser.id;
-  try {
-    const responseCompeticion = await axios.get(
-      `http://localhost:3001/getCompeticionByUser/${idP}`
-    );
-    return responseCompeticion.data;
-  } catch (error) {
-    console.error("Error getting competitions:", error);
-  }
 }
 
 export default NewTorneo;

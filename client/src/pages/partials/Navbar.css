@@ -1,9 +1,10 @@
 .navbar {
   background-color: #060b26;
-  height: 80px;
+  height: 50px;
   display: flex;
   justify-content: start;
   align-items: center;
+  margin:  0  0 10px  0;
 }
 
 .menu-bars {
@@ -22,6 +23,7 @@
   top: 0;
   left: -100%;
   transition: 850ms;
+  z-index: 99;
 }
 
 .nav-menu.active {

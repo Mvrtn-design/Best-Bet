@@ -1,7 +1,7 @@
 import React from "react";
 import Popup from "./partials/Popup";
 import Layout from "./partials/Layout";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -74,36 +74,41 @@ const Inicio = () => {
     Semifinals: {},
     Final: {},
   });
-  const [sidebar, setSidebar] = useState({
-    open: false,
-    match: null,
-    coinBet: 0,
-    odd: 0,
-    betChoice: null,
-  });
+
+  // BETS
+  const [ID_distributor, setID_distributor] = useState(0);
+  const [openPopup, setopenPopup] = useState(false);
+  const [openTicket, setOpenTicket] = useState(false);
+  const [betCard, setBetCart] = useState(false);
+  const [bets, setBets] = useState([]);
   const [notifications, setNotificaction] = useState({
     apuestas_ganadas: 0,
     apuestas_perdidas: 0,
     apuestas_sin_finalizar: 0,
   });
+  const [ticket, setTicket] = useState({
+    bets: [],
+    bet_coins: 0,
+    status: "",
+    potencial_prize: 0.0,
+  });
+
+  //// CURRENT STATE
+
+  let temporada_actual = "2023";
   const [currentSection, setCurrentSection] = useState(competition_statuses[0]);
   const [loading, setLoading] = useState(true);
   const [IdMatchesReadyToPlay, setIdMatchesReadyToPlay] = useState([]);
-  const [bets, setBets] = useState([]);
-  const [openPopup, setopenPopup] = useState(false);
-  const [betCard, setBetCart] = useState(false);
   const fechas = {
-    octavos: new Date("2023-12-01T00:00:00").toISOString().slice(0, 24),
+    octavos: new Date(`${temporada_actual}-12-01T00:00:00`)
+      .toISOString()
+      .slice(0, 24),
     cuartos: new Date("2024-01-05T00:00:00").toISOString().slice(0, 24),
     Semifinales: new Date("2024-01-20T00:00:00").toISOString().slice(0, 24),
     final: new Date("2024-02-10T00:00:00").toISOString().slice(0, 24),
     Champion: new Date("2024-03-01T00:00:00").toISOString().slice(0, 24),
   };
   ////////              FUNCTIONS         ////////////
-  useEffect(() => {
-    fetchCompetitionInfo();
-  }, []);
-
   async function fetchCompetitionInfo() {
     console.log("GETTING COMPETITION INFO");
     if (loading == false) {
@@ -114,7 +119,7 @@ const Inicio = () => {
         `http://localhost:3001/getUSerByPartida/${idPartida}`,
         { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
       );
-      const response = await axios.get(
+      const competition_response = await axios.get(
         `http://localhost:3001/getCompeticionByPartida/${idPartida}`
       );
       if (user_backend_data.data.error) {
@@ -122,13 +127,13 @@ const Inicio = () => {
         console.error(user_backend_data.error);
         navigate("/");
       } else {
-        const Competition_data = response.data[0];
-
+        const Competition_data = competition_response.data[0];
+        temporada_actual = competition_response.data[0].temporada.split("-")[0];
         setCompetition({
-          ID: response.data[0].ID,
-          temporada: response.data[0].temporada,
-          estado: response.data[0].estado,
-          dia: response.data[0].dia,
+          ID: competition_response.data[0].ID,
+          temporada: competition_response.data[0].temporada,
+          estado: competition_response.data[0].estado,
+          dia: competition_response.data[0].dia,
         });
 
         setUser({
@@ -137,20 +142,22 @@ const Inicio = () => {
           nombre_usuario: user_backend_data.data[0].nombre_usuario,
         });
 
+        
+
         ////////////////////////////////////////////////
         ///     SEGÚN ESTADO DE LA COMPETICIÓN      ////
         ////////////////////////////////////////////////
         /// GRUPOS
         if (Competition_data.estado.split(".")[0] <= 1) {
           //meter clubes
-          fetchTeams();
+          await fetchTeams();
         } else if (Competition_data.estado.split(".")[0] > 1) {
           fetchGroups(Competition_data.ID, competition_rounds[0].toUpperCase());
         }
         if (Competition_data.estado.split(".")[0] > 2) {
-          fetchMathes(Competition_data.ID, competition_rounds[0].toUpperCase());
-          fetchPartidosDisponibles(Competition_data.ID);
-          if (fechas.octavos == competition.dia) {
+          await fetchMathes(Competition_data.ID, competition_rounds[0].toUpperCase());
+          await fetchPartidosDisponibles(Competition_data.ID);
+          if (fechas.octavos == competition_response.data[0].dia) {
             setNewRound(competition_statuses[3]);
           }
           /// OCTAVOS
@@ -219,65 +226,25 @@ const Inicio = () => {
           const semis = await fetchClasificados(competition_rounds[4]);
           setTeams((prevDict) => ({ ...prevDict, Champion: semis }));
         }
-
-        setLoading(false);
+        
+        
+        setTimeout(() => {
+          /// APUESTAS
+        fetchBets(competition_response.data[0].ID);
+          setLoading(false);
+       }, 2000);
       }
     } catch (error) {
       console.error("Error fetching competition info: ", error);
       setLoading(false);
     }
   }
-  const handleBetIncrease = () => {
-    if (user.monedas > 0) {
-      setSidebar((prevSidebar) => ({
-        ...prevSidebar,
-        coinBet: sidebar.coinBet + 1,
-      }));
-    }
-  };
-  const handleBetDecrease = () => {
-    if (sidebar.coinBet > 0) {
-      setSidebar((prevSidebar) => ({
-        ...prevSidebar,
-        coinBet: sidebar.coinBet - 1,
-      }));
-    }
-  };
-  const handleBetClose = () => {
-    setSidebar({
-      open: false,
-      matchId: null,
-      coinBet: 0,
-      odd: 0,
-      betChoice: null,
-    });
-  };
-  const handleBetSubmit = (temp_bar) => {
-    const bet_status = "ON_GOING"; // ON_GOING | WINNER | LOOSER
-    const newBet = {
-      match: temp_bar.match,
-      amount_bet: temp_bar.coinBet,
-      choice: temp_bar.betChoice,
-      odd: temp_bar.odd,
-      estado_partido: bet_status,
-    };
-    setBets((prevBets) => [...prevBets, newBet]);
-    setSidebar({
-      open: false,
-      matchId: null,
-      coinBet: 0,
-      odd: 0,
-      betChoice: null,
-    });
+  useEffect(() => {
+    fetchCompetitionInfo();
+  }, []);
 
-    setUser({ ...user, monedas: user.monedas - temp_bar.coinBet });
-  };
-  const openBetCard = () => {
-    setBetCart(true);
-  };
-  const closeBetCard = () => {
-    setBetCart(false);
-  };
+
+
   const fetchTeams = async () => {
     try {
       const teamss = [];
@@ -296,59 +263,6 @@ const Inicio = () => {
     } catch (error) {
       console.warn("Error fetching teams: ", error);
     }
-  };
-  const checkBetResults = () => {
-    const temp_notification = {
-      apuestas_ganadas: 0,
-      apuestas_perdidas: 0,
-      apuestas_sin_finalizar: 0,
-    };
-
-    let cash_won = 0;
-
-    for (let i = 0; i < bets.length; i++) {
-      const match_aux = findMatchById(bets[i].match.Idd, bets[i].match.ronda);
-
-      if (match_aux.estado_partido === "FINISHED") {
-        console.log("Match  finished");
-
-        let match_result = "";
-        if (match_aux.localGoals > match_aux.awayGoals) {
-          match_result = "Local";
-        } else if (match_aux.localGoals < match_aux.awayGoals) {
-          match_result = "Away";
-        } else {
-          match_result = "Draw";
-        }
-        let decitiion = "";
-        if (bets[i].choice === match_result) {
-          temp_notification.apuestas_ganadas++;
-          decitiion = `WINNER (+ ${bets[i].amount_bet * bets[i].odd})`;
-          cash_won += bets[i].amount_bet * bets[i].odd;
-        } else {
-          decitiion = "LOOSER";
-          temp_notification.apuestas_perdidas++;
-        }
-        const newBets = [...bets];
-        newBets[i].estado_partido = decitiion;
-        setBets(newBets);
-      } else {
-        temp_notification.apuestas_sin_finalizar++;
-      }
-    }
-
-    setNotificaction((prevNotifications) => ({
-      ...prevNotifications,
-      apuestas_sin_finalizar: temp_notification.apuestas_sin_finalizar,
-      apuestas_ganadas: temp_notification.apuestas_ganadas,
-      apuestas_perdidas: temp_notification.apuestas_perdidas,
-    }));
-    setopenPopup(true);
-
-    setUser({
-      ...user,
-      monedas: user.monedas + cash_won,
-    });
   };
 
   function groupByLetra(equipos) {
@@ -373,6 +287,19 @@ const Inicio = () => {
       result.push(chunk);
     }
     return result;
+  }
+  function groupTickets(allBets) {
+    return allBets.reduce((tickets, item) => {
+      const ticketName = [item.id_ticket];
+
+      if (!tickets[ticketName]) {
+        tickets[ticketName] = [];
+      }
+
+      tickets[ticketName].push(item);
+      return tickets;
+    }, {});
+
   }
 
   const fetchOctavosFinal = async () => {
@@ -521,7 +448,7 @@ const Inicio = () => {
         case competition_rounds[0].toUpperCase():
           setMatches((prevDict) => ({
             ...prevDict,
-            Group_state: groupByJornada(teamsResponse.data),
+            Group_state: teamsResponse.data,
           }));
           break;
         case competition_rounds[1].toUpperCase():
@@ -566,51 +493,29 @@ const Inicio = () => {
     }
     return results;
   }
-  const findMatchById = (id, ronda) => {
-    console.log("DATOS: ", id, ronda);
+  const findMatchById = (id, ronda = "") => {
     switch (ronda) {
+      //Caso sin ronda especificada, irá por todas 
+      case "":
+        var res = null;
+        for (let index = 0; index < competition_rounds.length && res === null; index++) {
+          res = findMatchById(id, competition_rounds[index].toUpperCase());
+        }
+        return res;
       case competition_rounds[0].toUpperCase():
-        console.log("gruuu");
-        console.log(matches.Group_state);
         return matches.Group_state.find((match) => match.Idd === id) || null;
-        break;
       case competition_rounds[1].toUpperCase():
         return matches.Round_of_16.find((match) => match.Idd === id) || null;
-        break;
       case competition_rounds[2].toUpperCase():
         return matches.Round_of_8.find((match) => match.Idd === id) || null;
-        break;
       case competition_rounds[3].toUpperCase():
         return matches.Semifinals.find((match) => match.Idd === id) || null;
-        break;
       case competition_rounds[4].toUpperCase():
         return matches.Final.find((match) => match.Idd === id) || null;
-        break;
       default:
-        console.error("Error al encotrar el partido");
+        console.error("Error al encontrar el partido");
         return null;
-        break;
     }
-  };
-
-  const handleBet = (match, bet_choice) => {
-    var odd = 0;
-    switch (bet_choice) {
-      case "Local":
-        odd = match.cuota_local;
-        break;
-      case "Draw":
-        odd = match.cuota_empate;
-        break;
-      case "Away":
-        odd = match.cuota_visitante;
-        break;
-
-      default:
-        console.error("WARNING: Tipo apuesta no encontrada");
-        break;
-    }
-    setSidebar({ open: true, match, coinBet: 0, odd, betChoice: bet_choice });
   };
 
   const handleMatches2 = async (ronda) => {
@@ -730,13 +635,10 @@ const Inicio = () => {
         });
         fech.setDate(fech.getDate() + 14);
       }
-      await axios.put(
-        "http://localhost:3001/updateCompetitionState",
-        {
-          value1: competition.ID,
-          value2: "3.MATCHED",
-        }
-      );
+      await axios.put("http://localhost:3001/updateCompetitionState", {
+        value1: competition.ID,
+        value2: "3.MATCHED",
+      });
       fetchCompetitionInfo();
     } catch (error) {
       console.error("no va: ", error);
@@ -745,13 +647,9 @@ const Inicio = () => {
   const handleAdvance = async () => {
     if (IdMatchesReadyToPlay <= 0) {
       try {
-        const readies = await axios.put(
-          "http://localhost:3001/avanzarUnDia",
-          { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
-          {
-            value1: competition.ID,
-          }
-        );
+        const readies = await axios.put("http://localhost:3001/avanzarUnDia", {
+          value1: competition.ID,
+        });
         setIdMatchesReadyToPlay(readies.data);
         readies.data.forEach(async (element) => {
           await axios.put(
@@ -770,6 +668,284 @@ const Inicio = () => {
       alert("Quedan partidos por simular: ", IdMatchesReadyToPlay.length);
     }
   };
+
+  ////////////////////////////            APUESTAS           ///////////////////////////////////////////
+  const handleBet = (match, cuota, bet_choice, ronda) => {
+    const bet_aux = {
+      bet_id: ID_distributor,
+      match: match,
+      match_ID: match.Idd,
+      choice: bet_choice,
+      odd: cuota,
+    };
+
+    setID_distributor(ID_distributor + 1);
+
+    var bets_aux = ticket.bets;
+    bets_aux.push(bet_aux);
+    setTicket({ ...ticket, bets: bets_aux });
+
+    var sumOdds = 0.0;
+    for (let i = 0; i < ticket.bets.length; i++) {
+      sumOdds += ticket.bets[i].odd;
+    }
+    setTicket((prevSidebar) => ({
+      ...prevSidebar,
+      potencial_prize: ticket.bet_coins * sumOdds,
+    }));
+
+    if (!openTicket) {
+      setOpenTicket(true);
+    }
+  };
+  const handleBetIncrease = async () => {
+    if (user.monedas > 0) {
+      const aux_coins = ticket.bet_coins + 1;
+
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        bet_coins: aux_coins,
+      }));
+      var sumOdds = 0.0;
+      for (let i = 0; i < ticket.bets.length; i++) {
+        sumOdds += ticket.bets[i].odd;
+      }
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        potencial_prize: aux_coins * sumOdds,
+      }));
+    }
+  };
+  const handleBetDecrease = async () => {
+    if (ticket.bet_coins > 0) {
+      const aux_coins = ticket.bet_coins - 1;
+
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        bet_coins: aux_coins,
+      }));
+      var sumOdds = 0.0;
+      for (let i = 0; i < ticket.bets.length; i++) {
+        sumOdds += ticket.bets[i].odd;
+      }
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        potencial_prize: aux_coins * sumOdds,
+      }));
+    }
+  };
+
+  const handleDeleteBet = async (id) => {
+    const bets_aux = ticket.bets.filter((x) => x.bet_id !== id);
+    const count = bets_aux.length;
+    setTicket({ ...ticket, bets: bets_aux });
+    var sumOdds = 0.0;
+    for (let i = 0; i < bets_aux.length; i++) {
+      sumOdds += bets_aux[i].odd;
+    }
+    setTicket((prevSidebar) => ({
+      ...prevSidebar,
+      potencial_prize: ticket.bet_coins * sumOdds,
+    }));
+    if (count === 0) {
+      setOpenTicket(false);
+    }
+  };
+  const handleBetSubmit = async () => {
+    let confirmation_check = true;
+
+    //check todos los partidos aun no están jugados
+    for (let i = 0; i < ticket.bets.length && confirmation_check === true; i++) {
+      if (findMatchById(ticket.bets[i].match_ID).estado_partido !== "NOT_STARTED") {
+        confirmation_check = false;
+      }
+    }
+
+    if (confirmation_check) {
+      const ticket_status = "ON_GOING"; // ON_GOING | WINNER | LOOSER
+      var bets_aux = bets;
+      const aux_coins = ticket.bet_coins;
+      const aux_ticket = ticket;
+      aux_ticket.status = ticket_status;
+
+      postTicket(aux_ticket);
+
+      bets_aux.push(aux_ticket);
+      setBets(bets_aux);
+
+      await updateWallet(aux_coins);
+
+      alert("APUESTA REALIZADA");
+
+    } else {
+      alert("Apuestas no válidas, por favor introdúzcalas nuevamente");
+    }
+
+    setTicket({ bets: [], bet_coins: 0, status: "", potencial_prize: 0.0 });
+    setOpenTicket(false);
+  };
+  const postTicket = async (ticket) => {
+    const competition_response = await axios.get(
+      `http://localhost:3001/getCompeticionByPartida/${idPartida}`
+    );
+    const ticket_response = await axios.post(
+      "http://localhost:3001/addTicket",
+      {
+        competition: competition_response.data[0].ID,
+        potencial_prize: ticket.potencial_prize,
+        coins: ticket.bet_coins,
+        status: ticket.status,
+      }
+    );
+    const backend_id_ticket = ticket_response.data;
+    console.log(backend_id_ticket);
+    ticket.bets.forEach(async (bet) => {
+      //POST BET
+      await axios.post("http://localhost:3001/addBet", {
+        ticket_id: backend_id_ticket,
+        match_id: bet.match_ID,
+        choice: bet.choice,
+        odd: bet.odd,
+      });
+    });
+  }
+  const updateWallet = async (coins) => {
+    await axios.put(
+      `http://localhost:3001/setUserCoins/${user.ID}`,
+      {
+        value1: (user.monedas - coins),
+      }
+    );
+    setUser({ ...user, monedas: user.monedas - coins });
+  }
+
+  const openBetCard = () => {
+    setBetCart(true);
+  };
+  const closeBetCard = () => {
+    setBetCart(false);
+  };
+
+  const checkBetResults = () => {
+    const temp_notification = {
+      apuestas_ganadas: 0,
+      apuestas_perdidas: 0,
+      apuestas_sin_finalizar: 0,
+    };
+    let cash_won = 0;
+    //CHECKEO TICKET
+    for (let i = 0; i < bets.length; i++) {
+      console.log("ticket: ", bets[i]);
+
+      if (bets[i].status === "ON_GOING") {
+        var estado_ticket = ""; //ESTADOS: ON_GOING, winner, looser, on_going
+
+        //CHECKEO PARTIDO DEL TICKET
+        for (
+          let j = 0;
+          j < bets[i].bets.length &&
+          (estado_ticket == "" || estado_ticket == "winner");
+          j++
+        ) {
+          console.log(bets[i].bets[j]);
+          const match_aux = findMatchById(bets[i].bets[j].match.Idd);
+          console.log("partido apostado: ", match_aux);
+
+          if (match_aux.status === "FINISHED") {
+            let match_result = "";
+            if (match_aux.localGoals > match_aux.awayGoals) {
+              match_result = "Local";
+            } else if (match_aux.localGoals < match_aux.awayGoals) {
+              match_result = "Away";
+            } else {
+              match_result = "Draw";
+            }
+            const decition = bets[i].bets[j].choice;
+            console.log(`digo: ${decition} y fue: ${match_result}`);
+
+            //PARTIDO ACERTADO
+
+            if (decition === match_result) {
+              estado_ticket = "winner";
+              console.log(`Match ${j + 1} acertado`);
+            } else {
+              //PARTIDO FALLADO
+              estado_ticket = "looser";
+              console.log(`Match ${j + 1} fallado`);
+            }
+          } else {
+            estado_ticket = "ON_GOING";
+            console.log(`Match ${j + 1} not finished`);
+          }
+        }
+        console.log("estado: ", estado_ticket);
+        //ACTUALIZAR TICKET
+        switch (estado_ticket) {
+          case "winner":
+
+            console.log(`apuesta ${i + 1} ganada`);
+            temp_notification.apuestas_ganadas++;
+            cash_won += bets[i].potencial_prize;
+            break;
+          case "looser":
+            temp_notification.apuestas_perdidas++;
+            console.log(`apuesta ${i + 1} perdida`);
+            break;
+          case "ON_GOING":
+            temp_notification.apuestas_sin_finalizar++;
+            console.log(`apuesta ${i + 1} CONTINÚA AÚN`);
+            break;
+
+          default:
+            console.error("Error al obtener el estado del ticket");
+            break;
+        }
+      }
+    }
+
+    setNotificaction((prevNotifications) => ({
+      ...prevNotifications,
+      apuestas_sin_finalizar: temp_notification.apuestas_sin_finalizar,
+      apuestas_ganadas: temp_notification.apuestas_ganadas,
+      apuestas_perdidas: temp_notification.apuestas_perdidas,
+    }));
+    setopenPopup(true);
+
+    setUser({
+      ...user,
+      monedas: user.monedas + cash_won,
+    });
+  };
+
+  const updateTicket = async (id_Ticket, estado) => {
+    await axios.put(
+      `http://localhost:3001/updateEstadoTicket/${id_Ticket}`,
+      {
+        value1: estado,
+      }
+    );
+  }
+
+  const fetchBets = async (competition_id) => {
+    const tickets_response = await axios.get(
+      `http://localhost:3001/getLiveBetsByCompeticion/${competition_id}`
+    );
+
+    const grouped_tickets = groupTickets(tickets_response.data);
+    var temp_ticket = [];
+
+    for (const ticket_number in grouped_tickets) {
+      var temp_bets = [];
+      for (const bet_number in grouped_tickets[ticket_number]) {
+        const bet = grouped_tickets[ticket_number][bet_number];
+        const temp_match = findMatchById(bet.id_partido);
+        
+        temp_bets.push({ choice: bet.eleccion, odd: bet.cuota, match: temp_match });
+      }
+      temp_ticket.push({ bet_coins: grouped_tickets[ticket_number][0].cantidad_apostada, potencial_prize: grouped_tickets[ticket_number][0].ganancia_potencial, status: grouped_tickets[ticket_number][0].estado, bets: temp_bets });
+    }
+    setBets(temp_ticket);
+  }
 
   const handleSimular = async (id_match, local, visitante, id_group) => {
     const marcador_local = Math.round(Math.random() * 4);
@@ -800,8 +976,8 @@ const Inicio = () => {
           marcador_local > marcador_visitante
             ? 3
             : marcador_local == marcador_visitante
-            ? 1
-            : 0,
+              ? 1
+              : 0,
       }
     );
     //Visitante
@@ -818,8 +994,8 @@ const Inicio = () => {
           marcador_local < marcador_visitante
             ? 3
             : marcador_local == marcador_visitante
-            ? 1
-            : 0,
+              ? 1
+              : 0,
       }
     );
     fetchCompetitionInfo();
@@ -1028,10 +1204,12 @@ const Inicio = () => {
         return (
           <div>
             <h2>Teams:</h2>
-            {teams.Group_state.map((team) => (
-              <p key={team.id}>
-                {team.name}, {team.country}
-              </p>
+            {teams.Group_state.map((team, index) => (
+              <div key={`${team.id}-${index}`}>
+                <p>
+                  {team.name}, {team.country}
+                </p>
+              </div>
             ))}
 
             <button
@@ -1042,7 +1220,6 @@ const Inicio = () => {
             </button>
           </div>
         );
-
       case "2":
         return (
           <div>
@@ -1059,7 +1236,7 @@ const Inicio = () => {
                     }
                   >
                     <thead className="group-short-head">
-                      GRUPO {letra.split(",")[1]}
+                      <p>GRUPO {letra.split(",")[1]}</p>
                     </thead>
                     <tbody className="group-short-body">
                       {groups.Group_state[letra].map((team, index) => (
@@ -1091,25 +1268,17 @@ const Inicio = () => {
               disabled={
                 loading ||
                 +competition?.estado.split(".")[0] !== 3 ||
-                IdMatchesReadyToPlay.length != 0
+                IdMatchesReadyToPlay.length !== 0
               }
             >
               Avanzar
             </button>
             {matches.Group_state != [] &&
-              matches.Group_state.map((jornada, index) => (
+              groupByJornada(matches.Group_state).map((jornada, index) => (
                 <div key={index}>
                   <h2>JORNADA {index + 1}:</h2>
                   {jornada.map((match, index) => (
-                    <div
-                      key={index}
-                      className="match-short-container"
-                      onClick={() =>
-                        navigate(`/partido/${match.Idd}`, {
-                          state: { match: match.Idd, usuario: user },
-                        })
-                      }
-                    >
+                    <div key={index} className="match-short-container">
                       <div className="match-short-header">
                         <div className="match-short-place">
                           {match.stadium} in {match.location}
@@ -1118,19 +1287,40 @@ const Inicio = () => {
                       </div>
 
                       <div className="match-short-body">
-                        <div className="match-short-column">
+                        <div
+                          className="match-short-column"
+                          onClick={() =>
+                            navigate(`/partido/${match.Idd}`, {
+                              state: { match: match.Idd, usuario: user },
+                            })
+                          }
+                        >
                           <div className="team-short-name">
                             {match.club_local}
                           </div>
                         </div>
 
-                        <div className="match-short-column">
+                        <div
+                          className="match-short-column"
+                          onClick={() =>
+                            navigate(`/partido/${match.Idd}`, {
+                              state: { match: match.Idd, usuario: user },
+                            })
+                          }
+                        >
                           <div className="match-short-score">
                             {match.marcador_local} - {match.marcador_visitante}
                           </div>
                         </div>
 
-                        <div className="match-short-column">
+                        <div
+                          className="match-short-column"
+                          onClick={() =>
+                            navigate(`/partido/${match.Idd}`, {
+                              state: { match: match.Idd, usuario: user },
+                            })
+                          }
+                        >
                           <div className="team-short-name">
                             {match.club_visitante}
                           </div>
@@ -1144,6 +1334,7 @@ const Inicio = () => {
                                 onClick={() =>
                                   handleBet(
                                     match,
+                                    match.cuota_local,
                                     "Local",
                                     competition_rounds[0]
                                   )
@@ -1159,6 +1350,7 @@ const Inicio = () => {
                                 onClick={() =>
                                   handleBet(
                                     match,
+                                    match.cuota_empate,
                                     "Draw",
                                     competition_rounds[0]
                                   )
@@ -1174,6 +1366,7 @@ const Inicio = () => {
                                 onClick={() =>
                                   handleBet(
                                     match,
+                                    match.cuota_visitante,
                                     "Away",
                                     competition_rounds[0]
                                   )
@@ -1222,7 +1415,7 @@ const Inicio = () => {
 
             <button
               onClick={() => handleGroupTeams(16, 2)}
-              disabled={loading || +competition?.estado.split(".")[0] != 4}
+              disabled={loading || +competition?.estado.split(".")[0] !== 4}
             >
               Sorteo Eliminatorias
             </button>
@@ -1271,7 +1464,7 @@ const Inicio = () => {
               disabled={
                 loading ||
                 +competition?.estado.split(".")[0] !== 6 ||
-                IdMatchesReadyToPlay.length != 0
+                IdMatchesReadyToPlay.length !== 0
               }
             >
               Avanzar
@@ -1642,17 +1835,16 @@ const Inicio = () => {
 
   const renderNavbar = () => {
     return (
-      <div>
+      <div className="botoness">
         {competition_statuses.map((state, index) => (
-          <button
-            key={index}
+          <button className="navbar-item" key={index}
             onClick={() => setCurrentSection(state)}
             disabled={
               loading ||
               +state.split(".")[0] > +competition?.estado.split(".")[0]
             }
           >
-            {state}
+            {state.split(".")[1]}
           </button>
         ))}
       </div>
@@ -1660,99 +1852,120 @@ const Inicio = () => {
   };
 
   return (
-    <div>
-      <Layout>
-        <button onClick={() => navigate(-1)}>Back</button>
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
-          <>
-            {user && (
-              <div class="profile-short-container">
-                <div class="bg">
-                  <div class="bottom-section">
-                    <span class="profile">PERFIL</span>
-                    <span class="title">{user?.nombre_usuario}</span>
-                    <div class="row row1">
-                      <div class="item">
-                        <span class="big-text">{user?.monedas}</span>
-                        <span class="regular-text">Monedas</span>
-                      </div>
-                      <div class="item">
-                        <span class="big-text">0</span>
-                        <span class="regular-text">Apuestas</span>
-                      </div>
-                    </div>
+    <Layout>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="Inicio-partida">
+          <div className="top-container">
+            <div className="profile-container">
+              {user && (
+                <div className="profil">
+                  <h2 className="title">PERFIL</h2>
+                  <div className="item">
+                    <p className="big-text">{user?.nombre_usuario}</p>
+                    <p className="regular-text">Nombre</p>
+                  </div>
+                  <div className="item">
+                    <p className="big-text">{user?.monedas}</p>
+                    <p className="regular-text">Monedas</p>
+                  </div>
+                  <div className="item">
+                    <p className="big-text">0</p>
+                    <p className="regular-text">Apuestas</p>
                   </div>
                 </div>
-                <div class="blob"></div>
-              </div>
-            )}
-            <button onClick={openBetCard}>Ver Apuestas</button>
-            {betCard && (
-              <div className="popup">
-                <div className="popup-inner">
-                  <div className="bets">
-                    {bets.map((bet, index) => (
-                      <div key={index} className="bet">
-                        <h2>
-                          Match: {bet.match.club_local} vs{" "}
-                          {bet.match.club_visitante}
-                        </h2>
-                        <p>Bet Amount: {bet.amount_bet}</p>
-                        <p>
-                          Choice: {bet.choice} ({bet.odd})
-                        </p>
-                        <p>Estado apuesta: {bet.estado_partido}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <button onClick={checkBetResults}>CHECK BET RESULTS</button>
-                  <button onClick={closeBetCard}>CERRAR</button>
-                </div>
-              </div>
-            )}
-
-            {competition && (
-              <div>
-                <p>Season: {competition?.temporada}</p>
-                <p>State: {competition?.estado}</p>
-                <h2>
-                  DIA: <p>{competition?.dia}</p>
-                </h2>
-                {renderNavbar()}
-                {renderContent()}
-              </div>
-            )}
-          </>
-        )}
-        {sidebar.open && (
-          <div className="popup">
-            <div className="popup-inner">
-              <h2>
-                En partido: {sidebar.match.club_local} vs{" "}
-                {sidebar.match.club_visitante}
-              </h2>
-              <p>Bet Amount: {sidebar.coinBet}</p>
-              <p>
-                {" "}
-                CHOICE: {sidebar.betChoice} ({sidebar.odd}){" "}
-              </p>
-              <button onClick={handleBetIncrease}>+</button>
-              <button onClick={handleBetDecrease}>-</button>
-              <p>Potential win: {sidebar.coinBet * sidebar.odd}</p>
-              <button
-                onClick={() => handleBetSubmit(sidebar)}
-                disabled={sidebar.match.estado_partido === "ENDED"}
-              >
-                Confirm Bet
-              </button>
-              <button onClick={handleBetClose}>Cancel</button>
+              )}
             </div>
+            <div className="date-container">
+              {competition && (
+                <div>
+                  <div className="item">
+                    <p className="big-text">{competition?.temporada}</p>
+                    <p className="regular-text">Temporada</p>
+                  </div>
+                  <div className="item">
+                    <p className="big-text">{competition?.estado}</p>
+                    <p className="regular-text">Estado Actual</p>
+                  </div>
+                  <div className="item">
+                    <p className="big-text">{competition?.dia.split("T")[0]}</p>
+                    <p className="regular-text">Día</p>
+                  </div>
+                  <button onClick={openBetCard}>Ver Apuestas</button>
+                </div>
+              )}
+            </div>
+            <div className="ticket-container">
+              <h2>TICKET</h2>
+              {openTicket ? (
+                <div>
+                  <ul>
+                    {Object.entries(ticket.bets).map(([index, obj]) => (
+                      <li key={obj.bet_id} className="bet">
+                        <hr></hr>
+                        <p>
+                          {obj.match.club_local} - {obj.match.club_visitante}
+                        </p>
+                        <p>
+                          - Apuesta a {obj.choice}, cuota: {obj.odd}
+                        </p>
+                        <button onClick={() => handleDeleteBet(obj.bet_id)}>x</button>
+                        <hr></hr>
+                      </li>
+                    ))}
+                  </ul>
+                  Cantidad apostada: {ticket.bet_coins}
+                  <button onClick={handleBetIncrease}>+</button>
+                  <button onClick={handleBetDecrease}>-</button>
+                  <p>Ganancia potencial: {ticket.potencial_prize}</p>
+                  <br></br>
+                  <button onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
+                    Realizar apuesta
+                  </button>
+                </div>
+              ) : (
+                <p>VACÍO</p>
+              )}
+            </div>
+
           </div>
-        )}
-      </Layout>
-    </div>
+          <div className="bottom-container">
+            <div className="nav-butons">{renderNavbar()}</div>
+            <div className="nav-content"> {renderContent()}</div>
+          </div>
+          {betCard && (
+            <div className="popup">
+              <div className="popup-inner">
+                <div className="bets">
+                  {bets.map((bet, index) => (
+                    <div key={index} className="bet">
+                      <h2>TICKET {index + 1} </h2>
+
+                      {Object.entries(bet.bets).map(([indexx, obj]) => (
+                        <div key={indexx}>
+                          <p>
+                            - {obj.match.club_local} vs {obj.match.club_visitante}:{" "}
+                            {obj.odd} for {obj.choice}{" "}
+                          </p>
+                        </div>
+                      ))}
+
+                      <p>Apostado: {bet.bet_coins}</p>
+                      <p>Potencial Win: {bet.potencial_prize}</p>
+                      <p>Result: {bet.status}</p>
+                      <hr></hr>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={checkBetResults}>CHECK BET RESULTS</button>
+                <button onClick={closeBetCard}>CERRAR</button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </Layout>
   );
 };
 
