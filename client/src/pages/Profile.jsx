@@ -1,15 +1,20 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import Layout from "./partials/Layout";
 import { AuthContext } from "../helpers/AuthContext";
+import Layout from "./partials/Layout";
+import Help from "./partials/Help";
+import axios from "axios";
 
 function Profile() {
   const [user, setUser] = useState({});
   const [competiciones, setCompeticiones] = useState([]);
   const { setAuthState } = useContext(AuthContext);
-
   const navigate = useNavigate();
+  const [openHelp, setopenHelp] = useState(false);
+
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
 
   async function getCompeticionesByUser(idUser) {
     const idP = idUser.id;
@@ -27,6 +32,7 @@ function Profile() {
     localStorage.removeItem("tokenAcceso");
     navigate("/");
   };
+
   useEffect(() => {
     axios
       .get("http://localhost:3001/getLogUser", {
@@ -37,14 +43,25 @@ function Profile() {
           alert(response.data.error);
           navigate("/logIn");
         } else {
-          const userData = response.data[0];
+          const userData = response.data;
           setUser(userData);
         }
       })
-      .catch((error) => {
-        console.error("Error fetching user:", error);
-      });
   }, []);
+  
+  if (openHelp) {
+    return (
+      <Help trigger={openHelp} setTrigger={setopenHelp}>
+
+        <h2 >Cuadro de ayuda para la página de inicio</h2>
+        <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
+          Si tienes alguna duda o inquietud no dudes en preguntarnos.       </p>
+        <div style={{ backgroundColor: `red` }} className="my-div" >
+          ...
+        </div>
+      </Help>)
+  }
+
   return (
     <Layout>
       <h1>PERFIL</h1>
@@ -68,6 +85,7 @@ function Profile() {
       <div>
         <button onClick={handleLogOut}>CERRAR SESION</button>
       </div>
+      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 }

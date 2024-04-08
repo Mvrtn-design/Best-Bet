@@ -8,7 +8,7 @@ const Home = ({ children }) => {
     <div  className="App">
       <Header />
       <Navbar />
-      <main>{children}</main>
+      <main className="Layout">{children}</main>
       <Footer />
     </div>
   );

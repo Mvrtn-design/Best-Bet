@@ -4,20 +4,29 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import MatchGenerator from "../routes/route_match";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Match_Info() {
+  const [ID_distributor, setID_distributor] = useState(0);
   const [match, setMatch] = useState(null);
   const [matchTemp, setMatchTemp] = useState(null);
+  const [betCard, setBetCart] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [openTicket, setOpenTicket] = useState(false);
   const location = useLocation();
-  const [betFormOpen, setBetFormOpen] = useState(false);
   const [posibilties, setPosibilities] = useState([
     { name: "local", price: 0 },
     { name: "draw", price: 0 },
     { name: "away", price: 0 },
   ]);
+  const [ticket, setTicket] = useState({
+    bets: [],
+    bet_coins: 0,
+    status: "",
+    potencial_prize: 0.0,
+  });
+
   const [amountToPlay, setAmountToPlay] = useState(1);
   const [bet, setBet] = useState(0);
   const [formCuota, setFormCuota] = useState(0);
@@ -43,9 +52,9 @@ function Match_Info() {
         `http://localhost:3001/getPartidoById/${id_match}`
       );
       const match_info = await response.data[0];
+      console.log(match_info);
 
       setMatch(match_info);
-      console.log(match_info);
       setPosibilities([
         { name: "local", price: match_info.cuota_local },
         { name: "draw", price: match_info.cuota_empate },
@@ -59,27 +68,6 @@ function Match_Info() {
   useEffect(() => {
     fetchMatchInfo();
   }, [matchTemp]);
-
-  const handleBet = (betResult) => {
-    setFormCuota(match.cuota_empate);
-    setBetFormOpen(true);
-    setBet(betResult);
-  };
-  const handleBetSubmit = () => {
-    setBets((prevBets) => [
-      ...prevBets,
-      ...posibilties.map((posibility) => ({
-        posibilty: posibility.name,
-        amount: betState[posibility.name].amount,
-        potencialWin: betState[posibility.name].potencialWin,
-      })),
-    ]);
-    setBetFormOpen(false);
-  };
-  const handleDeleteBet = (index) => {
-    const updatedBets = bets.filter((_, i) => i !== index);
-    setBets(updatedBets);
-  };
 
   const increaseAmount = (BetName) => {
     setBetState((prevState) => {
@@ -104,9 +92,169 @@ function Match_Info() {
       }
     });
   };
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
+  ////////////////////////////            APUESTAS           ///////////////////////////////////////////
   const handleCancel = () => {
     setBetState(initialState);
   };
+  const handleBet = (match, cuota, bet_choice) => {
+    const bet_aux = {
+      bet_id: ID_distributor,
+      match: match,
+      match_ID: match.Idd,
+      choice: bet_choice,
+      odd: cuota,
+    };
+
+    setID_distributor(ID_distributor + 1);
+
+    var bets_aux = ticket.bets;
+    bets_aux.push(bet_aux);
+    setTicket({ ...ticket, bets: bets_aux });
+
+    var sumOdds = 0.0;
+    for (let i = 0; i < ticket.bets.length; i++) {
+      sumOdds += ticket.bets[i].odd;
+    }
+    setTicket((prevSidebar) => ({
+      ...prevSidebar,
+      potencial_prize: ticket.bet_coins * sumOdds,
+    }));
+
+    if (!openTicket) {
+      setOpenTicket(true);
+    }
+  };
+  const handleBetIncrease = async () => {
+    if (user.monedas > 0) {
+      const aux_coins = ticket.bet_coins + 1;
+
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        bet_coins: aux_coins,
+      }));
+      var sumOdds = 0.0;
+      for (let i = 0; i < ticket.bets.length; i++) {
+        sumOdds += ticket.bets[i].odd;
+      }
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        potencial_prize: aux_coins * sumOdds,
+      }));
+    }
+  };
+  const handleBetDecrease = async () => {
+    if (ticket.bet_coins > 0) {
+      const aux_coins = ticket.bet_coins - 1;
+
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        bet_coins: aux_coins,
+      }));
+      var sumOdds = 0.0;
+      for (let i = 0; i < ticket.bets.length; i++) {
+        sumOdds += ticket.bets[i].odd;
+      }
+      setTicket((prevSidebar) => ({
+        ...prevSidebar,
+        potencial_prize: aux_coins * sumOdds,
+      }));
+    }
+  };
+
+  const handleDeleteBet = async (id) => {
+    const bets_aux = ticket.bets.filter((x) => x.bet_id !== id);
+    const count = bets_aux.length;
+    setTicket({ ...ticket, bets: bets_aux });
+    var sumOdds = 0.0;
+    for (let i = 0; i < bets_aux.length; i++) {
+      sumOdds += bets_aux[i].odd;
+    }
+    setTicket((prevSidebar) => ({
+      ...prevSidebar,
+      potencial_prize: ticket.bet_coins * sumOdds,
+    }));
+    if (count === 0) {
+      setOpenTicket(false);
+    }
+  };
+  const handleBetSubmit = async () => {
+    let confirmation_check = true;
+
+    //check todos los partidos aun no están jugados
+    for (let i = 0; i < ticket.bets.length && confirmation_check === true; i++) {
+      if (findMatchById(ticket.bets[i].match_ID).estado_partido !== "NOT_STARTED") {
+        confirmation_check = false;
+      }
+    }
+
+    if (confirmation_check) {
+      const ticket_status = "ON_GOING"; // ON_GOING | WINNER | LOOSER
+      var bets_aux = bets;
+      const aux_coins = ticket.bet_coins;
+      const aux_ticket = ticket;
+      aux_ticket.status = ticket_status;
+
+      postTicket(aux_ticket);
+
+      bets_aux.push(aux_ticket);
+      setBets(bets_aux);
+
+      await updateWallet(aux_coins);
+
+      alert("APUESTA REALIZADA");
+
+    } else {
+      alert("Apuestas no válidas, por favor introdúzcalas nuevamente");
+    }
+
+    setTicket({ bets: [], bet_coins: 0, status: "", potencial_prize: 0.0 });
+    setOpenTicket(false);
+  };
+  const postTicket = async (ticket) => {
+    const competition_response = await axios.get(
+      `http://localhost:3001/getCompeticionByPartida/${idPartida}`
+    );
+    const ticket_response = await axios.post(
+      "http://localhost:3001/addTicket",
+      {
+        competition: competition_response.data[0].ID,
+        potencial_prize: ticket.potencial_prize,
+        coins: ticket.bet_coins,
+        status: ticket.status,
+      }
+    );
+    const backend_id_ticket = ticket_response.data;
+    console.log(backend_id_ticket);
+    ticket.bets.forEach(async (bet) => {
+      //POST BET
+      await axios.post("http://localhost:3001/addBet", {
+        ticket_id: backend_id_ticket,
+        match_id: bet.match_ID,
+        choice: bet.choice,
+        odd: bet.odd,
+      });
+    });
+  }
+  const updateWallet = async (coins) => {
+    await axios.put(
+      `http://localhost:3001/setUserCoins/${user.ID}`,
+      {
+        value1: (user.monedas - coins),
+      }
+    );
+    setUser({ ...user, monedas: user.monedas - coins });
+  }
+
+  const openBetCard = () => {
+    setBetCart(true);
+  };
+  const closeBetCard = () => {
+    setBetCart(false);
+  };
+
   async function handlePlayMatch() {
     const marcador_local = Math.round(Math.random() * 4);
     const marcador_visitante = Math.round(Math.random() * 4);
@@ -134,8 +282,8 @@ function Match_Info() {
           marcador_local > marcador_visitante
             ? 3
             : marcador_local == marcador_visitante
-            ? 1
-            : 0,
+              ? 1
+              : 0,
       }
     );
 
@@ -152,8 +300,8 @@ function Match_Info() {
           marcador_local < marcador_visitante
             ? 3
             : marcador_local == marcador_visitante
-            ? 1
-            : 0,
+              ? 1
+              : 0,
       }
     );
 
@@ -162,92 +310,107 @@ function Match_Info() {
   return (
     <Layout>
       {loading && <p>Loading...</p>}
-      {user && (
-        <div>
-          <p>Nombre Usuario: {user?.nombre_usuario}</p>
-          <p>Monedas: {user?.monedas}</p>
-        </div>
-      )}
-      <button onClick={() => navigate(-1)}>Back</button> 
-
-      {match && (
-        <>
-          <div className="match-container">
-            <div className="match">
-              <div className="match-header">
-                <button>Estadisticas</button>
-                <button>Alertas</button>
-                <div className="match-date">{match.fecha}</div>
-                <div className="match-location">
-                  {match.stadium} in {match.location}{" "}
+      <div className="match-info">
+        <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+        <div className="top-container">
+          <div className="profile-bg-container">
+            {user && (
+              <div className="profil">
+                <h2 className="title">PERFIL</h2>
+                <div className="item">
+                  <p className="big-text">{user?.nombre_usuario}</p>
+                  <p className="regular-text">Nombre</p>
                 </div>
-                <div className="match-status">{match.estado_partido}</div>
+                <div className="item">
+                  <p className="big-text">{user?.monedas}</p>
+                  <p className="regular-text">Monedas</p>
+                </div>
+                <div className="item">
+                  <p className="big-text">0</p>
+                  <p className="regular-text">Apuestas</p>
+                </div>
+                <button onClick={openBetCard}>Ver Apuestas</button>
               </div>
-              <div className="match-body"></div>
-              <div className="match-column"></div>
-              <div className="match-column"></div>
-              <div className="match-column"></div>
-
-              <h1>
-                {match.club_local} {match.marcador_local}-
-                {match.marcador_visitante}
-                {match.club_visitante}
-              </h1>
-
+            )}
+          </div>
+          <div className="ticket-container">
+            <h2>TICKET</h2>
+            {openTicket ? (
               <div>
-                - 1: {match.cuota_local}
-                X: {match.cuota_empate}
-                2: {match.cuota_visitante}
-              </div>
-              <div className="match-simulate">
-                <button
-                  onClick={() => handlePlayMatch()}
-                  disabled={loading || match.estado_partido !== "READY_TO_PLAY"}
-                >
-                  JUGAR PARTIDO
+                <ul>
+                  {Object.entries(ticket.bets).map(([index, obj]) => (
+                    <li key={obj.bet_id} className="bet">
+                      <hr></hr>
+                      <p>
+                        {obj.match.club_local} - {obj.match.club_visitante}
+                      </p>
+                      <p>
+                        - Apuesta a {obj.choice}, cuota: {obj.odd}
+                      </p>
+                      <button onClick={() => handleDeleteBet(obj.bet_id)}>x</button>
+                      <hr></hr>
+                    </li>
+                  ))}
+                </ul>
+                Cantidad apostada: {ticket.bet_coins}
+                <button onClick={handleBetIncrease}>+</button>
+                <button onClick={handleBetDecrease}>-</button>
+                <p>Ganancia potencial: {ticket.potencial_prize}</p>
+                <br></br>
+                <button onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
+                  Realizar apuesta
                 </button>
               </div>
+            ) : (
+              <p>VACÍO</p>
+            )}
+          </div>
+        </div>
+        {match && (
+          <div className="match-container">
+            <div className="match-header">
+              <div className="match-date">{match.fecha.split(".")[0]}</div>
+              <div className="match-location">
+                <p className="match-stadium">{match.stadium}</p> - {match.location}
+              </div>
+              <div className="match-status">{match.estado_partido}</div>
+            </div>
+            <div className="match-body">
+              <div className="match-column">
+                <p className="match-team"> {match.club_local}</p>
+              </div>
+              <div className="match-column">
+                {match.marcador_local}-
+                {match.marcador_visitante}
+              </div>
+              <div className="match-column">
+                <p className="match-team">{match.club_visitante}</p>
+              </div>
+
+            </div>
+            <div className="match-actions">
+              1<button
+                onClick={() => handleBet(match,
+                  match.cuota_local,
+                  "Local")}
+                disabled={match.estado_partido !== "NOT_STARTED"} >
+                {match.cuota_local}
+              </button>
+              X:<button>{match.cuota_empate}</button>
+              2:<button>{match.cuota_visitante}</button>
+            </div>
+            <div className="match-footer">
+              <button
+                onClick={() => handlePlayMatch()}
+                disabled={loading || match.estado_partido !== "READY_TO_PLAY"}
+              >
+                JUGAR PARTIDO
+              </button>
             </div>
           </div>
-
-          <h2>APUESTAS</h2>
-          {posibilties.map((posibilty) => (
-            <div key={posibilty.name}>
-              <h2>
-                {posibilty.name.charAt(0).toUpperCase() +
-                  posibilty.name.slice(1)}
-              </h2>
-              <h3>Amount: {betState[posibilty.name].amount}</h3>
-              <h3>
-                Potencial Win: $
-                {betState[posibilty.name].potencialWin.toFixed(2)}
-              </h3>
-              <button onClick={() => increaseAmount(posibilty.name)}>
-                Increase Amount
-              </button>
-              <button
-                onClick={() => decreaseAmount(posibilty.name)}
-                disabled={loading || betState[posibilty.name].amount <= 0}
-              >
-                Decrease Amount
-              </button>
-            </div>
-          ))}
-          <button onClick={handleBetSubmit}>Submit</button>
-          <button onClick={handleCancel}>Cancel</button>
-          <h2>BETS</h2>
-          <ul>
-            {bets.map((purchase, index) =>
-              purchase.amount > 0 ? (
-                <li key={index}>
-                  {purchase.amount} monedas apostadas {purchase.posibilty} for $
-                  {purchase.totalPrice}
-                </li>
-              ) : null
-            )}
-          </ul>
-        </>
-      )}
+        )}
+      </div>
+      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 }

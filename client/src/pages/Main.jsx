@@ -1,24 +1,40 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import Layout from "./partials/Layout";
+import Help from "./partials/Help";
 import jsonFile from "../files/fichero_equipos.json";
 import axios from "axios";
-import { useEffect} from "react";
+import { React, useEffect, useState } from "react";
 
 
 function Main() {
-//   useEffect(() => {
-//     const fetchData = async () => {
-//         try {
-//             await axios.post("http://localhost:3001/storeClubsJSON", jsonFile);
-//             console.log('JSON data stored successfully');
-//         } catch (error) {
-//             console.error(`There was an error retrieving the data: ${error}`);
-//         }
-//     };
+  const [openHelp, setopenHelp] = useState(false);
+  if (openHelp) {
+    return (
+      <Help trigger={openHelp} setTrigger={setopenHelp}>
 
-//     fetchData();
-// }, []);  
+        <h2 >Cuadro de ayuda para la página de inicio</h2>
+        <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
+          Si tienes alguna duda o inquietud no dudes en preguntarnos.</p>
+        <div style={{ backgroundColor: `red`}} className="my-div" >
+          ...
+        </div>
+      </Help>)
+  }
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
+
+  //   useEffect(() => {
+  //     const fetchData = async () => {
+  //         try {
+  //             await axios.post("http://localhost:3001/storeClubsJSON", jsonFile);
+  //             console.log('JSON data stored successfully');
+  //         } catch (error) {
+  //             console.error(`There was an error retrieving the data: ${error}`);
+  //         }
+  //     };
+  //     fetchData();
+  // }, []);
 
   return (
     <Layout>
@@ -58,6 +74,7 @@ function Main() {
           </figcaption>
         </figure>
       </div>
+      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 }

@@ -1,11 +1,9 @@
-import React from "react";
+import {React, useEffect, useState } from "react";
 import Popup from "./partials/Popup";
 import Layout from "./partials/Layout";
+import Help from "./partials/Help";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useEffect, useState } from "react";
-
-import "../Appp.css";
 
 const Inicio = () => {
   const competition_statuses = [
@@ -77,8 +75,9 @@ const Inicio = () => {
 
   // BETS
   const [ID_distributor, setID_distributor] = useState(0);
-  const [openPopup, setopenPopup] = useState(false);
   const [openTicket, setOpenTicket] = useState(false);
+  const [openPopup, setopenPopup] = useState(false);
+  const [openHelp, setopenHelp] = useState(false);
   const [betCard, setBetCart] = useState(false);
   const [bets, setBets] = useState([]);
   const [notifications, setNotificaction] = useState({
@@ -142,7 +141,7 @@ const Inicio = () => {
           nombre_usuario: user_backend_data.data[0].nombre_usuario,
         });
 
-        
+
 
         ////////////////////////////////////////////////
         ///     SEGÚN ESTADO DE LA COMPETICIÓN      ////
@@ -226,13 +225,13 @@ const Inicio = () => {
           const semis = await fetchClasificados(competition_rounds[4]);
           setTeams((prevDict) => ({ ...prevDict, Champion: semis }));
         }
-        
-        
+
+
         setTimeout(() => {
           /// APUESTAS
-        fetchBets(competition_response.data[0].ID);
+          fetchBets(competition_response.data[0].ID);
           setLoading(false);
-       }, 2000);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error fetching competition info: ", error);
@@ -431,6 +430,23 @@ const Inicio = () => {
       console.error("Error recuperando los grupos:", error);
     }
   };
+  
+  if (openHelp) {
+    return (
+      <Help trigger={openHelp} setTrigger={setopenHelp}>
+
+        <h2 >Cuadro de ayuda para la página de inicio</h2>
+        <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
+          Si tienes alguna duda o inquietud no dudes en preguntarnos.       </p>
+        <div style={{ backgroundColor: `red`}} className="my-div" >
+          ...
+        </div>
+      </Help>)
+  }
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
+
 
   const fetchMathes = async (id_competicion, ronda) => {
     try {
@@ -939,7 +955,7 @@ const Inicio = () => {
       for (const bet_number in grouped_tickets[ticket_number]) {
         const bet = grouped_tickets[ticket_number][bet_number];
         const temp_match = findMatchById(bet.id_partido);
-        
+
         temp_bets.push({ choice: bet.eleccion, odd: bet.cuota, match: temp_match });
       }
       temp_ticket.push({ bet_coins: grouped_tickets[ticket_number][0].cantidad_apostada, potencial_prize: grouped_tickets[ticket_number][0].ganancia_potencial, status: grouped_tickets[ticket_number][0].estado, bets: temp_bets });
@@ -1965,6 +1981,7 @@ const Inicio = () => {
           )}
         </div>
       )}
+      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import Layout from "./partials/Layout";
 import { useLocation } from "react-router-dom";
+import Help from "./partials/Help";
 import axios from "axios";
 import { useEffect, useState } from "react";
 

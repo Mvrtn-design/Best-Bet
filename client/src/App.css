@@ -54,10 +54,27 @@ td {
   border: 1px solid;
 }
 .App {
+  margin: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
+  min-height: fit-content;
+}
+.football-container {
+  width: 100%;
+  height: 100%;
+  --s: 15px; /* control the size */
+
+  --c: #0000, var(--color-fondo-oscuro-primario-suave) 0.5deg 119.5deg,
+    #00000000 120deg;
+  --g1: conic-gradient(from 60deg at 56.25% calc(425% / 6), var(--c));
+  --g2: conic-gradient(from 180deg at 43.75% calc(425% / 6), var(--c));
+  --g3: conic-gradient(from -60deg at 50% calc(175% / 12), var(--c));
+  background: var(--g1), var(--g1) var(--s) calc(1.73 * var(--s)), var(--g2),
+    var(--g2) var(--s) calc(1.73 * var(--s)), var(--g3) var(--s) 0,
+    var(--g3) 0 calc(1.73 * var(--s))
+      var(--color-fondo-oscuro-primario-resaltado);
+  background-size: calc(2 * var(--s)) calc(3.46 * var(--s));
 }
 
 /* BUTTON */
@@ -95,6 +112,53 @@ button:disabled:active {
 button:disabled:hover {
   color: var(--color-texto-error);
   cursor: not-allowed;
+}
+
+/* BOTON-ELIMINAR */
+.button-close {
+  outline: none;
+  background-color: var(--color-fondo-oscuro-primario-resaltado);
+  color: var(--color-texto-error);
+  transition: all ease 0.3s;
+  padding: 5px;
+  margin: 5px;
+  text-align: center;
+  border-radius: 30%;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  box-shadow: var(--color-texto-primario) 0px 3px 2px, #000 0px 8px 5px;
+  cursor: pointer;
+}
+
+.button-close:hover {
+  color: var(--color-texto-primario);
+  box-shadow: var(--color-texto-error) 0px 3px 2px, #000 0px 3px 5px;
+}
+
+.button-close:active {
+  box-shadow: 0px 0px 0px 0px;
+  color: var(--color-fondo-primario);
+}
+
+/* BOTON-HELP */
+.button-help {
+  background-color: var(--color-fondo-oscuro-primario-resaltado);
+  color: var(--color-texto-secundario);
+  padding: 7px;
+  margin: 10px;
+  text-align: center;
+  float: right;
+  border-radius: 40%;
+  top: 10px;
+  right: 10px;
+  box-shadow: var(--color-texto-primario) 0px 3px 2px, #000 0px 8px 5px;
+  cursor: pointer;
+}
+
+.button-help:hover {
+  color: var(--color-texto-primario);
+  box-shadow: var(--color-texto-secundario) 0px 3px 2px, #000 0px 3px 5px;
 }
 
 .eliminar {
@@ -172,9 +236,10 @@ button:disabled:hover {
 
 /*****      PIE DE PAGINA       *****/
 footer {
-  margin: 10px 0 0 0;
-  box-sizing: border-box;
+  bottom: 0;
   width: 100%;
+  margin: 0;
+  border: none;
   line-height: 1.5;
 }
 
@@ -601,12 +666,13 @@ hr {
 
 /****************   PARTIDA MATCH BIG   ************/
 .match-container {
-  margin: 50px 0;
-  border: 1px;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  border: solid 0.1rem #414741;
+  height: 70%;
+  max-height: 500px;
+  margin: 100px 0;
+  border-radius: 10px;
+  border: solid 2px var(--color-texto-primario);
   border-radius: 10px;
   background: linear-gradient(
     135deg,
@@ -615,19 +681,33 @@ hr {
     #000000
   );
 }
+.match-header {
+  height: calc(10%);
+  display: flex;
+  padding: 10px;
+  border-bottom: 2px solid var(--color-fondo-oscuro-primario);
+}
+.match-date,
+.match-location,
 .match-status {
-  width: 100px;
-  height: 10px;
+  width: calc(100% / 3);
+  text-align: center;
+  align-items: center;
+  align-content: center;
+  display: flex;
+}
+.match-stadium {
+  color: #ffffff;
+}
+.match-status {
+  height: calc(50%);
   background-color: #c00000;
   color: var(--color-texto-primario);
   padding: 8px 12px;
   border-radius: 6px;
   font-weight: 600;
   font-size: 14px;
-  display: flex;
-  align-items: center;
   line-height: 1;
-  margin-right: auto;
   &:before {
     content: "";
     display: block;
@@ -639,8 +719,8 @@ hr {
   }
 }
 .match-body {
+  height: calc(60%);
   display: flex;
-  position: relative;
 }
 .match-column {
   padding: 5px;
@@ -668,11 +748,31 @@ hr {
 }
 
 .match-team {
-  display: flex;
-  flex-direction: column;
+  text-align: center;
+  font-size: xx-large;
+  font-weight: 800;
   align-items: center;
   color: var(--color-text-secondary);
 }
+.match-actions {
+  height: calc(20%);
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.match-footer {
+  height: calc(10%);
+  text-align: center;
+  align-items: center;
+  align-content: center;
+  transform: translateY(50%);
+}
+.match-simulate button {
+  color: var(--color-fondo-oscuro-primario-resaltado);
+  font-weight: 800;
+}
+/*******        SHORT BET/         *******/
 
 .match-short-column {
   padding: 2px;
@@ -704,21 +804,7 @@ hr {
   font-weight: 600;
 }
 
-.match-simulate {
-  position: absolute;
-  bottom: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.match-simulate button {
-  color: var(--color-fondo-oscuro-primario-resaltado);
-  font-weight: 800;
-}
-/*******        SORT BET/         *******/
-
 /********       PARTIDO          *******/
-button,
 input,
 select,
 textarea {
@@ -738,12 +824,6 @@ strong {
   display: flex;
   flex-direction: column;
   border-radius: 10px;
-}
-
-.match-header {
-  display: flex;
-  padding: 10px;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.87);
 }
 
 .partido-competicion img {
@@ -773,12 +853,6 @@ strong {
 .card-body {
   display: flex;
   position: relative;
-}
-
-.match-team {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .equipo-logo {
@@ -986,7 +1060,7 @@ html.is-animating .animacion-fade {
 
 /************/
 
-.Inicio-partida {
+.Inicio-partida , .match-info, .partido-amistoso{
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1020,6 +1094,12 @@ html.is-animating .animacion-fade {
   width: calc(100% / 2);
   overflow-y: scroll;
 }
+.profile-bg-container {
+  width: calc(50%);
+  text-align: center;
+  font-size: large;
+  line-height: 0.6;
+}
 .top-container .big-text {
   font-weight: 700;
 }
@@ -1040,10 +1120,107 @@ html.is-animating .animacion-fade {
   height: 90%;
   overflow-y: scroll;
 }
-.botoness{
-display: flex;
-text-align: justify;
-white-space: nowrap;
-justify-content: space-around;
+.botoness {
+  display: flex;
+  text-align: justify;
+  white-space: nowrap;
+  justify-content: space-around;
 }
 
+/*****************          LAYOUT              *********************/
+.Layout {
+  min-height: 100vh;
+}
+/*****************          HELP  SECTION       ********************************/
+.help-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+:root {
+  --data-bg-color: inherit;
+}
+
+.help-container {
+  --s: 15px; /* control the size */
+
+  --c: #0000, var(--color-fondo-oscuro-primario-suave) 0.5deg 119.5deg,
+    #00000000 120deg;
+  --g1: conic-gradient(from 60deg at 56.25% calc(425% / 6), var(--c));
+  --g2: conic-gradient(from 180deg at 43.75% calc(425% / 6), var(--c));
+  --g3: conic-gradient(from -60deg at 50% calc(175% / 12), var(--c));
+  background: var(--g1), var(--g1) var(--s) calc(1.73 * var(--s)), var(--g2),
+    var(--g2) var(--s) calc(1.73 * var(--s)), var(--g3) var(--s) 0,
+    var(--g3) 0 calc(1.73 * var(--s))
+      var(--color-fondo-oscuro-primario-resaltado);
+  background-size: calc(2 * var(--s)) calc(3.46 * var(--s));
+
+  position: relative;
+  margin: 20px;
+  padding: 12px;
+  width: 100%;
+  border-radius: 20px;
+  border: var(--color-fondo-oscuro-primario-resaltado) solid 4px;
+
+  box-shadow: 10px 10px 100px 10px var(--color-fondo-oscuro-primario-resaltado);
+  z-index: 1000;
+  max-width: 640px;
+  overflow: auto;
+  max-height: calc(100% / 2);
+}
+.help-container h2 {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.close-button {
+  position: absolute;
+  background-color: var(--color-texto-error);
+  top: 10px;
+  right: 10px;
+}
+.my-div {
+  color: green;
+}
+/*****************            POP UP            *********************/
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+
+  background-color: rgba(0, 0, 0, 0.389);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-inner {
+  position: relative;
+  padding: 32px;
+  width: 100%;
+
+  max-width: 640px;
+  background-color: #001d4c;
+  color: #000000;
+  overflow: auto;
+  max-height: calc(100% / 2);
+}
+
+.popup-inner .close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.bets {
+  background-color: #001ca7;
+}
+/*******    CLUB CONTAINER    *********/

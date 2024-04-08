@@ -1,17 +1,21 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Layout from "./partials/Layout";
+import Help from "./partials/Help";
+import axios from "axios";
 
 function NewTorneo() {
-  const [user, setUser] = useState({});
+
   const [competiciones, setCompeticiones] = useState([]);
+  const [openHelp, setopenHelp] = useState(false);
+  const [user, setUser] = useState({});
   const [form, setForm] = useState({
     id_usuario: "",
   });
   const inicio_temporada = 2023;
   const temporada_actual = `${inicio_temporada}-${inicio_temporada + 1}`;
   const navigate = useNavigate();
+
 
   useEffect(() => {
     axios
@@ -88,6 +92,21 @@ function NewTorneo() {
       console.error("Error getting competitions:", error);
     }
   }
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
+  if (openHelp) {
+    return (
+      <Help trigger={openHelp} setTrigger={setopenHelp}>
+
+        <h2 >Cuadro de ayuda para la página de inicio</h2>
+        <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
+          Si tienes alguna duda o inquietud no dudes en preguntarnos.       </p>
+        <div style={{ backgroundColor: `red` }} className="my-div" >
+          ...
+        </div>
+      </Help>)
+  }
 
   return (
     <Layout>
@@ -144,6 +163,7 @@ function NewTorneo() {
         </div>
         <button type="submit">COMENZAR NUEVA COMPETICION</button>
       </form>
+      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 }
