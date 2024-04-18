@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+
 :root {
   --color-texto-primario: #777777;
   --color-texto-secundario: #067000;
@@ -18,7 +20,10 @@
 body {
   background-color: var(--color-fondo-oscuro-primario);
   color: var(--color-texto-primario);
-  font-family: "Verdana", Times, sans-serif, bold;
+  font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
   line-height: 1.5;
 }
 
@@ -33,7 +38,6 @@ a:hover {
 }
 
 h1 {
-  font-family: Tahoma, sans-serif;
   font-size: 50px;
   text-align: center;
   padding: 10px;
@@ -185,7 +189,6 @@ button:disabled:hover {
 }
 
 .header-titulo {
-  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
   font-size: 50px;
   font-weight: 600;
   text-align: center;
@@ -734,6 +737,14 @@ hr {
   margin-top: 8px;
   padding-bottom: 8px;
 }
+.marcador-local, .marcador-visitante{
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  font-size: xx-large;
+  font-weight: bold;
+  color: var(--color-fondo-primario);
+}
 
 .match-bet-option {
   margin-left: 4px;
@@ -955,6 +966,49 @@ html.is-changing .animacion-fade {
 /* Define the styles for the unloaded pages */
 html.is-animating .animacion-fade {
   opacity: 0;
+}
+
+/**********          CLUB INFO      ****************/
+.club-list{
+  list-style-type:circle;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: auto;
+  text-align: start;
+  overflow-y: scroll;
+  overflow-x:hidden;
+}
+.club{
+  margin-bottom: 10px;
+}
+.club button{
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  color: var(--color-texto-primario);
+  cursor: pointer;
+  font-size: 16px;
+}.club button:hover {
+  color: var(--color-fondo-primario);
+}
+.club button:active {
+  color: var(--color-texto-secundario);
+}
+.clubes{
+  display: flex;
+  height: 90lvh;
+}
+.club-info{
+  width: 50%;
+  background-color: var(--color-fondo-oscuro-primario-resaltado);
+  text-align: justify;
+  padding: 3vw;
+  border-radius: 20px;
+  box-shadow: -4px  8px 16px rgba(0, 0, 0, 0.1);
 }
 
 /***********      LOG IN      SET UP   ************/

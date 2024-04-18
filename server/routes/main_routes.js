@@ -29,6 +29,7 @@ router.get("/getLiveBetsByCompeticion/:id", bet_controller.getLiveBetsByCompetic
 router.get("/getClubsByCountry", club_controller.clubsByCountry);
 router.get("/getOtherClubs", club_controller.otherClubs);
 router.get("/getClubsByCompetition", club_controller.getClubsByCompetition);
+router.get("/getFromPage",club_controller.getFromPage);
 
 /////////       PARTIDA            ///////////
 router.post("/addPartida", partida_controller.crearPartida);

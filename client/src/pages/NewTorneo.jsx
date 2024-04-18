@@ -1,8 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import Layout from "./partials/Layout";
 import Help from "./partials/Help";
 import axios from "axios";
+import { Field, Form, Formik } from "formik";
+import * as Yup from 'yup';
 
 function NewTorneo() {
 
@@ -92,9 +94,19 @@ function NewTorneo() {
       console.error("Error getting competitions:", error);
     }
   }
+  const loginSchema = Yup.object().shape({
+    email: Yup.string()
+      .email("Ingrese un correo electrónico válido")
+      .required("Campo requerido"),
+    password: Yup.string()
+      .min(6, "La contraseña debe tener al menos 6 caracteres")
+      .required("Contraseña es obligatoria"),
+  });
+
   function handleClickOpenHelp() {
     setopenHelp(!openHelp);
   }
+
   if (openHelp) {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
@@ -141,6 +153,21 @@ function NewTorneo() {
           ))}
         </tbody>
       </table>
+      <hr></hr>
+      <Formik
+        initialValues={{ temporada: temporada_actual, nombre_usuario: user.nombre_usuario, monedas: 0 }}
+        validationSchema={loginSchema }
+        onSubmit={handleSubmit}>
+          <label>
+            Temporada:
+            <Field type='text' name='temporada' value={temporada_actual}
+            readOnly />
+          </label>
+          <label>
+            Nombre de Usuario:
+          </label>
+
+      </Formik>
       <h2>NUEVO TORNEO</h2>
       <form onSubmit={handleSubmit}>
         <label>

@@ -1,3 +1,4 @@
+const axios = require('axios');
 const controller = {};
 
 
@@ -61,4 +62,17 @@ controller.otherClubs = (req, res) => {
     });
 };
 
+controller.getFromPage = async (req, res) => {
+    console.log("Llega la peti");
+    try {
+        const response = await axios.get("api.clubelo.com/Chelsea");
+        console.log(response.data);
+        // Send a response to the client
+        res.send(response.data);
+    } catch (error) {
+        console.error("El errrrrror es: ",error);
+        res.status(500).send("Error fetching data from server");
+    }
+
+}
 module.exports = controller;

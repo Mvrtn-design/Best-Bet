@@ -310,66 +310,12 @@ function Match_Info() {
   return (
     <Layout>
       {loading && <p>Loading...</p>}
-      <div className="match-info">
-        <button className="back-button" onClick={() => navigate(-1)}>Back</button>
-        <div className="top-container">
-          <div className="profile-bg-container">
-            {user && (
-              <div className="profil">
-                <h2 className="title">PERFIL</h2>
-                <div className="item">
-                  <p className="big-text">{user?.nombre_usuario}</p>
-                  <p className="regular-text">Nombre</p>
-                </div>
-                <div className="item">
-                  <p className="big-text">{user?.monedas}</p>
-                  <p className="regular-text">Monedas</p>
-                </div>
-                <div className="item">
-                  <p className="big-text">0</p>
-                  <p className="regular-text">Apuestas</p>
-                </div>
-                <button onClick={openBetCard}>Ver Apuestas</button>
-              </div>
-            )}
-          </div>
-          <div className="ticket-container">
-            <h2>TICKET</h2>
-            {openTicket ? (
-              <div>
-                <ul>
-                  {Object.entries(ticket.bets).map(([index, obj]) => (
-                    <li key={obj.bet_id} className="bet">
-                      <hr></hr>
-                      <p>
-                        {obj.match.club_local} - {obj.match.club_visitante}
-                      </p>
-                      <p>
-                        - Apuesta a {obj.choice}, cuota: {obj.odd}
-                      </p>
-                      <button onClick={() => handleDeleteBet(obj.bet_id)}>x</button>
-                      <hr></hr>
-                    </li>
-                  ))}
-                </ul>
-                Cantidad apostada: {ticket.bet_coins}
-                <button onClick={handleBetIncrease}>+</button>
-                <button onClick={handleBetDecrease}>-</button>
-                <p>Ganancia potencial: {ticket.potencial_prize}</p>
-                <br></br>
-                <button onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
-                  Realizar apuesta
-                </button>
-              </div>
-            ) : (
-              <p>VACÍO</p>
-            )}
-          </div>
-        </div>
+      <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+      <div>
         {match && (
           <div className="match-container">
             <div className="match-header">
-              <div className="match-date">{match.fecha.split(".")[0]}</div>
+              <div className="match-date">{match.fecha}</div>
               <div className="match-location">
                 <p className="match-stadium">{match.stadium}</p> - {match.location}
               </div>
@@ -380,8 +326,9 @@ function Match_Info() {
                 <p className="match-team"> {match.club_local}</p>
               </div>
               <div className="match-column">
-                {match.marcador_local}-
-                {match.marcador_visitante}
+                <div className="marcador-local">{match.marcador_local}</div>
+                -
+                <div className="marcador-visitante">{match.marcador_visitante}</div>
               </div>
               <div className="match-column">
                 <p className="match-team">{match.club_visitante}</p>
@@ -396,21 +343,115 @@ function Match_Info() {
                 disabled={match.estado_partido !== "NOT_STARTED"} >
                 {match.cuota_local}
               </button>
-              X:<button>{match.cuota_empate}</button>
-              2:<button>{match.cuota_visitante}</button>
+              X<button
+                onClick={() => handleBet(match,
+                  match.cuota_empate,
+                  "Draw")}
+                disabled={match.estado_partido !== "NOT_STARTED"} >
+                {match.cuota_empate}
+              </button>
+              2<button
+                onClick={() => handleBet(match,
+                  match.cuota_visitante,
+                  "Visitante")}
+                disabled={match.estado_partido !== "NOT_STARTED"} >
+                {match.cuota_visitante}
+              </button>
             </div>
             <div className="match-footer">
               <button
                 onClick={() => handlePlayMatch()}
-                disabled={loading || match.estado_partido !== "READY_TO_PLAY"}
-              >
+                disabled={match.estado_partido !== "NOT_STARTED"} >
                 JUGAR PARTIDO
               </button>
             </div>
           </div>
         )}
+        < div className="partido-amistoso">
+          <div className="top-container">
+            <div className="profile-bg-container">
+              {user && (
+                <div className="profil">
+                  <h2 className="title">PERFIL</h2>
+                  <div className="item">
+                    <p className="big-text">{user?.nombre_usuario}</p>
+                    <p className="regular-text">Nombre</p>
+                  </div>
+                  <div className="item">
+                    <p className="big-text">{user?.monedas}</p>
+                    <p className="regular-text">Monedas</p>
+                  </div>
+                  <div className="item">
+                    <p className="big-text">{bets.length}</p>
+                    <p className="regular-text">Apuestas</p>
+                  </div>
+                  <button onClick={openBetCard}>Ver Apuestas</button>
+                </div>
+              )}
+            </div>
+            <div className="ticket-container">
+              <h2>TICKET</h2>
+              {openTicket ?
+                (
+                  <div>
+                    <ul>
+                      {Object.entries(ticket.bets).map(([index, obj]) => (
+                        <li key={obj.bet_id} className="bet">
+                          <hr></hr>
+                          <p>
+                            {match.club_local} - {match.club_visitante}
+                          </p>
+                          <p>
+                            - Apuesta a {obj.choice}, cuota: {obj.odd}
+                          </p>
+                          <button onClick={() => handleDeleteBet(obj.bet_id)}>x</button>
+                          <hr></hr>
+                        </li>
+                      ))}
+                    </ul>
+                    Cantidad apostada: {ticket.bet_coins}
+                    <button onClick={handleBetIncrease}>+</button>
+                    <button onClick={handleBetDecrease}>-</button>
+                    <p>Ganancia potencial: {ticket.potencial_prize}</p>
+                    <br></br>
+                    <button onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
+                      Realizar apuesta
+                    </button>
+                  </div>
+                ) : (
+                  <p>VACÍO</p>
+                )}
+            </div>
+          </div>
+        </div>
+        {betCard && (
+          <div className="popup">
+            <div className="popup-inner">
+              <div className="bets">
+                {bets.map((bet, index) => (
+                  <div key={index} className="bet">
+                    <h2>TICKET {index + 1} </h2>
+                    {Object.entries(bet.bets).map(([indexx, obj]) => (
+                      <div key={indexx}>
+                        <ul>
+                          {match.club_local} vs {match.club_visitante}:  {obj.odd} for {obj.choice}
+                        </ul>
+                      </div>
+                    ))}
+                    <p>Apostado: {bet.bet_coins}</p>
+                    <p>Potencial Win: {bet.potencial_prize}</p>
+                    <p>Result: {bet.status}</p>
+                    <hr></hr>
+                  </div>
+                ))}
+              </div>
+              <button onClick={checkBetResults}> COMPROBAR APUESTAS</button>
+              <button onClick={closeBetCard}>CERRAR</button>
+            </div>
+          </div>
+        )}
+        <button className="button-help" onClick={handleClickOpenHelp}>?</button>
       </div>
-      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 }

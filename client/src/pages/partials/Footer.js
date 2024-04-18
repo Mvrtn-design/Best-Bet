@@ -10,7 +10,6 @@ function Footer() {
             <div className="footer-col">
               <h4>Opciones</h4>
               <ul>
-                <li><Link to="/match">Inicio</Link></li>
                 <li><Link to="/match">Accesibilidad</Link></li>
                 <li><Link to="/match">Ajustes</Link></li>
                 <li><Link to="/match">Opciones desarrollador</Link></li>
@@ -19,10 +18,8 @@ function Footer() {
             <div className="footer-col">
               <h4>¿Quienes somos?</h4>
               <ul>
-                <li><Link to="/match">Empresa</Link></li>
-                <li><Link to="/match">Localización</Link></li>
-                <li><Link to="/logIn">Sé uno de nosotros</Link></li>
                 <li><Link to="/match">Contacto</Link></li>
+                <li><Link to="/match">Dudas Comunes</Link></li>
               </ul>
             </div>
             <div className="footer-col">
@@ -47,7 +44,6 @@ function Footer() {
             <div className="footer-below-links">
               <Link to="/match">Términos & condiciones</Link>
               <Link to="/match">Privacidad</Link>
-              <Link to="/match">Seguridad</Link>
               <Link to="/match">Declaración de Cookies</Link>
             </div>
           </div>

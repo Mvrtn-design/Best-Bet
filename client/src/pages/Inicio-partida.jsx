@@ -1,8 +1,9 @@
-import {React, useEffect, useState } from "react";
+import { React, useEffect, useState } from "react";
 import Popup from "./partials/Popup";
 import Layout from "./partials/Layout";
 import Help from "./partials/Help";
 import { useParams, useNavigate } from "react-router-dom";
+import { create_odds, generateMatchResult } from "../routes/Route_matches";
 import axios from "axios";
 
 const Inicio = () => {
@@ -96,7 +97,8 @@ const Inicio = () => {
 
   let temporada_actual = "2023";
   const [currentSection, setCurrentSection] = useState(competition_statuses[0]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [aux_loading, setAuxLoading] = useState(true);
   const [IdMatchesReadyToPlay, setIdMatchesReadyToPlay] = useState([]);
   const fechas = {
     octavos: new Date(`${temporada_actual}-12-01T00:00:00`)
@@ -110,8 +112,8 @@ const Inicio = () => {
   ////////              FUNCTIONS         ////////////
   async function fetchCompetitionInfo() {
     console.log("GETTING COMPETITION INFO");
-    if (loading == false) {
-      setLoading(true);
+    if (loading === false) {
+      setAuxLoading(true);
     }
     try {
       const user_backend_data = await axios.get(
@@ -156,11 +158,11 @@ const Inicio = () => {
         if (Competition_data.estado.split(".")[0] > 2) {
           await fetchMathes(Competition_data.ID, competition_rounds[0].toUpperCase());
           await fetchPartidosDisponibles(Competition_data.ID);
-          if (fechas.octavos == competition_response.data[0].dia) {
+          if (fechas.octavos === competition_response.data[0].dia) {
             setNewRound(competition_statuses[3]);
           }
-          /// OCTAVOS
         }
+        /// OCTAVOS
         if (Competition_data.estado.split(".")[0] > 3) {
           const oct = await fetchOctavosFinal();
           setTeams((prevDict) => ({ ...prevDict, Round_of_16: oct }));
@@ -171,7 +173,7 @@ const Inicio = () => {
         }
         if (Competition_data.estado.split(".")[0] > 5) {
           fetchPartidosDisponibles(Competition_data.ID);
-          if (fechas.cuartos == competition.dia) {
+          if (fechas.cuartos === competition.dia) {
             setNewRound(competition_statuses[6]);
           }
           //////  CUARTOS
@@ -186,7 +188,7 @@ const Inicio = () => {
         }
         if (Competition_data.estado.split(".")[0] > 8) {
           fetchPartidosDisponibles(Competition_data.ID);
-          if (fechas.Semifinales == competition.dia) {
+          if (fechas.Semifinales === competition.dia) {
             setNewRound(competition_statuses[9]);
           }
           /// SEMIFINALES
@@ -201,7 +203,7 @@ const Inicio = () => {
         }
         if (Competition_data.estado.split(".")[0] > 11) {
           fetchPartidosDisponibles(Competition_data.ID);
-          if (fechas.final == competition.dia) {
+          if (fechas.final === competition.dia) {
             setNewRound(competition_statuses[12]);
           }
         }
@@ -216,7 +218,7 @@ const Inicio = () => {
         }
         if (Competition_data.estado.split(".")[0] > 14) {
           fetchPartidosDisponibles(Competition_data.ID);
-          if (fechas.Champion == competition.dia) {
+          if (fechas.Champion === competition.dia) {
             setNewRound(competition_statuses[15]);
           }
         }
@@ -225,22 +227,17 @@ const Inicio = () => {
           const semis = await fetchClasificados(competition_rounds[4]);
           setTeams((prevDict) => ({ ...prevDict, Champion: semis }));
         }
-
-
-        setTimeout(() => {
-          /// APUESTAS
-          fetchBets(competition_response.data[0].ID);
-          setLoading(false);
-        }, 3000);
+        fetchBets(competition_response.data[0].ID);
+        setAuxLoading(false);
       }
     } catch (error) {
       console.error("Error fetching competition info: ", error);
-      setLoading(false);
+      setAuxLoading(false);
     }
   }
   useEffect(() => {
     fetchCompetitionInfo();
-  }, []);
+  }, [aux_loading]);
 
 
 
@@ -430,7 +427,7 @@ const Inicio = () => {
       console.error("Error recuperando los grupos:", error);
     }
   };
-  
+
   if (openHelp) {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
@@ -438,7 +435,7 @@ const Inicio = () => {
         <h2 >Cuadro de ayuda para la página de inicio</h2>
         <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
           Si tienes alguna duda o inquietud no dudes en preguntarnos.       </p>
-        <div style={{ backgroundColor: `red`}} className="my-div" >
+        <div style={{ backgroundColor: `red` }} className="my-div" >
           ...
         </div>
       </Help>)
@@ -502,13 +499,7 @@ const Inicio = () => {
     }
   };
 
-  function makeCuotas(local_cat, away_cat) {
-    const results = [];
-    for (let index = 0; index < 3; index++) {
-      results.push(parseFloat(Math.random() * (1.9 - 1.1) + 1.1).toFixed(2));
-    }
-    return results;
-  }
+  
   const findMatchById = (id, ronda = "") => {
     switch (ronda) {
       //Caso sin ronda especificada, irá por todas 
@@ -569,10 +560,9 @@ const Inicio = () => {
       ];
       for (let i = 0; i < 2 /*ida y vuelta */; i++) {
         Object.keys(round_teams).map((letra) => {
-          var cuotas = makeCuotas(
-            round_teams[letra][d[i][0]].category,
-            round_teams[letra][d[i][1]].category
-          );
+          const cuotas = create_odds(round_teams[letra][d[i][0]].elo,
+            round_teams[letra][d[i][1]].elo);
+         
           const formattedDate = fechaPartidosRonda
             .toISOString()
             .slice(0, 19)
@@ -588,9 +578,9 @@ const Inicio = () => {
               location: round_teams[letra][d[i][0]].country,
               stadium: round_teams[letra][d[i][0]].stadium,
               grupo: round_teams[letra][d[i][0]].id_grupo,
-              cuota_local: cuotas[0],
-              cuota_empate: cuotas[1],
-              cuota_visitante: cuotas[2],
+              cuota_local: cuotas.local,
+              cuota_empate: cuotas.draw,
+              cuota_visitante: cuotas.away,
             }
           );
         });
@@ -627,10 +617,8 @@ const Inicio = () => {
       for (let i = 0; i < order.length; i++) {
         Object.keys(groups.Group_state).map((letra) => {
           for (let j = 0; j < 2; j++) {
-            const cuotas = makeCuotas(
-              groups.Group_state[letra][order[i][j]].category,
-              groups.Group_state[letra][order[i][j + 1]].category
-            );
+            const cuotas = create_odds(groups.Group_state[letra][order[i][j]].elo,
+              groups.Group_state[letra][order[i][j + 1]].elo)
             const formattedDate = fech
               .toISOString()
               .slice(0, 19)
@@ -643,9 +631,9 @@ const Inicio = () => {
               location: groups.Group_state[letra][order[i][j]].country,
               stadium: groups.Group_state[letra][order[i][j]].stadium,
               grupo: groups.Group_state[letra][order[i][j]].id_grupo,
-              cuota_local: cuotas[0],
-              cuota_empate: cuotas[1],
-              cuota_visitante: cuotas[2],
+              cuota_local: cuotas.local,
+              cuota_empate: cuotas.draw,
+              cuota_visitante: cuotas.away,
             });
           }
         });
@@ -860,7 +848,7 @@ const Inicio = () => {
         for (
           let j = 0;
           j < bets[i].bets.length &&
-          (estado_ticket == "" || estado_ticket == "winner");
+          (estado_ticket === "" || estado_ticket === "winner");
           j++
         ) {
           console.log(bets[i].bets[j]);
@@ -952,6 +940,7 @@ const Inicio = () => {
 
     for (const ticket_number in grouped_tickets) {
       var temp_bets = [];
+
       for (const bet_number in grouped_tickets[ticket_number]) {
         const bet = grouped_tickets[ticket_number][bet_number];
         const temp_match = findMatchById(bet.id_partido);
@@ -961,11 +950,13 @@ const Inicio = () => {
       temp_ticket.push({ bet_coins: grouped_tickets[ticket_number][0].cantidad_apostada, potencial_prize: grouped_tickets[ticket_number][0].ganancia_potencial, status: grouped_tickets[ticket_number][0].estado, bets: temp_bets });
     }
     setBets(temp_ticket);
+    console.log(bets);
   }
 
   const handleSimular = async (id_match, local, visitante, id_group) => {
-    const marcador_local = Math.round(Math.random() * 4);
-    const marcador_visitante = Math.round(Math.random() * 4);
+    const result = generateMatchResult(local.catefory, visitante.category);
+    const marcador_local = result.local;
+    const marcador_visitante = result.away;
     const estado_partido = "ENDED";
 
     await axios.put(
@@ -991,7 +982,7 @@ const Inicio = () => {
         puntos:
           marcador_local > marcador_visitante
             ? 3
-            : marcador_local == marcador_visitante
+            : marcador_local === marcador_visitante
               ? 1
               : 0,
       }
@@ -1009,7 +1000,7 @@ const Inicio = () => {
         puntos:
           marcador_local < marcador_visitante
             ? 3
-            : marcador_local == marcador_visitante
+            : marcador_local === marcador_visitante
               ? 1
               : 0,
       }
@@ -1956,15 +1947,13 @@ const Inicio = () => {
                 <div className="bets">
                   {bets.map((bet, index) => (
                     <div key={index} className="bet">
-                      <h2>TICKET {index + 1} </h2>
-
-                      {Object.entries(bet.bets).map(([indexx, obj]) => (
-                        <div key={indexx}>
-                          <p>
-                            - {obj.match.club_local} vs {obj.match.club_visitante}:{" "}
-                            {obj.odd} for {obj.choice}{" "}
-                          </p>
-                        </div>
+                      <h2>TICKET </h2>
+                      {bet.bets.map((singleBet, index) => (
+                        <li>
+                          <ul key={index}>Partido: {singleBet.match.club_local}  vs {singleBet.match.club_visitante}</ul>
+                          <ul key={index}>Elección: {singleBet.choice}</ul>
+                          <ul key={index}>Cuota: {singleBet.odd}</ul>
+                        </li>
                       ))}
 
                       <p>Apostado: {bet.bet_coins}</p>

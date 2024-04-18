@@ -65,9 +65,7 @@ function CreatePost() {
             <label>
               Clave: <Field type="password" name="clave" autoComplete="false" />
             </label>
-            <button type="submit" disabled={isSubmitting}>
-              BUSCAR
-            </button>
+            <button type="submit" disabled={isSubmitting}>BUSCAR</button>
           </Form>
         )}
       </Formik>

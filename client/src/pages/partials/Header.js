@@ -18,7 +18,6 @@ function Header() {
           <Link className="vistoso" to="/">
             INICIO
           </Link>
-          <Link to="/clubs">CLUBS</Link>
           {authState.status ? <Link to="/profile">{authState.username}</Link> : <Link to="/login">INICIAR SESIÓN</Link>}
         </div>
       </nav>
