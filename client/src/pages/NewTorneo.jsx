@@ -3,19 +3,20 @@ import React, { useState, useEffect } from "react";
 import Layout from "./partials/Layout";
 import Help from "./partials/Help";
 import axios from "axios";
-import { Field, Form, Formik } from "formik";
-import * as Yup from 'yup';
 
 function NewTorneo() {
 
   const [competiciones, setCompeticiones] = useState([]);
   const [openHelp, setopenHelp] = useState(false);
   const [user, setUser] = useState({});
-  const [form, setForm] = useState({
-    id_usuario: "",
-  });
   const inicio_temporada = 2023;
   const temporada_actual = `${inicio_temporada}-${inicio_temporada + 1}`;
+  const [form, setForm] = useState({
+    nombre_usuario: "",
+    temporada: temporada_actual,
+    nombre_torneo: "",
+    monedas: 0,
+  });
   const navigate = useNavigate();
 
 
@@ -30,8 +31,8 @@ function NewTorneo() {
           navigate("/logIn");
         } else {
           const userData = response.data;
-          setUser(userData);
-          setForm({ ...form, id_usuario: userData.id });
+          setUser(userData.id);
+          setForm({ ...form, nombre_usuario: userData.id })
           getCompeticionesByUser(response.data.id).then((datosCompeticion) => {
             setCompeticiones(datosCompeticion);
           });
@@ -42,35 +43,36 @@ function NewTorneo() {
       });
   }, []);
 
-  async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault();
-
     try {
-      const response = await fetch("http://localhost:3001/addPartida", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-      const datos = await response.json();
-
-      postCompetition(datos).then((datosCompeticion) => {
-        navigate(`/menu/${datos}/${datosCompeticion.data}`);
+      postPartida(form).then((respuestaServe) => {
+        postCompetition(respuestaServe).then((datosCompeticion) => {
+          navigate(`/menu/${respuestaServe}/${datosCompeticion.data}`);
+        });
       });
     } catch (error) {
       console.error("Error:", error);
     }
   }
+  async function postPartida() {
+    try {
+      const response = await axios.post("http://localhost:3001/addPartida", {
+        body: user,
+      });
+      return response.data;
+    } catch (errr) {
+      console.error("Error:", errr);
+      return ({ error: errr })
+    }
+  }
 
   async function postCompetition(idPartida) {
     const formData = {
-      nombre: "champions1",
+      nombre: form.nombre_torneo,
       partida: idPartida,
-      temporada: temporada_actual,
+      temporada: form.temporada,
+      monedas: form.monedas,
     };
 
     try {
@@ -81,6 +83,19 @@ function NewTorneo() {
       return responseCompeticion;
     } catch (error) {
       console.error("Error posting competition:", error);
+      alert("Error creando la competicion");
+      navigate("/");
+    }
+  }
+  async function handleEliminarCompeticion(idCompeticion){
+    try{
+      console.log(idCompeticion);
+      await axios.get(`http://localhost:3001/eliminarCompeticion`,{
+    idd: idCompeticion});      
+      alert("Partida Eliminada");
+      window.location.reload();
+    }catch(error){
+      console.log(error);
     }
   }
 
@@ -92,16 +107,10 @@ function NewTorneo() {
       return responseCompeticion.data;
     } catch (error) {
       console.error("Error getting competitions:", error);
+      alert("Error de carga");
+      navigate("/");
     }
   }
-  const loginSchema = Yup.object().shape({
-    email: Yup.string()
-      .email("Ingrese un correo electrónico válido")
-      .required("Campo requerido"),
-    password: Yup.string()
-      .min(6, "La contraseña debe tener al menos 6 caracteres")
-      .required("Contraseña es obligatoria"),
-  });
 
   function handleClickOpenHelp() {
     setopenHelp(!openHelp);
@@ -147,29 +156,28 @@ function NewTorneo() {
                 >
                   ENTRAR
                 </button>
-                <button>ELIMINAR</button>
+                <button type="button" onClick={() => handleEliminarCompeticion(item.ID)}>ELIMINAR</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       <hr></hr>
-      <Formik
-        initialValues={{ temporada: temporada_actual, nombre_usuario: user.nombre_usuario, monedas: 0 }}
-        validationSchema={loginSchema }
-        onSubmit={handleSubmit}>
-          <label>
-            Temporada:
-            <Field type='text' name='temporada' value={temporada_actual}
-            readOnly />
-          </label>
-          <label>
-            Nombre de Usuario:
-          </label>
-
-      </Formik>
       <h2>NUEVO TORNEO</h2>
+
       <form onSubmit={handleSubmit}>
+        <label>
+          Nombre Torneo:
+          <input type='text'
+            name='nombre_torneo'
+            placeholder="Inserte nombre del torneo"
+            autoComplete="on"
+            required
+            value={form.nombre_torneo}
+            onChange={(e) => setForm({ ...form, nombre_torneo: e.target.value })}>
+          </input>
+          <br />
+        </label>
         <label>
           Temporada:
           <input
@@ -179,19 +187,17 @@ function NewTorneo() {
             readOnly
           ></input>
         </label>
-        <div>
-          Nombre usuario:
-          <input
-            type="text"
-            name="nombre_usuario"
-            defaultValue={user.nombre_usuario}
-            readOnly
-          ></input>
-        </div>
+        <label>
+          Regalo de Bienvenida:
+          <br /><input name="monedas" type='radio' label='Dificultad_baja' required value='100' checked={form.monedas === 100} onChange={() => setForm({ ...form, monedas: 100 })} /> Dificultad Baja: 100 monedas
+          <br /><input name="monedas" type='radio' label='Dificultad_media' required value='20' checked={form.monedas === 20} onChange={() => setForm({ ...form, monedas: 20 })} /> Dificultad media: 20 monedas
+          <br /><input name="monedas" type='radio' label='Dificultad_alta' required value='1' checked={form.monedas === 1} onChange={() => setForm({ ...form, monedas: 1 })} /> Dificultad alta: 1 moneda<br />
+        </label>
         <button type="submit">COMENZAR NUEVA COMPETICION</button>
+        <button type="reset">BORRAR CAMPOS</button>
       </form>
       <button className="button-help" onClick={handleClickOpenHelp}>?</button>
-    </Layout>
+    </Layout >
   );
 }
 

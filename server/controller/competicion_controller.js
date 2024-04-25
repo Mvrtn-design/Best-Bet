@@ -2,6 +2,7 @@ const controller = {};
 
 controller.crearCompeticion = (req, res) => {
   const datos_competicion = req.body;
+  console.log(datos_competicion);
 
   req.getConnection((err, conn) => {
     if (err) {
@@ -17,6 +18,30 @@ controller.crearCompeticion = (req, res) => {
         const idd = competicion.insertId;
         res.json(idd);
         console.log("COMPETICIÓN CREADA");
+      }
+    );
+  });
+};
+
+controller.eliminarCompeticion = (req, res) => {
+  console.log(req);
+  console.log(req.body);
+  console.log("iiiiii: ", req.idd);
+  const id = req.idd;
+  req.getConnection((err, conn) => {
+    if (err) {
+      console.log(`Error al establecer la conexion: ${err}`);
+    }
+    conn.query(
+      `DELETE FROM competicion WHERE ID = ?`,
+      id,
+      (errr, respuesta_ejecucion) => {
+        if (errr) {
+          console.error(errr);
+          res.json(errr); //manejar los errores con next (mas profesional)
+        }
+        console.log("Competicion eliminada");
+        res.json(respuesta_ejecucion);
       }
     );
   });
@@ -47,7 +72,7 @@ controller.getClubesByCompetition = (req, res) => {
 controller.updateCompetitionState = (req, res) => {
   const idd = req.body.value1;
   const estadoo = req.body.value2;
-
+  console.log(estadoo, idd);
   req.getConnection((err, conn) => {
     if (err) {
       console.log(`Error al establecer la conexion: ${err}`);
@@ -66,6 +91,8 @@ controller.updateCompetitionState = (req, res) => {
   });
 };
 
+
+
 controller.avanzarUnDia = (req, res) => {
   const idd = req.body.value1;
   console.log("id: ", idd);
@@ -79,17 +106,18 @@ controller.avanzarUnDia = (req, res) => {
       [idd],
       (errr, estado) => {
         if (errr) {
-          res.json(errr); //manejar los errores con next (mas profesional)
+          console.error("eeeeeeror al cambiooo: ", errr);
+          res.json({ error: errr }); //manejar los errores con next (mas profesional)
         }
         conn.query(
-          "SELECT Idd FROM partido WHERE date(fecha) = (SELECT date(dia) FROM competicion WHERE ID = ?)",
-          [idd],
+          "SELECT Idd FROM partido join grupo on id_group = grupo.ID join competicion on grupo.id_competicion = competicion.ID WHERE competicion.ID = ? and date(fecha) = (SELECT date(dia) FROM competicion WHERE ID = ?);",
+          [idd, idd],
           (errr, estado) => {
             if (errr) {
               console.error("Error al cambiar de fecha");
               res.json(errr); //manejar los errores con next (mas profesional)
             }
-            console.log("eeeee: ", estado);
+            console.log("cambioooo: ", estado);
             res.json(estado);
           }
         );
@@ -201,6 +229,7 @@ controller.guardarGrupo = (req, res) => {
   const datos_competicion = req.body.value1;
   const ronda = req.body.value2;
   const letra = req.body.value3;
+  console.log("recibido en grupo: ", datos_competicion, ronda, letra);
 
   req.getConnection((err, conn) => {
     if (err) {
@@ -212,7 +241,7 @@ controller.guardarGrupo = (req, res) => {
       (errr, grupo, next) => {
         if (errr) {
           console.log(`Error al insertar el grupo: ${errr}`);
-          res.json(errr);
+          res.json({ error: errr });
         }
         const ddd = grupo.insertId;
         console.log("GRUPO CREADO: ", ddd);

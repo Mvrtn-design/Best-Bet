@@ -22,14 +22,14 @@ router.post("/storeClubsJSON", main_controller.storeClubsJSON);
 /////////       BET             ///////////
 router.post("/addTicket", bet_controller.addTicket);
 router.post("/addBet", bet_controller.addBet);
-router.put("/updateEstadoTicket", bet_controller.cambiarEstadoTicket);
+router.put("/updateEstadoTicket/:id", bet_controller.cambiarEstadoTicket);
 router.get("/getLiveBetsByCompeticion/:id", bet_controller.getLiveBetsByCompeticion);
 
 /////////       CLUB            ///////////
 router.get("/getClubsByCountry", club_controller.clubsByCountry);
 router.get("/getOtherClubs", club_controller.otherClubs);
 router.get("/getClubsByCompetition", club_controller.getClubsByCompetition);
-router.get("/getFromPage",club_controller.getFromPage);
+router.get("/getFromPage", club_controller.getFromPage);
 
 /////////       PARTIDA            ///////////
 router.post("/addPartida", partida_controller.crearPartida);
@@ -52,6 +52,8 @@ router.post("/addCompeticion", competicion_controller.crearCompeticion);
 router.put("/updateCompetitionState", competicion_controller.updateCompetitionState);
 router.put("/avanzarUnDia", competicion_controller.avanzarUnDia);
 router.put("/getClubesByCompetition", competicion_controller.getClubesByCompetition);
+router.get("/eliminarCompeticion", competicion_controller.eliminarCompeticion);
+router.put("/setCompetitionCoins/:id", usuario_controller.actualizarMonedas);
 
 /////////       USUARIO            ///////////
 router.get("/login", usuario_controller.irInicioSesion);
@@ -65,7 +67,7 @@ router.post("/add", usuario_controller.guardarUsuario);
 router.post("/update/:id", usuario_controller.editarUsuario);
 router.get("/check", usuario_controller.checkUsuario);
 router.get("/auth", tokenValido, usuario_controller.usuario_autenticado);
-router.put("/setUserCoins/:id", usuario_controller.actualizarMonedas);
+
 
 /////////       PARTIDO            ///////////
 router.get("/getPartidoById/:id", match_controller.getMatchByID);

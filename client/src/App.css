@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
 
 :root {
   --color-texto-primario: #777777;
@@ -32,6 +32,14 @@ a {
   text-decoration: none;
   transition: all 0.7s ease;
 }
+form {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+}
+form button {
+  width: 50%;
+}
 
 a:hover {
   color: var(--color-texto-secundario);
@@ -41,6 +49,12 @@ h1 {
   font-size: 50px;
   text-align: center;
   padding: 10px;
+}
+th {
+  padding: 10px;
+  background-color: var(--color-fondo-oscuro-primario-resaltado);
+  color: var(--color-texto-primario);
+  border: var(--color-fondo-primario);
 }
 
 table {
@@ -544,7 +558,7 @@ hr {
   display: flex;
   left: -10;
   align-items: left;
-  color: #ffffff;
+  color: var(--color-fondo-primario);
 }
 
 .match-short-date {
@@ -552,14 +566,6 @@ hr {
   display: flex;
   color: var(--color-texto-secundario);
   margin: 2px 0 0 200px;
-}
-
-.match-short-column {
-  padding: 2px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: calc(100% / 4);
 }
 
 .team-short-name {
@@ -570,7 +576,7 @@ hr {
   text-transform: uppercase;
 }
 .match-short-score {
-  color: #ffffff;
+  color: var(--color-fondo-primario);
   font-size: x-large;
 }
 
@@ -597,7 +603,6 @@ hr {
 }
 /****************     GROUP SHORT       ************/
 .group-short-container {
-  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   width: 100%;
@@ -606,16 +611,15 @@ hr {
   border-radius: 10px;
 }
 .group-short {
+  cursor: pointer;
+  flex-grow: 1;
   border-radius: 5px;
-  margin-inline: 3px;
   display: flex;
   flex-direction: column;
-  width: fit-content;
+  width: 100%;
   box-shadow: 0 1.5px 0 0 rgba(0, 0, 0, 0.686);
-
-  gap: 10px;
   background-color: #ffffff00;
-  padding: 10px;
+  padding: 5px;
   border-radius: 10px;
   transition: ease 2s;
 }
@@ -628,7 +632,7 @@ hr {
   );
   padding: 5px;
   border-radius: 10px;
-  margin: 0;
+  margin: 10px 0;
   color: var(--color-texto-primario);
   text-align: center;
   align-items: center;
@@ -638,8 +642,7 @@ hr {
   color: var(--color-texto-primario);
 }
 .group-short:hover {
-  border: 4px #0000b0 solid;
-  transform: scale(1.05);
+  color: var(--color-texto-primario);
 }
 
 .group-short-body {
@@ -647,7 +650,7 @@ hr {
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
   text-align: justify;
   align-items: justify;
   border-radius: 5px;
@@ -667,6 +670,13 @@ hr {
   background-color: #d10101;
 }
 
+/****************   TEAM LIST   ************/
+.list-teams{
+  display: flex;
+}
+.list-team{
+  color: var(--color-fondo-primario);
+}
 /****************   PARTIDA MATCH BIG   ************/
 .match-container {
   display: flex;
@@ -737,7 +747,8 @@ hr {
   margin-top: 8px;
   padding-bottom: 8px;
 }
-.marcador-local, .marcador-visitante{
+.marcador-local,
+.marcador-visitante {
   align-items: center;
   align-content: center;
   text-align: center;
@@ -791,6 +802,7 @@ hr {
   justify-content: center;
   align-items: center;
   width: calc(100% / 4);
+  cursor: pointer;
 }
 
 .team-short-name {
@@ -969,20 +981,20 @@ html.is-animating .animacion-fade {
 }
 
 /**********          CLUB INFO      ****************/
-.club-list{
-  list-style-type:circle;
+.club-list {
+  list-style-type: circle;
   display: flex;
   flex-direction: column;
   width: 50%;
   height: auto;
   text-align: start;
   overflow-y: scroll;
-  overflow-x:hidden;
+  overflow-x: hidden;
 }
-.club{
+.club {
   margin-bottom: 10px;
 }
-.club button{
+.club button {
   display: block;
   width: 100%;
   text-align: left;
@@ -992,23 +1004,24 @@ html.is-animating .animacion-fade {
   color: var(--color-texto-primario);
   cursor: pointer;
   font-size: 16px;
-}.club button:hover {
+}
+.club button:hover {
   color: var(--color-fondo-primario);
 }
 .club button:active {
   color: var(--color-texto-secundario);
 }
-.clubes{
+.clubes {
   display: flex;
   height: 90lvh;
 }
-.club-info{
+.club-info {
   width: 50%;
   background-color: var(--color-fondo-oscuro-primario-resaltado);
   text-align: justify;
   padding: 3vw;
   border-radius: 20px;
-  box-shadow: -4px  8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: -4px 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 /***********      LOG IN      SET UP   ************/
@@ -1114,7 +1127,9 @@ html.is-animating .animacion-fade {
 
 /************/
 
-.Inicio-partida , .match-info, .partido-amistoso{
+.Inicio-partida,
+.match-info,
+.partido-amistoso {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -1277,4 +1292,44 @@ html.is-animating .animacion-fade {
 .bets {
   background-color: #001ca7;
 }
-/*******    CLUB CONTAINER    *********/
+/*******    FAQ    *********/
+.faq-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 ;
+  padding: 2px;
+}
+
+.faq-wrapper {
+  margin-top: 3px;
+}
+
+.accordion_header {
+  margin-top: 5px;
+  border-radius: 20px;
+  background: linear-gradient(
+  135deg,
+  #0000b0,
+  #000000,
+  var(--color-fondo-oscuro-primario-resaltado)
+);
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all  0.5s ease-in-out;
+}
+.accordion_header:hover{
+  color: var(--color-fondo-primario);
+  transform: scale(1.01);
+}
+.accordion_header:active{
+  transform: scale(0.75);
+}
+
+.answer {
+  padding: 0 ;
+  border-top: 1px solid transparent;
+  transition: all  4s ease-in-out;
+}

@@ -1,5 +1,6 @@
 import React from 'react'
 import Help from "./partials/Help";
+import { useState } from 'react';
 
 function Contact() {
     const [openHelp, setopenHelp] = useState(false);

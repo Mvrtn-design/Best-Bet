@@ -3,43 +3,33 @@ import Layout from "./partials/Layout";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import MatchGenerator from "../routes/route_match";
+import { generateMatchResult } from "../routes/Route_matches";
 import { useNavigate } from "react-router-dom";
 
 function Match_Info() {
+  const API_URL = 'http://localhost:3001';
   const [ID_distributor, setID_distributor] = useState(0);
   const [match, setMatch] = useState(null);
-  const [matchTemp, setMatchTemp] = useState(null);
   const [betCard, setBetCart] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openTicket, setOpenTicket] = useState(false);
   const location = useLocation();
-  const [posibilties, setPosibilities] = useState([
-    { name: "local", price: 0 },
-    { name: "draw", price: 0 },
-    { name: "away", price: 0 },
-  ]);
+  const [competition, setCompetition] = useState(location.state.competition);
+  const [openHelp, setopenHelp] = useState(false);
   const [ticket, setTicket] = useState({
     bets: [],
     bet_coins: 0,
     status: "",
     potencial_prize: 0.0,
   });
-
-  const [amountToPlay, setAmountToPlay] = useState(1);
-  const [bet, setBet] = useState(0);
-  const [formCuota, setFormCuota] = useState(0);
-
-  const initialState = posibilties.reduce((acc, posibilty) => {
-    acc[posibilty.name] = { price: 0, amount: 0, potencialWin: 0 };
-    return acc;
-  }, {});
-  const [betState, setBetState] = useState(initialState);
-  const [bets, setBets] = useState([]);
+  const [bets, setBets] = useState(location.state.bets);
 
   const id_match = location.state.match;
   const usuario = location.state.usuario;
+  const local = location.state.local;
+  const visitante = location.state.visitante;
+
 
   let navigate = useNavigate();
 
@@ -49,56 +39,23 @@ function Match_Info() {
       setLoading(true);
       setUser(usuario);
       const response = await axios.get(
-        `http://localhost:3001/getPartidoById/${id_match}`
+        `${API_URL}/getPartidoById/${id_match}`, { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
       );
       const match_info = await response.data[0];
-      console.log(match_info);
+      console.log(visitante);
 
       setMatch(match_info);
-      setPosibilities([
-        { name: "local", price: match_info.cuota_local },
-        { name: "draw", price: match_info.cuota_empate },
-        { name: "away", price: match_info.cuota_visitante },
-      ]);
       setLoading(false);
     } catch (error) {
       console.error("Error: ", error);
     }
   };
-  useEffect(() => {
-    fetchMatchInfo();
-  }, [matchTemp]);
 
-  const increaseAmount = (BetName) => {
-    setBetState((prevState) => {
-      const newState = { ...prevState };
-      newState[BetName].amount += 1;
-      newState[BetName].potencialWin += posibilties.find(
-        (posibilty) => posibilty.name === BetName
-      ).price;
-      return newState;
-    });
-  };
-
-  const decreaseAmount = (betName) => {
-    setBetState((prevState) => {
-      const newState = { ...prevState };
-      if (newState[betName].amount > 0) {
-        newState[betName].amount -= 1;
-        newState[betName].potencialWin -= posibilties.find(
-          (posibilty) => posibilty.name === betName
-        ).price;
-        return newState;
-      }
-    });
-  };
   function handleClickOpenHelp() {
     setopenHelp(!openHelp);
   }
   ////////////////////////////            APUESTAS           ///////////////////////////////////////////
-  const handleCancel = () => {
-    setBetState(initialState);
-  };
+
   const handleBet = (match, cuota, bet_choice) => {
     const bet_aux = {
       bet_id: ID_distributor,
@@ -128,7 +85,7 @@ function Match_Info() {
     }
   };
   const handleBetIncrease = async () => {
-    if (user.monedas > 0) {
+    if (competition.monedas > 0) {
       const aux_coins = ticket.bet_coins + 1;
 
       setTicket((prevSidebar) => ({
@@ -183,11 +140,8 @@ function Match_Info() {
   const handleBetSubmit = async () => {
     let confirmation_check = true;
 
-    //check todos los partidos aun no están jugados
-    for (let i = 0; i < ticket.bets.length && confirmation_check === true; i++) {
-      if (findMatchById(ticket.bets[i].match_ID).estado_partido !== "NOT_STARTED") {
-        confirmation_check = false;
-      }
+    if (match.estado_partido === "ENDED") {
+      confirmation_check = false;
     }
 
     if (confirmation_check) {
@@ -214,13 +168,10 @@ function Match_Info() {
     setOpenTicket(false);
   };
   const postTicket = async (ticket) => {
-    const competition_response = await axios.get(
-      `http://localhost:3001/getCompeticionByPartida/${idPartida}`
-    );
     const ticket_response = await axios.post(
-      "http://localhost:3001/addTicket",
+      `${API_URL}/addTicket`,
       {
-        competition: competition_response.data[0].ID,
+        competition: competition.ID,
         potencial_prize: ticket.potencial_prize,
         coins: ticket.bet_coins,
         status: ticket.status,
@@ -230,7 +181,7 @@ function Match_Info() {
     console.log(backend_id_ticket);
     ticket.bets.forEach(async (bet) => {
       //POST BET
-      await axios.post("http://localhost:3001/addBet", {
+      await axios.post(`${API_URL}/addBet`, {
         ticket_id: backend_id_ticket,
         match_id: bet.match_ID,
         choice: bet.choice,
@@ -240,13 +191,14 @@ function Match_Info() {
   }
   const updateWallet = async (coins) => {
     await axios.put(
-      `http://localhost:3001/setUserCoins/${user.ID}`,
+      `${API_URL}/setCompetitionCoins/${competition.ID}`,
       {
-        value1: (user.monedas - coins),
+        value1: (competition.monedas - coins),
       }
     );
-    setUser({ ...user, monedas: user.monedas - coins });
+    setCompetition({ ...competition, monedas: competition.monedas - coins });
   }
+
 
   const openBetCard = () => {
     setBetCart(true);
@@ -256,57 +208,68 @@ function Match_Info() {
   };
 
   async function handlePlayMatch() {
-    const marcador_local = Math.round(Math.random() * 4);
-    const marcador_visitante = Math.round(Math.random() * 4);
+    const result = generateMatchResult(local.category, visitante.category);
+    const marcador_local = result.local;
+    const marcador_visitante = result.away;
     const estado_partido = "ENDED";
+    try {
+      await axios.put(
+        `${API_URL}/updateResultadoPartido/${id_match}`,
+        {
+          value1: marcador_local,
+          value2: marcador_visitante,
+          value3: estado_partido,
+        }
+      );
 
-    await axios.put(
-      `http://localhost:3001/updateResultadoPartido/${id_match}`,
-      {
-        value1: marcador_local,
-        value2: marcador_visitante,
-        value3: estado_partido,
-      }
-    );
+      //Local
+      await axios.put(
+        `${API_URL}/updateEstadisticasEquipo/${local.name}/${match.id_group}`,
+        {
+          marcados: marcador_local,
+          encajados: marcador_visitante,
+          ganados: marcador_local > marcador_visitante ? 1 : 0,
+          empatados: marcador_local === marcador_visitante ? 1 : 0,
+          perdidos: marcador_local < marcador_visitante ? 1 : 0,
+          puntos:
+            marcador_local > marcador_visitante
+              ? 3
+              : marcador_local === marcador_visitante
+                ? 1
+                : 0,
+        }
+      );
 
-    //Local
-    await axios.put(
-      `http://localhost:3001/updateEstadisticasEquipo/${match.club_local}/${match.id_group}`,
-      {
-        marcados: marcador_local,
-        encajados: marcador_visitante,
-        ganados: marcador_local > marcador_visitante ? 1 : 0,
-        empatados: marcador_local === marcador_visitante ? 1 : 0,
-        perdidos: marcador_local < marcador_visitante ? 1 : 0,
-        puntos:
-          marcador_local > marcador_visitante
-            ? 3
-            : marcador_local == marcador_visitante
-              ? 1
-              : 0,
-      }
-    );
+      //Visitante
+      await axios.put(
+        `${API_URL}/updateEstadisticasEquipo/${visitante.name}/${match.id_group}`,
+        {
+          marcados: marcador_visitante,
+          encajados: marcador_local,
+          ganados: marcador_local < marcador_visitante ? 1 : 0,
+          empatados: marcador_local === marcador_visitante ? 1 : 0,
+          perdidos: marcador_local > marcador_visitante ? 1 : 0,
+          puntos:
+            marcador_local < marcador_visitante
+              ? 3
+              : marcador_local === marcador_visitante
+                ? 1
+                : 0,
+        }
+      );
 
-    //Visitante
-    await axios.put(
-      `http://localhost:3001/updateEstadisticasEquipo/${match.club_visitante}/${match.id_group}`,
-      {
-        marcados: marcador_visitante,
-        encajados: marcador_local,
-        ganados: marcador_local < marcador_visitante ? 1 : 0,
-        empatados: marcador_local === marcador_visitante ? 1 : 0,
-        perdidos: marcador_local > marcador_visitante ? 1 : 0,
-        puntos:
-          marcador_local < marcador_visitante
-            ? 3
-            : marcador_local == marcador_visitante
-              ? 1
-              : 0,
-      }
-    );
-
-    fetchMatchInfo();
+      fetchMatchInfo();
+    } catch (error) {
+      console.error('Error fetching match info:', error);
+      setLoading(false);
+      alert('Error fetching match info');
+    }
   }
+
+  useEffect(() => {
+    fetchMatchInfo();
+  }, []);
+
   return (
     <Layout>
       {loading && <p>Loading...</p>}
@@ -340,28 +303,28 @@ function Match_Info() {
                 onClick={() => handleBet(match,
                   match.cuota_local,
                   "Local")}
-                disabled={match.estado_partido !== "NOT_STARTED"} >
+                disabled={match.estado_partido === "ENDED"} >
                 {match.cuota_local}
               </button>
               X<button
                 onClick={() => handleBet(match,
                   match.cuota_empate,
                   "Draw")}
-                disabled={match.estado_partido !== "NOT_STARTED"} >
+                disabled={match.estado_partido === "ENDED"} >
                 {match.cuota_empate}
               </button>
               2<button
                 onClick={() => handleBet(match,
                   match.cuota_visitante,
                   "Visitante")}
-                disabled={match.estado_partido !== "NOT_STARTED"} >
+                disabled={match.estado_partido === "ENDED"} >
                 {match.cuota_visitante}
               </button>
             </div>
             <div className="match-footer">
               <button
                 onClick={() => handlePlayMatch()}
-                disabled={match.estado_partido !== "NOT_STARTED"} >
+                disabled={match.estado_partido !== "READY_TO_PLAY"} >
                 JUGAR PARTIDO
               </button>
             </div>
@@ -378,7 +341,7 @@ function Match_Info() {
                     <p className="regular-text">Nombre</p>
                   </div>
                   <div className="item">
-                    <p className="big-text">{user?.monedas}</p>
+                    <p className="big-text">{competition?.monedas}</p>
                     <p className="regular-text">Monedas</p>
                   </div>
                   <div className="item">
@@ -430,14 +393,15 @@ function Match_Info() {
               <div className="bets">
                 {bets.map((bet, index) => (
                   <div key={index} className="bet">
-                    <h2>TICKET {index + 1} </h2>
-                    {Object.entries(bet.bets).map(([indexx, obj]) => (
-                      <div key={indexx}>
-                        <ul>
-                          {match.club_local} vs {match.club_visitante}:  {obj.odd} for {obj.choice}
-                        </ul>
-                      </div>
+                    <h2>TICKET</h2>
+                    {bet.bets.map((singleBet, index) => (
+                      <li>
+                        <ul key={index}>Partido: {singleBet.match.club_local}  vs {singleBet.match.club_visitante}</ul>
+                        <ul key={index}>Elección: {singleBet.choice}</ul>
+                        <ul key={index}>Cuota: {singleBet.odd}</ul>
+                      </li>
                     ))}
+
                     <p>Apostado: {bet.bet_coins}</p>
                     <p>Potencial Win: {bet.potencial_prize}</p>
                     <p>Result: {bet.status}</p>
@@ -445,7 +409,6 @@ function Match_Info() {
                   </div>
                 ))}
               </div>
-              <button onClick={checkBetResults}> COMPROBAR APUESTAS</button>
               <button onClick={closeBetCard}>CERRAR</button>
             </div>
           </div>

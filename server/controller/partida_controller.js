@@ -7,15 +7,16 @@ controller.crearPartida = (req, res) => {
       console.log(`Error al establecer la conexion: ${err}`);
     }
     conn.query(
-      `INSERT INTO partida SET ? `,
-      [datos_partida],
+      `INSERT INTO partida SET usuario = ?`,
+      datos_partida.body,
       (errr, partida) => {
         if (errr) {
+          console.log(errr);
           res.json(errr); //manejar los errores con next (mas profesional)
         }
         iiiddd = partida.insertId;
+        console.log("Partida creada");
         res.json(iiiddd);
-        console.log("PARTIDA CREADA");
       }
     );
   });
@@ -29,8 +30,9 @@ controller.listaPartidas = (req, res) => {
     }
     conn.query("SELECT * FROM partida", (err, partidas) => {
       if (err) {
-        res.json(err); //manejar los errores con next (mas profesional)
+        res.json(err);
       }
+      console.log("Partidas encontradas")
       res.send(partidas);
     });
   });

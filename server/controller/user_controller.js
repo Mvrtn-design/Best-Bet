@@ -29,7 +29,7 @@ controller.actualizarMonedas = (req, res) => {
       console.log(`Error al establecer la conexion: ${err}`);
     }
     conn.query(
-      `UPDATE usuario SET monedas = ? WHERE id = ? `,
+      `UPDATE competicion SET monedas = ? WHERE id = ? `,
       [estadoo, id],
       (errr, estado) => {
         if (errr) {
@@ -118,7 +118,7 @@ controller.guardarUsuario = (req, res) => {
             console.error(errr);
             res.json("Error debido a: ", errr); //manejar los errores con next (mas profesional)
           }
-          console.log("GUARDADO");
+          console.log("Usuario guardado");
         }
       );
     })

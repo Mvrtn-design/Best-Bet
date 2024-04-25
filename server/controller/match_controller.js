@@ -18,7 +18,7 @@ controller.getMatchByID = (req, res) => {
 
 controller.partidoDisponible = (req, res) => {
   const idd = req.body.value1;
-  console.log("iiii: ", idd);
+  console.log("cambio estado para: ", idd);
 
   req.getConnection((err, conn) => {
     if (err) {
@@ -66,6 +66,7 @@ controller.updateResultadoPartido = (req, res) => {
 controller.updateEstadisticasEquipo = (req, res) => {
   const club_name = req.params.club;
   const id_grupo = req.params.id_group;
+  console.log("club: ",club_name,id_grupo);
 
   const ganados = req.body.ganados;
   const empatados = req.body.empatados;
@@ -77,13 +78,15 @@ controller.updateEstadisticasEquipo = (req, res) => {
   req.getConnection((err, conn) => {
     if (err) {
       console.error("Error al establecer la conexion");
+      res.json({error:err})
     }
     conn.query(
-      `UPDATE estadisticas JOIN partido ON id_grupo = id_group set ganados = ganados + ?, empatados = empatados + ? , perdidos = perdidos + ?, goles_a_favor = goles_a_favor + ?, goles_en_contra = goles_en_contra + ?, puntos = puntos + ? where nombre_equipo = ? and id_grupo = ? `,
+      `UPDATE estadisticas JOIN partido ON id_grupo = id_group SET ganados = ganados + ?, empatados = empatados + ? , perdidos = perdidos + ?, goles_a_favor = goles_a_favor + ?, goles_en_contra = goles_en_contra + ?, puntos = puntos + ? where nombre_equipo = ? and id_grupo = ? `,
       [ganados, empatados, perdidos, marcados, encajados, puntos, club_name, id_grupo],
       (err, partido) => {
         if (err) {
           console.error("Fallo al get partido debido a: ", err);
+          res.json({error:"No se pudo actualizar los datos por: ",err});
         }
         console.log("ESTADISTICAS ACTUALIZADAS");
         res.json(partido);
