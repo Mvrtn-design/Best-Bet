@@ -43,8 +43,8 @@ export default function Login() {
     <Layout>
       <div className="user-container">
         <div className="user-form">
-          <p class="heading">INICIO SESIÓN</p>
-          <p class="paragraph">Introduzca sus credenciales</p>
+          <p className="heading">INICIO SESIÓN</p>
+          <p className="paragraph">Introduzca sus credenciales</p>
           <Formik
             initialValues={{ nombre_usuario: "", clave: "" }}
             validationSchema={loginSchema}
@@ -75,10 +75,10 @@ export default function Login() {
                     )}
                   </label>
                 </div>
-                <button type="submit">
+                <button className="button-important" type="submit">
                   BUSCAR
                 </button>
-                <button type="reset" >
+                <button className="button-important" type="reset" >
                   BORRAR
                 </button>
               </Form>

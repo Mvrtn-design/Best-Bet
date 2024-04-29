@@ -6,9 +6,11 @@ export function getInfoEquipos(equipos) {
       <h2>Equipos: </h2>
       {equipos.map((team, index) => (
         <div key={`${team.id}-${index}`}>
-          <li className="list-teams">
-           <ul className="list-team">{team.name}, {team.country}</ul> 
-          </li>
+          <ul className="list-teams">
+            <li className="list-team">
+              {team.name}, {team.country}
+            </li>
+          </ul>
         </div>
       ))}
     </div>);

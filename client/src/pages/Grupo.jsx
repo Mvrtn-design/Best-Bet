@@ -3,19 +3,23 @@ import Layout from "./partials/Layout";
 import { useLocation } from "react-router-dom";
 import Help from "./partials/Help";
 import axios from "axios";
+import { AiFillBackward } from "react-icons/ai";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getHelpText } from "./partials/HelpTexts";
 
 function Grupo() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [grupo, setGrupo] = useState(null);
-  const [ordenTabla, setOrdenTabla] = useState({ key: 'PUNTOS', direction: 'desc' })
   const location = useLocation();
   const groupId = location.state.group;
   const usuario = location.state.usuario;
+  let navigate = useNavigate();
+  const [openHelp, setopenHelp] = useState(false);
 
   const fetchMatchInfo = async () => {
-    console.log("GETTING INFO");
+    console.log("GETTING GROUP INFO");
     setLoading(true);
     try {
       setUser(usuario);
@@ -28,30 +32,28 @@ function Grupo() {
       console.error("Error: ", error);
     }
   };
+
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
   useEffect(() => {
     fetchMatchInfo();
-  }, [usuario]);
+  }, [user]);
 
-  // useEffect(() => {
-  //   ordenarTabla(ordenTabla.key, ordenTabla.direction);
-  // }, [ordenTabla]);
+  if (openHelp) {
+    return (
+      <Help trigger={openHelp} setTrigger={setopenHelp}>
+        {getHelpText("home")}
+      </Help>)
+  }
 
-  // const ordenarTabla = (key, direction) => {
-  //   let tablaOrdenada;
-  //   if (direction === 'desc') {
-  //     tablaOrdenada = [...grupo].sort((a, b) => b[key] - a[key]);
-  //   } else {
-  //     tablaOrdenada = [...grupo].sort((a, b) => a[key] - b[key]);
-  //   }
-  //   setGrupo(tablaOrdenada);
-  //   setOrdenTabla({ key, direction })
-  // }
 
   return (
     <Layout>
       {loading && <p>Loading...</p>}
       {grupo && (
         <div>
+          <button className="back-button" onClick={() => navigate(-1)}><AiFillBackward /> Volver</button>
           <h1>Grupo {grupo[0].letra}</h1>
 
           <table className="tabla_usuarios">
@@ -63,7 +65,6 @@ function Grupo() {
                 <th >DERROTAS</th>
                 <th >GOLES MARCADOS </th>
                 <th >GOLES ENCAJADOS</th>
-                <th >DIFERENCIA</th>
                 <th >
                   <strong>PUNTOS</strong>
                 </th>
@@ -75,15 +76,15 @@ function Grupo() {
                   <td><strong>{club.name}</strong></td>
                   <td>{club.ganados}</td>
                   <td>{club.empatados}</td>
-                  <th>{club.perdidos}</th>
+                  <td>{club.perdidos}</td>
                   <td>{club.goles_a_favor}</td>
                   <td>{club.goles_en_contra}</td>
-                  <td>{club.diferencia}</td>
                   <td><strong>{club.puntos}</strong></td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <button className="button-help" onClick={handleClickOpenHelp}>?</button>
         </div>
       )}
     </Layout>

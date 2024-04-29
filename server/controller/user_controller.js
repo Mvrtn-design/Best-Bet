@@ -115,10 +115,11 @@ controller.guardarUsuario = (req, res) => {
         [datos_usuario],
         (errr, usuarios) => {
           if (errr) {
-            console.error(errr);
-            res.json("Error debido a: ", errr); //manejar los errores con next (mas profesional)
+            console.error("Error debido a: ", errr);
+            res.json({ error: errr }); //manejar los errores con next (mas profesional)
           }
           console.log("Usuario guardado");
+          res.json("Usuario Creado Correctamente");
         }
       );
     })

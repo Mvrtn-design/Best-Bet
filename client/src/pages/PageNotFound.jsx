@@ -8,7 +8,7 @@ function PageNotFound() {
       <div>
         <h1>Page Not Found</h1>
         <p>Sorry, the page you are looking for could not be found.</p>
-        <Link to="/">Go back home</Link>
+        <Link to="/">Volver al inicio</Link>
       </div>
     </Layout>
   );

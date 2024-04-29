@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import Help from "./partials/Help";
 import { AuthContext } from "../helpers/AuthContext";
 import { create_odds, generateMatchResult } from "../routes/Route_matches";
+import { getHelpText } from "./partials/HelpTexts";
+import * as AiIcons from "react-icons/ai";
 
 function Match() {
 
@@ -308,31 +310,32 @@ function Match() {
   if (openHelp) {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
-
-        <h2 >Cuadro de ayuda para la página de partido amistoso</h2>
-        <hr></hr>
-        <p>En la parte superior de la página, hay dos menús desplegables para seleccionar los equipos local y visitante para el partido. El usuario puede seleccionar un equipo de una lista de equipos disponibles.</p>
-        <p> Una vez que el usuario ha seleccionado los equipos, puede hacer clic en el botón "VER PARTIDO" para pasar a la siguiente sección.</p>
-        <p>La siguiente sección muestra los detalles del partido, incluidos los equipos, la fecha y el lugar del partido, y el marcador actual. El usuario puede realizar apuestas sobre el partido haciendo clic en uno de los tres botones, cada botón corresponde a un resultado diferente del partido (es decir, el equipo local gana, el partido termina en empate, o el equipo visitante gana), y tiene una cuota asociada, que es la cantidad de dinero que el usuario ganará si su apuesta tiene éxito. </p>
-        <p>Debajo de los detalles del partido, hay una sección para realizar apuestas. El usuario puede introducir la cantidad de dinero que desea apostar y, a continuación, hacer clic en uno de los tres botones para realizar la apuesta. El usuario también puede aumentar o disminuir la cantidad de dinero que quiere apostar utilizando los botones "+" y "-". Una vez que el usuario ha realizado sus apuestas, puede hacer clic en el botón "Realizar apuesta" para enviar sus apuestas. </p>
-        <p> En la parte derecha de la página, hay una sección para mostrar la información del perfil del usuario, incluyendo su nombre de usuario, el número de monedas que tiene y el número de apuestas que ha realizado. El usuario puede hacer clic en el botón "Ver Apuestas" para ver sus apuestas actuales. </p>
+        {getHelpText("match")}
       </Help>)
   }
   if (openPopup) {
     return (
       <Popup trigger={openPopup} setTrigger={setopenPopup}>
-        <p>- Ganadas: {notifications.apuestas_ganadas} </p>
-        <p>- Perdidas: {notifications.apuestas_perdidas}</p>
-        <p>- Sin finalizar: {notifications.apuestas_sin_finalizar} </p>
+        <h2>RESULTADOS DE APUESTAS</h2>
+        <ul>
+          <li>
+            Ganadas: {notifications.apuestas_ganadas}
+          </li>
+          <li>
+            Perdidas: {notifications.apuestas_perdidas}
+          </li>
+          <li>
+            Sin finalizar: {notifications.apuestas_sin_finalizar}
+          </li>
+        </ul>
       </Popup>
     );
   }
 
-
   return (
     <Layout>
       <div>
-        <button className="back-button" onClick={() => navigate(-1)}>Back</button>
+        <button className="back-button" onClick={() => navigate(-1)}> <AiIcons.AiFillBackward /> Volver</button>
         <h1>PARTIDO</h1>
         <h2>SELECCIONE LOS EQUIPOS</h2>
         <select
@@ -361,7 +364,7 @@ function Match() {
           ))}
         </select>
 
-        <button id="jugarPartido" onClick={ShowMatch}>
+        <button className="button-important" id="jugarPartido" onClick={ShowMatch}>
           VER PARTIDO
         </button>
         {mostrarPartido ?
@@ -405,6 +408,7 @@ function Match() {
               </div>
               <div className="match-footer">
                 <button
+                  className="button-important"
                   onClick={() => handlePlayMatch()}
                   disabled={partido.estado_partido !== "NOT_STARTED"} >
                   JUGAR PARTIDO
@@ -429,7 +433,7 @@ function Match() {
                         <p className="big-text">{bets.length}</p>
                         <p className="regular-text">Apuestas</p>
                       </div>
-                      <button onClick={openBetCard}>Ver Apuestas</button>
+                      <button className="button-important" onClick={openBetCard}>Ver Apuestas</button>
                     </div>
                   )}
                 </div>
@@ -458,7 +462,7 @@ function Match() {
                         <button onClick={handleBetDecrease}>-</button>
                         <p>Ganancia potencial: {ticket.potencial_prize}</p>
                         <br></br>
-                        <button onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
+                        <button className="button-important" onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
                           Realizar apuesta
                         </button>
                       </div>
@@ -481,18 +485,20 @@ function Match() {
                     {Object.entries(bet.bets).map(([indexx, obj]) => (
                       <div key={indexx}>
                         <ul>
-                          {partido.local} vs {partido.visitante}:  {obj.odd} for {obj.choice}
+                          <li>
+                            <strong>{partido.local} vs {partido.visitante}</strong>: {obj.odd} for {obj.choice}
+                          </li>
                         </ul>
                       </div>
                     ))}
-                    <p>Apostado: {bet.bet_coins}</p>
-                    <p>Potencial Win: {bet.potencial_prize}</p>
-                    <p>Result: {bet.status}</p>
+                    <p><strong>Apostado :</strong> {bet.bet_coins}</p>
+                    <p><strong>Ganancia potencial :</strong> {bet.potencial_prize}</p>
+                    <p><strong>Estado ticket : </strong>{bet.status}</p>
                     <hr></hr>
                   </div>
                 ))}
               </div>
-              <button onClick={checkBetResults}>COMPROBAR APUESTAS</button>
+              <button className="button-important" onClick={checkBetResults}>COMPROBAR APUESTAS</button>
               <button onClick={closeBetCard}>CERRAR</button>
             </div>
           </div>

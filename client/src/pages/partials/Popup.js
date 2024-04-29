@@ -1,5 +1,4 @@
 import React from "react";
-import "../../Appp.css";
 
 function Popup(props) {
   return props.trigger ? (

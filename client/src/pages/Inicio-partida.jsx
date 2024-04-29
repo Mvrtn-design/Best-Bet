@@ -102,13 +102,13 @@ const Inicio = () => {
   const [aux_loading, setAuxLoading] = useState(true);
   const [IdMatchesReadyToPlay, setIdMatchesReadyToPlay] = useState([]);
   const fechas = {
-    octavos: new Date(`${temporada_actual}-11-23T00:00:00`)
+    octavos: new Date(`${temporada_actual}-11-23T10:00:00`)
       .toISOString()
       .slice(0, 24),
-    cuartos: new Date("2024-01-05T00:00:00").toISOString().slice(0, 24),
-    Semifinales: new Date("2024-01-20T00:00:00").toISOString().slice(0, 24),
-    final: new Date("2024-02-10T00:00:00").toISOString().slice(0, 24),
-    Champion: new Date("2024-03-01T00:00:00").toISOString().slice(0, 24),
+    cuartos: new Date(`${temporada_actual}-12-28T10:00:00`).toISOString().slice(0, 24),
+    Semifinales: new Date("2024-01-09T00:00:00").toISOString().slice(0, 24),
+    final: new Date("2024-02-24T10:00:00").toISOString().slice(0, 24),
+    Champion: new Date("2024-03-01T10:00:00").toISOString().slice(0, 24),
   };
 
   ////////              FUNCTIONS         ////////////
@@ -164,17 +164,17 @@ const Inicio = () => {
             await handleAdvance();
           }
         }
-        
+
         /// OCTAVOS
         if (Competition_data.estado.split(".")[0] > 3) {
-          console.log("fechas: ", fechas.octavos.split("T")[0], competition_response.data[0].dia.split("T")[0]);    
           const equipos_de_octavos = await fetchOctavosFinal();
           setTeams((prevDict) => ({ ...prevDict, Round_of_16: equipos_de_octavos }));
           if (Competition_data.estado.split(".")[0] > 4) {
+
             fetchGroups(Competition_data.ID, competition_rounds[1].toUpperCase());
             fetchMathes(Competition_data.ID, competition_rounds[1].toUpperCase());
             if (Competition_data.estado.split(".")[0] > 5) {
-              if (fechas.cuartos.split("T")[0] === competition.dia.split("T")[0]) {
+              if (fechas.cuartos.split("T")[0] === competition_response.data[0].dia.split("T")[0]) {
                 await updateCompetitionState(competition_statuses[6]);
                 await handleAdvance();
               }
@@ -186,7 +186,7 @@ const Inicio = () => {
                   fetchGroups(Competition_data.ID, competition_rounds[2].toUpperCase());
                   fetchMathes(Competition_data.ID, competition_rounds[2].toUpperCase());
                   if (Competition_data.estado.split(".")[0] > 8) {
-                    if (fechas.Semifinales.split("T")[0] === competition.dia.split("T")[0]) {
+                    if (fechas.Semifinales.split("T")[0] === competition_response.data[0].dia.split("T")[0]) {
                       await updateCompetitionState(competition_statuses[9]);
                       await handleAdvance();
                     }
@@ -198,7 +198,7 @@ const Inicio = () => {
                         fetchGroups(Competition_data.ID, competition_rounds[3].toUpperCase());
                         fetchMathes(Competition_data.ID, competition_rounds[3].toUpperCase());
                         if (Competition_data.estado.split(".")[0] > 11) {
-                          if (fechas.final.split("T")[0] === competition.dia.split("T")[0]) {
+                          if (fechas.final.split("T")[0] === competition_response.data[0].dia.split("T")[0]) {
                             await updateCompetitionState(competition_statuses[12]);
                             await handleAdvance();
                           }
@@ -211,7 +211,7 @@ const Inicio = () => {
                               fetchMathes(Competition_data.ID, competition_rounds[4].toUpperCase());
                               if (Competition_data.estado.split(".")[0] > 14) {
 
-                                if (fechas.Champion.split("T")[0] === competition.dia.split("T")[0]) {
+                                if (fechas.Champion.split("T")[0] === competition_response.data[0].dia.split("T")[0]) {
                                   await updateCompetitionState(competition_statuses[15]);
                                   await handleAdvance();
                                 }
@@ -280,9 +280,9 @@ const Inicio = () => {
     }, {});
   }
 
-  function groupByJornada(partidos) {
+  function groupByJornada(partidos, jornadas) {
     const result = [];
-    const chunkSize = Math.ceil(partidos.length / 6);
+    const chunkSize = Math.ceil(partidos.length / jornadas);
 
     for (let i = 0; i < partidos.length; i += chunkSize) {
       const chunk = partidos.slice(i, i + chunkSize);
@@ -428,8 +428,51 @@ const Inicio = () => {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
 
-        <h2 >Cuadro de ayuda para la página de inicio</h2>
-        <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
+        <h2 >Cuadro de ayuda la partida</h2>
+        <p>Esta sección te ofrece información sobre cómo utilizar esta seccion.
+
+          The Inicio-Partida page is the main page of the application where users can view and interact with the ongoing football competition. This page is divided into several sections, each representing a different stage of the competition. The sections are:
+
+          Creado (Created)
+
+          This section displays the teams participating in the competition. Users can view the teams' names, countries, and categories.
+          There is a button to group the teams into leagues. This action is only available if the competition is in the "Creado" state and the user has the necessary permissions.
+          Grouped
+
+          This section displays the teams grouped into leagues. Users can view the teams' names, countries, and the league they belong to.
+          There is a button to generate matches. This action is only available if the competition is in the "Grouped" state and the user has the necessary permissions.
+          Matched
+
+          This section displays the generated matches. Users can view the local and visiting teams, the date and location of the match, and the odds for each possible outcome (local win, draw, or visiting win).
+          There is a button to simulate the match. This action is only available if the competition is in the "Matched" state, the match is ready to play, and the user has the necessary permissions.
+          Users can place bets on the matches. To place a bet, users need to select a match, choose an outcome (local win, draw, or visiting win), and enter the amount of coins they want to bet. The potential prize is calculated based on the odds and the amount of coins bet.
+          There is a button to increase the amount of coins bet and a button to decrease it.
+          Users can submit their bets. Once a bet is submitted, it cannot be modified or deleted.
+          Octavos (Round of 16)
+
+          This section displays the teams that have qualified for the Round of 16. Users can view the teams' names and countries.
+          There is a button to sort the teams into pairs for the Round of 16. This action is only available if the competition is in the "Octavos" state and the user has the necessary permissions.
+          Cuartos (Quarter-finals)
+
+          This section displays the teams that have qualified for the Quarter-finals. Users can view the teams' names and countries.
+          There is a button to generate the Quarter-final matches. This action is only available if the competition is in the "Cuartos" state and the user has the necessary permissions.
+          Semifinales (Semi-finals)
+
+          This section displays the teams that have qualified for the Semi-finals. Users can view the teams' names and countries.
+          There is a button to generate the Semi-final matches. This action is only available if the competition is in the "Semifinales" state and the user has the necessary permissions.
+          Final
+
+          This section displays the teams that have qualified for the Final. Users can view the teams' names and countries.
+          There is a button to generate the Final match. This action is only available if the competition is in the "Final" state and the user has the necessary permissions.
+          Campeón (Champion)
+
+          This section displays the teams that have qualified for the Champion stage. Users can view the teams' names and countries.
+          There is a button to sort the teams for the Champion stage. This action is only available if the competition is in the "Campeón" state and the user has the necessary permissions.
+          Finalizado (Finished)
+
+          This section displays the teams that have finished the competition. Users can view the teams' names and countries.
+          There is a button to return to the main page. This action is only available if the competition is in the "Finalizado" state.
+
           Si tienes alguna duda o inquietud no dudes en preguntarnos.       </p>
         <div style={{ backgroundColor: `red` }} className="my-div" >
           ...
@@ -523,7 +566,7 @@ const Inicio = () => {
 
   const handleMatches2 = async (ronda) => {
     let round_teams = {};
-    let fechaPartidosRonda = new Date("2023-12-20T00:00:00");
+    let fechaPartidosRonda = new Date("2023-12-20T21:00:00");
     try {
       switch (ronda) {
         case competition_rounds[0].toUpperCase():
@@ -531,19 +574,19 @@ const Inicio = () => {
           break;
         case competition_rounds[1].toUpperCase():
           round_teams = groups.Round_of_16;
-          fechaPartidosRonda = new Date("2023-12-20T00:00:00");
+          fechaPartidosRonda = new Date("2023-12-01T21:00:00");
           break;
         case competition_rounds[2].toUpperCase():
           round_teams = groups.Round_of_8;
-          fechaPartidosRonda = new Date("2024-01-10T00:00:00");
+          fechaPartidosRonda = new Date("2024-01-01T21:00:00");
           break;
         case competition_rounds[3].toUpperCase():
           round_teams = groups.Semifinals;
-          fechaPartidosRonda = new Date("2024-02-01T00:00:00");
+          fechaPartidosRonda = new Date("2024-01-18T21:00:00");
           break;
         case competition_rounds[4].toUpperCase():
           round_teams = groups.Final;
-          fechaPartidosRonda = new Date("2024-02-15T00:00:00");
+          fechaPartidosRonda = new Date("2024-02-15T21:00:00");
           break;
 
         default:
@@ -566,7 +609,6 @@ const Inicio = () => {
 
           axios.post(
             "http://localhost:3001/addMatch",
-            { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
             {
               local: round_teams[letra][d[i][0]].name,
               visitante: round_teams[letra][d[i][1]].name,
@@ -580,6 +622,9 @@ const Inicio = () => {
             }
           );
         });
+        if (ronda == competition_rounds[4].toUpperCase()) {
+          i = 30; //Para que solo haga el bucle una vez
+        }
         fechaPartidosRonda.setDate(fechaPartidosRonda.getDate() + 7);
       }
       await updateCompetitionState(competition_statuses[competition.estado.split(".")[0]]);
@@ -787,7 +832,6 @@ const Inicio = () => {
       }
     );
     const backend_id_ticket = ticket_response.data;
-    console.log(backend_id_ticket);
     ticket.bets.forEach(async (bet) => {
       //POST BET
       await axios.post("http://localhost:3001/addBet", {
@@ -834,54 +878,44 @@ const Inicio = () => {
           (estado_ticket === "" || estado_ticket === "winner");
           j++
         ) {
-          console.log(bets[i].bets[j]);
           const match_aux = findMatchById(bets[i].bets[j].match.Idd);
-          console.log("partido apostado: ", match_aux);
-
           if (match_aux.estado_partido === "ENDED") {
             let match_result = "";
-            if (match_aux.localGoals > match_aux.awayGoals) {
+            if (match_aux.marcador_local > match_aux.marcador_visitante) {
               match_result = "Local";
-            } else if (match_aux.localGoals < match_aux.awayGoals) {
+            } else if (match_aux.marcador_local < match_aux.marcador_visitante) {
               match_result = "Away";
             } else {
               match_result = "Draw";
             }
             const decition = bets[i].bets[j].choice;
-            console.log(`digo: ${decition} y fue: ${match_result}`);
 
             //PARTIDO ACERTADO
 
             if (decition === match_result) {
               estado_ticket = "winner";
-              console.log(`Match ${j + 1} acertado`);
             } else {
               //PARTIDO FALLADO
               estado_ticket = "looser";
-              console.log(`Match ${j + 1} fallado`);
             }
           } else {
             estado_ticket = "ON_GOING";
-            console.log(`Match ${j + 1} not finished`);
           }
         }
-        console.log("estado: ", estado_ticket);
         //ACTUALIZAR TICKET
+        console.log("estado ticket: ",estado_ticket);
         switch (estado_ticket) {
           case "winner":
             await updateTicket(bets[i].ID, "WINNER");
-            console.log(`apuesta ${i + 1} ganada`);
             temp_notification.apuestas_ganadas++;
             cash_won += bets[i].potencial_prize;
             break;
           case "looser":
             await updateTicket(bets[i].ID, "LOOSER");
             temp_notification.apuestas_perdidas++;
-            console.log(`apuesta ${i + 1} perdida`);
             break;
           case "ON_GOING":
             temp_notification.apuestas_sin_finalizar++;
-            console.log(`apuesta ${i + 1} CONTINÚA AÚN`);
             break;
 
           default:
@@ -934,7 +968,6 @@ const Inicio = () => {
   }
 
   const handleSimular = async (id_match, local, visitante, id_group) => {
-    console.log(visitante);
     const result = generateMatchResult(local.category, visitante.category);
     const marcador_local = result.local;
     const marcador_visitante = result.away;
@@ -969,7 +1002,6 @@ const Inicio = () => {
     //Visitante
     await axios.put(
       `http://localhost:3001/updateEstadisticasEquipo/${visitante.name}/${id_group}`,
-      { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } },
       {
         marcados: marcador_visitante,
         encajados: marcador_local,
@@ -1032,7 +1064,6 @@ const Inicio = () => {
       do {
         d = groupTeams(Math.ceil(teams.Group_state.length / 4));
       } while (d === null);
-      console.log("hecho group: ", d);
 
       for (let i = 0; i < d.length; i++) {
         let letra = String.fromCharCode(65 + i);
@@ -1057,10 +1088,6 @@ const Inicio = () => {
       }
       setGroups((prevDict) => ({ ...prevDict, Group_state: d }));
 
-      console.log(
-        "competition: ",
-        competition_statuses[competition.estado.split(".")[0]]
-      );
       await updateCompetitionState(competition_statuses[competition.estado.split(".")[0]]);
       fetchCompetitionInfo();
     } catch (error) {
@@ -1108,7 +1135,6 @@ const Inicio = () => {
       for (let index = 0; index < shuffledTeams.length / groupSize; index++) {
         let letra = String.fromCharCode(65 + index);
         //POST GROUP
-        console.log("grupo a poner: ", ronda, letra);
         const groupResponse = await axios.post(
           "http://localhost:3001/addGroup",
           {
@@ -1121,7 +1147,6 @@ const Inicio = () => {
 
         for (let j = 0; j < groupSize; j++) {
           const team_aux = shuffledTeams[index * groupSize + j];
-          console.log("Equipo a poner: ", backend_id_group, team_aux.name);
           //POST TEAM
           await axios.post(
             "http://localhost:3001/addEquipoToGroup",
@@ -1192,13 +1217,13 @@ const Inicio = () => {
                 }
               >
                 <thead className="group-short-head">
-                  <p>{ronda} {letra.split(",")[1]}</p>
+                  {ronda} {letra.split(",")[1]}
                 </thead>
                 <tbody className="group-short-body">
                   {groupss[letra].map((team, index) => (
-                    <div key={index} className="group-short-team">
+                    <td key={index} className="group-short-team">
                       {team.name} ({team.country})
-                    </div>
+                    </td>
                   ))}
                 </tbody>
               </table>
@@ -1213,17 +1238,9 @@ const Inicio = () => {
       <div>
         <h2>PARTIDOS: </h2>
         <p>DISPONIBLES: {IdMatchesReadyToPlay.length}</p>
-        <button
-          onClick={handleAdvance}
-          disabled={
-            loading ||
-            +competition?.estado.split(".")[0] !== 3 ||
-            IdMatchesReadyToPlay.length !== 0
-          } >
-          Avanzar Día
-        </button>
+
         {partidos != [] &&
-          groupByJornada(partidos).map((jornada, index) => (
+          partidos.map((jornada, index) => (
             <div key={index}>
 
               <div className="accordion_header" onClick={() => toggleAccordion(index)}>
@@ -1378,6 +1395,7 @@ const Inicio = () => {
           <div>
             {getInfoEquipos(teams.Group_state)}
             <button
+              className="button-important"
               onClick={() => handleGroupTeams()}
               disabled={loading || +competition?.estado.split(".")[0] > 1}
             >
@@ -1388,8 +1406,9 @@ const Inicio = () => {
       case "2":
         return (
           <div>
-            {getGroups(groups.Group_state, user,"GRUPO")}
+            {getGroups(groups.Group_state, user, "GRUPO")}
             <button
+              className="button-important"
               onClick={handleGroupMatches}
               disabled={loading || +competition?.estado.split(".")[0] > 2}
             >
@@ -1400,7 +1419,18 @@ const Inicio = () => {
 
       case "3":
         return (
-          <div>{getInfoPartidos(matches.Group_state, competition_rounds[0])}</div>
+          <div>
+            <button
+              onClick={handleAdvance}
+              className="button-important"
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 3 ||
+                IdMatchesReadyToPlay.length !== 0
+              } >
+              Avanzar Día
+            </button>
+            {getInfoPartidos(groupByJornada(matches.Group_state, 6), competition_rounds[0])}</div>
         );
       case "4":
         return (
@@ -1409,6 +1439,7 @@ const Inicio = () => {
             <button
               onClick={() => handleKnockOutTeams(16, 2)}
               disabled={loading || +competition?.estado.split(".")[0] !== 4}
+              className="button-important"
             >
               Sorteo Eliminatorias
             </button>
@@ -1418,13 +1449,14 @@ const Inicio = () => {
       case "5":
         return (
           <div>
-            {getGroups(groups.Round_of_16, user,"OCTAVOS")}
-            
+            {getGroups(groups.Round_of_16, user, "OCTAVOS")}
+
             <button
+              className="button-important"
               onClick={() =>
                 handleMatches2(competition_rounds[1].toUpperCase())
               }
-              disabled={loading || +competition?.estado.split(".")[0] < 4}
+              disabled={loading || +competition?.estado.split(".")[0] !== 5}
             >
               Generar Partidos
             </button>
@@ -1432,21 +1464,28 @@ const Inicio = () => {
         );
       case "6":
         return (
-          <div>{getInfoPartidos(matches.Round_of_16)}</div>
+          <div>
+            <button
+              onClick={handleAdvance}
+              className="button-important"
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 6 ||
+                IdMatchesReadyToPlay.length !== 0
+              } >
+              Avanzar Día
+            </button>
+            {getInfoPartidos(groupByJornada(matches.Round_of_16, 2), competition_rounds[1])}
+          </div>
         );
       case "7":
         return (
           <div>
-            <h2>Teams cuartos:</h2>
-            {teams.Round_of_8.map((team) => (
-              <p key={team.id}>
-                {team.name}, {team.country}
-              </p>
-            ))}
-
+            {getInfoEquipos(teams.Round_of_8)}
             <button
+              className="button-important"
               onClick={() => handleKnockOutTeams(8, 2)}
-              disabled={loading || +competition?.estado.split(".")[0] != 7}
+              disabled={loading || +competition?.estado.split(".")[0] !== 7}
             >
               Sorteo Eliminatorias
             </button>
@@ -1455,30 +1494,13 @@ const Inicio = () => {
       case "8":
         return (
           <div>
-            <h2>CUARTOS de final:</h2>
-            {Object.keys(groups.Round_of_8).map((letra, index) => (
-              <div key={index}>
-                <div
-                  onClick={() =>
-                    navigate(`/grupo/${letra.split(",")[0]}`, {
-                      state: { group: letra.split(",")[0], usuario: user },
-                    })
-                  }
-                >
-                  <h3>Octavos {letra.split(",")[1]}:</h3>
-                  {groups.Round_of_8[letra].map((team, index) => (
-                    <div key={index}>
-                      - {team.name} - {team.country}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {getGroups(groups.Round_of_8, user, "CUARTOS DE FINAL")}
             <button
+              className="button-important"
               onClick={() =>
                 handleMatches2(competition_rounds[2].toUpperCase())
               }
-              disabled={loading || +competition?.estado.split(".")[0] != 8}
+              disabled={loading || +competition?.estado.split(".")[0] !== 8}
             >
               Generar Partidos
             </button>
@@ -1486,49 +1508,39 @@ const Inicio = () => {
         );
       case "9":
         return (
-          <div>{getInfoPartidos(matches.Round_of_8)}</div>
+          <div>
+            <button
+              className="button-important"
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 9 ||
+                IdMatchesReadyToPlay.length !== 0
+              } >
+              Avanzar Día
+            </button>
+            {getInfoPartidos(groupByJornada(matches.Round_of_8, 2), competition_rounds[2])}
+          </div>
         );
       case "10":
         return (
           <div>
-            <h2>Teams Semifinales:</h2>
-            {teams.Semifinals.map((team) => (
-              <p key={team.id}>
-                {team.name}, {team.country}
-              </p>
-            ))}
-
+            {getInfoEquipos(teams.Semifinals)}
             <button
+              className="button-important"
               onClick={() => handleKnockOutTeams(4, 2)}
-              disabled={loading || +competition?.estado.split(".")[0] != 10}
+              disabled={loading || +competition?.estado.split(".")[0] !== 10}
             >
-              Sorteo Semifinales
+              Sorteo Eliminatorias
             </button>
           </div>
         );
       case "11":
         return (
           <div>
-            <h2>SEMIFINALES:</h2>
-            {Object.keys(groups.Semifinals).map((letra, index) => (
-              <div key={index}>
-                <div
-                  onClick={() =>
-                    navigate(`/grupo/${letra.split(",")[0]}`, {
-                      state: { group: letra.split(",")[0], usuario: user },
-                    })
-                  }
-                >
-                  <h3>Octavos {letra.split(",")[1]}:</h3>
-                  {groups.Semifinals[letra].map((team, index) => (
-                    <div key={index}>
-                      - {team.name} - {team.country}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {getGroups(groups.Semifinals, user, "SEMIFINALES")}
             <button
+              className="button-important"
               onClick={() =>
                 handleMatches2(competition_rounds[3].toUpperCase())
               }
@@ -1540,71 +1552,72 @@ const Inicio = () => {
         );
       case "12":
         return (
-          <div>{getInfoPartidos(matches.Semifinals)}</div>
+          <div>
+            <button
+              className="button-important"
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 12 ||
+                IdMatchesReadyToPlay.length !== 0
+              } >
+              Avanzar Día
+            </button>
+            {getInfoPartidos(groupByJornada(matches.Semifinals, 2), competition_rounds[3])}
+          </div>
         );
       case "13":
         return (
           <div>
-            <h2>Teams Final:</h2>
-            {teams.Final.map((team) => (
-              <p key={team.id}>
-                {team.name}, {team.country}
-              </p>
-            ))}
-
+            {getInfoEquipos(teams.Final)}
             <button
+              className="button-important"
               onClick={() => handleKnockOutTeams(2, 2)}
-              disabled={loading || +competition?.estado.split(".")[0] != 13}
+              disabled={loading || +competition?.estado.split(".")[0] !== 13}
             >
-              Sorteo Final
+              Sorteo (Local y visitante)
             </button>
           </div>
         );
       case "14":
         return (
           <div>
-            <h2>FINAL:</h2>
-            {Object.keys(groups.Final).map((letra, index) => (
-              <div key={index}>
-                <div
-                  onClick={() =>
-                    navigate(`/grupo/${letra.split(",")[0]}`, {
-                      state: { group: letra.split(",")[0], usuario: user },
-                    })
-                  }
-                >
-                  <h3>FINAL {letra.split(",")[1]}:</h3>
-                  {groups.Final[letra].map((team, index) => (
-                    <div key={index}>
-                      - {team.name} - {team.country}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
+            {getGroups(groups.Final, user, "FINAL")}
             <button
+              className="button-important"
               onClick={() =>
                 handleMatches2(competition_rounds[4].toUpperCase())
               }
               disabled={loading || +competition?.estado.split(".")[0] !== 14}
             >
-              Generar Partidos
+              GENERAR PARTIDO FINAL
             </button>
           </div>
         );
       case "15":
         return (
-          <div>{getInfoPartidos(matches.Final)}</div>
+          <div>
+            <button
+              className="button-important"
+              onClick={handleAdvance}
+              disabled={
+                loading ||
+                +competition?.estado.split(".")[0] !== 15 ||
+                IdMatchesReadyToPlay.length !== 0
+              } >
+              Avanzar Día
+            </button>
+            {getInfoPartidos(groupByJornada(matches.Final, 2), competition_rounds[4])}
+          </div>
         );
       case "16":
         return (
           <div>
             <h2>CHAMPIONS:</h2>
-            {teams.Champion.map((team) => (
-              <p key={team.id}>
-                {team.name}, {team.country}
-              </p>
-            ))}
+            {getInfoEquipos(teams.Champion)}
+            <button onClick={() => navigate("/")}>
+              Volver a la pagina principal
+            </button>
           </div>
         );
 
@@ -1650,7 +1663,7 @@ const Inicio = () => {
                     <p className="big-text">{bets.length}</p>
                     <p className="regular-text">Apuestas</p>
                   </div>
-                  <button onClick={openBetCard}>Ver Apuestas</button>
+                  <button className="button-important" onClick={openBetCard}>Ver Apuestas</button>
                 </div>
               )}
             </div>
@@ -1660,10 +1673,6 @@ const Inicio = () => {
                   <div className="item">
                     <p className="big-text">{competition?.temporada}</p>
                     <p className="regular-text">Temporada</p>
-                  </div>
-                  <div className="item">
-                    <p className="big-text">{competition?.estado}</p>
-                    <p className="regular-text">Estado Actual</p>
                   </div>
                   <div className="item">
                     <p className="big-text">{competition?.monedas}</p>
@@ -1701,7 +1710,7 @@ const Inicio = () => {
                   <button onClick={handleBetDecrease}>-</button>
                   <p>Ganancia potencial: {ticket.potencial_prize}</p>
                   <br></br>
-                  <button onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
+                  <button className="button-important" onClick={handleBetSubmit} disabled={ticket.bet_coins <= 0}>
                     Realizar apuesta
                   </button>
                 </div>
@@ -1709,11 +1718,6 @@ const Inicio = () => {
                 <p>VACÍO</p>
               )}
             </div>
-
-          </div>
-          <div className="bottom-container">
-            <div className="nav-butons">{renderNavbar()}</div>
-            <div className="nav-content"> {renderContent()}</div>
           </div>
           {betCard && (
             <div className="popup">
@@ -1729,7 +1733,6 @@ const Inicio = () => {
                           <ul key={index}>Cuota: {singleBet.odd}</ul>
                         </li>
                       ))}
-
                       <p>Apostado: {bet.bet_coins}</p>
                       <p>Potencial Win: {bet.potencial_prize}</p>
                       <p>Result: {bet.status}</p>
@@ -1737,14 +1740,18 @@ const Inicio = () => {
                     </div>
                   ))}
                 </div>
-                <button onClick={checkBetResults}>CHECK BET RESULTS</button>
+                <button className="button-important" onClick={checkBetResults}>CHECK BET RESULTS</button>
                 <button onClick={closeBetCard}>CERRAR</button>
               </div>
             </div>
           )}
+          <div className="bottom-container">
+            <div className="nav-butons">{renderNavbar()}</div>
+            <div className="nav-content"> {renderContent()}</div>
+          </div>
+          <button className="button-help" onClick={handleClickOpenHelp}>?</button>
         </div>
       )}
-      <button className="button-help" onClick={handleClickOpenHelp}>?</button>
     </Layout>
   );
 };

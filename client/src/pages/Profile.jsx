@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../helpers/AuthContext";
 import Layout from "./partials/Layout";
 import Help from "./partials/Help";
@@ -7,7 +7,6 @@ import axios from "axios";
 
 function Profile() {
   const [user, setUser] = useState({});
-  const [competiciones, setCompeticiones] = useState([]);
   const { setAuthState } = useContext(AuthContext);
   const navigate = useNavigate();
   const [openHelp, setopenHelp] = useState(false);
@@ -16,17 +15,6 @@ function Profile() {
     setopenHelp(!openHelp);
   }
 
-  async function getCompeticionesByUser(idUser) {
-    const idP = idUser.id;
-    try {
-      const responseCompeticion = await axios.get(
-        `http://localhost:3001/getCompeticionByUser/${idP}`
-      );
-      return responseCompeticion.data;
-    } catch (error) {
-      console.error("Error getting competitions:", error);
-    }
-  }
   const handleLogOut = async () => {
     setAuthState(false);
     localStorage.removeItem("tokenAcceso");
@@ -47,8 +35,8 @@ function Profile() {
           setUser(userData);
         }
       })
-  }, []);
-  
+  }, );
+
   if (openHelp) {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
@@ -76,10 +64,6 @@ function Profile() {
       <label>
         <p>Correo electronico: </p>
         <p>{user.correo_electronico}</p>
-      </label>
-      <label>
-        <p>Monedas: </p>
-        <p>{user.monedas}</p>
       </label>
 
       <div>

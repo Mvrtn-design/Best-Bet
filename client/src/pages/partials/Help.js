@@ -5,7 +5,7 @@ function Help(props) {
     return props.trigger ? (<div className="help-background">
         <div className="help-container">
             <button className="button-close" onClick={() => props.setTrigger(false)}>X</button>
-            {props.children}
+            <div className='help-content'>{props.children}</div>
         </div>
     </div>
     ) : ("");

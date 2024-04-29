@@ -1,6 +1,6 @@
 import "./App.css";
 import "./pages/partials/Navbar.css";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AuthContext } from "./helpers/AuthContext";
 import React, { useEffect, useState } from 'react';
 import axios from "axios";
@@ -20,19 +20,25 @@ import CreatePost from "./pages/CreatePost";
 import Profile from "./pages/Profile";
 import PageNotFound from "./pages/PageNotFound";
 import FAQ from "./pages/FAQ";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Cookies from "./pages/partials/Cookies";
+import Privacidad from "./pages/partials/Privacidad";
+import Terminos from "./pages/partials/Terminos";
 
 function App() {
-  const [authState, setAuthState] = useState({username: "",id: 0, status:false});
+  const [authState, setAuthState] = useState({ username: "", id: 0, status: false });
 
   useEffect(() => {
     axios.get('http://localhost:3001/auth', { headers: { tokenAcceso: localStorage.getItem('tokenAcceso') } }).then((response) => {
       if (response.data.error) {
-        setAuthState({...authState , status: false});
+        setAuthState({ ...authState, status: false });
       } else {
         setAuthState({
           username: response.data.username,
           id: response.data.id,
-          status:true});
+          status: true
+        });
       }
     })
   }, []);
@@ -56,8 +62,13 @@ function App() {
             <Route path="/partido/:id_match" element={<Match_Info />}></Route>
             <Route path="/grupo/:id_group" element={<Grupo />}></Route>
             <Route path="/faq" exact Component={FAQ}></Route>
-            
-            <Route path="*"exact Component={PageNotFound}></Route>
+            <Route path="/about" exact Component={About}></Route>
+            <Route path="/contact" exact Component={Contact}></Route>
+            <Route path="/terms-and-conditions" exact Component={Terminos}></Route>
+            <Route path="/privacy" exact Component={Privacidad}></Route>
+            <Route path="/cookies" exact Component={Cookies}></Route>
+
+            <Route path="*" exact Component={PageNotFound}></Route>
           </Routes>
         </Router>
       </div>
