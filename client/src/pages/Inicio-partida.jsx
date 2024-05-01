@@ -1740,7 +1740,7 @@ const Inicio = () => {
                     </div>
                   ))}
                 </div>
-                <button className="button-important" onClick={checkBetResults}>CHECK BET RESULTS</button>
+                <button className="button-important" onClick={checkBetResults}>COMPROBAR APUESTAS</button>
                 <button onClick={closeBetCard}>CERRAR</button>
               </div>
             </div>

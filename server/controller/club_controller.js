@@ -22,6 +22,25 @@ controller.clubsByCountry = (req, res) => {
         );
     });
 };
+
+controller.getTeamsNumber = (req, res) => {
+    req.getConnection((err, conn) => {
+        if (err) {
+            console.error("Error al establecer la conexion");
+        }
+        conn.query(
+            "SELECT count(name) FROM club",
+            (err, clubs) => {
+                if (err) {
+                    console.error("Fallo al get competicion debido a: ", err);
+                }
+                console.log("Numero de clubes encontrado", clubs[0]['count(name)']);
+                res.json( clubs[0]['count(name)']);
+            }
+        );
+    });
+};
+
 controller.getClubsByCompetition = (req, res) => {
     const competition = req.query.value1;
 
@@ -70,7 +89,7 @@ controller.getFromPage = async (req, res) => {
         // Send a response to the client
         res.send(response.data);
     } catch (error) {
-        console.error("El errrrrror es: ",error);
+        console.error("El errrrrror es: ", error);
         res.status(500).send("Error fetching data from server");
     }
 

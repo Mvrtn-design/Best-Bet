@@ -336,7 +336,7 @@ function Match() {
     <Layout>
       <div>
         <button className="back-button" onClick={() => navigate(-1)}> <AiIcons.AiFillBackward /> Volver</button>
-        <h1>PARTIDO</h1>
+        <h1>PARTIDO AMISTOSO</h1>
         <h2>SELECCIONE LOS EQUIPOS</h2>
         <select
           id="seleccionarEquipoLocal"

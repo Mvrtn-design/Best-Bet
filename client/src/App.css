@@ -1,5 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap");
-
+@font-face {
+  font-family: myFont;
+  src: url("../public/font/Exo2-VariableFont_wght.ttf");
+}
 :root {
   --color-texto-primario: #b1b1b1;
   --color-texto-secundario: #067000;
@@ -20,7 +22,7 @@
 body {
   background-color: var(--color-fondo-oscuro-primario);
   color: var(--color-texto-primario);
-  font-family: "Exo 2", sans-serif;
+  font-family: "myFont", sans-serif;
   font-optical-sizing: auto;
   font-weight: weight;
   font-style: normal;
@@ -34,7 +36,7 @@ body {
 }
 /*****************          LAYOUT              *********************/
 .Layout {
-  min-height: 100vh;
+  min-height: 10vh;
   flex-grow: 1;
 }
 

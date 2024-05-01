@@ -1,0 +1,33 @@
+# importante fijarse en la version del docker compose
+version: '3.8'
+
+services:
+  bestbet_db:
+    image: mysql
+    environment:
+    - MYSQL_ROOT_PASSWORD=Morchmiami56
+    - MYSQL_DATABASE=bestbet_db #poner el nombre de mi base de datos
+    ports:
+    - "3307:3306"
+    #volumes referencia una carpeta de tu ordenador a una carpeta de docker (que es linux internamente) para no tener que perder los datos. Su directorio de datos es /var/lib/mysql
+    volumes:
+      -./server/database/db.sql:/var/lib/mysql
+
+  backend:
+    build: ./server
+    ports:
+      - "3001:3001" # or any other port your Node.js app uses
+    environment:
+      - DB_HOST=bestbet_db
+      - DB_USER=root
+      - DB_PASSWORD=Morchmiami56
+      - DB_NAME=bestbet_db
+    depends_on:
+      - bestbet_db
+
+  frontend:
+    build: ./client
+    ports:
+      - "3000:3000" # or any other port your React app uses
+    depends_on:
+      - backend

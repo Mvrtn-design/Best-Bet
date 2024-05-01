@@ -6,6 +6,7 @@
             "country": "Spain",
             "category": 1,
             "stadium": "Camp Nou",
+            "elo": 1872,
             "colors": [
                 "Blue",
                 "Red"
@@ -21,6 +22,7 @@
             "country": "Spain",
             "category": 1,
             "stadium": "Santiago Bernabéu",
+            "elo": 1975,
             "colors": [
                 "White"
             ],
@@ -35,6 +37,7 @@
             "country": "Spain",
             "category": 2,
             "stadium": "Wanda Metropolitano",
+            "elo": 1829,
             "colors": [
                 "Red",
                 "White"
@@ -50,6 +53,7 @@
             "country": "Spain",
             "category": 3,
             "stadium": "Ramón Sánchez-Pizjuán",
+            "elo": 1688,
             "colors": [
                 "White",
                 "Red"
@@ -64,6 +68,7 @@
             "country": "Spain",
             "category": 3,
             "stadium": "Mestalla",
+            "elo": 1702,
             "colors": [
                 "White",
                 "Black"
@@ -78,6 +83,7 @@
             "country": "Spain",
             "category": 3,
             "stadium": "Estadio de la Cerámica",
+            "elo": 1712,
             "colors": [
                 "Yellow",
                 "Blue"
@@ -92,6 +98,7 @@
             "country": "Spain",
             "category": 3,
             "stadium": "Reale Arena",
+            "elo": 1765,
             "colors": [
                 "Blue",
                 "White"
@@ -107,6 +114,7 @@
             "country": "Spain",
             "category": 4,
             "stadium": "San Mamés",
+            "elo": 1763,
             "colors": [
                 "Red",
                 "White"
@@ -122,6 +130,7 @@
             "country": "Spain",
             "category": 4,
             "stadium": "Estadio Benito Villamarín",
+            "elo": 1687,
             "colors": [
                 "Green",
                 "White"
@@ -137,6 +146,7 @@
             "country": "England",
             "category": 1,
             "stadium": "Etihad Stadium",
+            "elo": 2041,
             "colors": [
                 "Sky Blue"
             ],
@@ -150,6 +160,7 @@
             "country": "England",
             "category": 2,
             "stadium": "Old Trafford",
+            "elo": 1795,
             "colors": [
                 "Red"
             ],
@@ -163,6 +174,7 @@
             "country": "England",
             "category": 2,
             "stadium": "Anfield",
+            "elo": 1918,
             "colors": [
                 "Red"
             ],
@@ -176,6 +188,7 @@
             "country": "England",
             "category": 2,
             "stadium": "Stamford Bridge",
+            "elo": 1787,
             "colors": [
                 "Blue"
             ],
@@ -189,6 +202,7 @@
             "country": "England",
             "category": 2,
             "stadium": "Emirates Stadium",
+            "elo": 1928,
             "colors": [
                 "Red"
             ],
@@ -202,6 +216,7 @@
             "country": "England",
             "category": 2,
             "stadium": "Tottenham Hotspur Stadium",
+            "elo": 1821,
             "colors": [
                 "White",
                 "Navy Blue"
@@ -216,6 +231,7 @@
             "country": "England",
             "category": 3,
             "stadium": "St James' Park",
+            "elo": 1814,
             "colors": [
                 "Black",
                 "White"
@@ -230,6 +246,7 @@
             "country": "England",
             "category": 4,
             "stadium": "Goodison Park",
+            "elo": 1687,
             "colors": [
                 "Blue",
                 "White"
@@ -244,6 +261,7 @@
             "country": "Germany",
             "category": 1,
             "stadium": "Allianz Arena",
+            "elo": 1931,
             "colors": [
                 "Red",
                 "White"
@@ -258,6 +276,7 @@
             "country": "Germany",
             "category": 2,
             "stadium": "Signal Iduna Park",
+            "elo": 1893,
             "colors": [
                 "Yellow",
                 "Black"
@@ -273,6 +292,7 @@
             "country": "Germany",
             "category": 3,
             "stadium": "Red Bull Arena",
+            "elo": 1845,
             "colors": [
                 "White",
                 "Red"
@@ -287,6 +307,7 @@
             "country": "Germany",
             "category": 3,
             "stadium": "BayArena",
+            "elo": 1924,
             "colors": [
                 "Red",
                 "Black"
@@ -301,6 +322,7 @@
             "country": "Germany",
             "category": 4,
             "stadium": "Stadion im Borussia-Park",
+            "elo": 1669,
             "colors": [
                 "Black",
                 "White",
@@ -316,6 +338,7 @@
             "country": "Germany",
             "category": 4,
             "stadium": "Volkswagen Arena",
+            "elo": 1648,
             "colors": [
                 "Green",
                 "White"
@@ -330,6 +353,7 @@
             "country": "Germany",
             "category": 5,
             "stadium": "Stadion An der Alten Försterei",
+            "elo": 1648,
             "colors": [
                 "Red",
                 "White"
@@ -344,6 +368,7 @@
             "country": "Italy",
             "category": 2,
             "stadium": "Allianz Stadium",
+            "elo": 1826,
             "colors": [
                 "Black",
                 "White"
@@ -359,6 +384,7 @@
             "country": "Italy",
             "category": 2,
             "stadium": "San Siro",
+            "elo": 1973,
             "colors": [
                 "Blue",
                 "Black"
@@ -373,6 +399,7 @@
             "country": "Italy",
             "category": 2,
             "stadium": "San Siro",
+            "elo": 1870,
             "colors": [
                 "Red",
                 "Black"
@@ -387,6 +414,7 @@
             "country": "Italy",
             "category": 3,
             "stadium": "Stadio Olimpico",
+            "elo": 1833,
             "colors": [
                 "Maroon",
                 "Orange"
@@ -401,6 +429,7 @@
             "country": "Italy",
             "category": 3,
             "stadium": "Diego Armando Maradona Stadium",
+            "elo": 1805,
             "colors": [
                 "Sky Blue",
                 "White"
@@ -415,6 +444,7 @@
             "country": "Italy",
             "category": 4,
             "stadium": "Gewiss Stadium",
+            "elo": 1835,
             "colors": [
                 "Black",
                 "Blue"
@@ -429,6 +459,7 @@
             "country": "Italy",
             "category": 4,
             "stadium": "Stadio Olimpico",
+            "elo": 1764,
             "colors": [
                 "Sky Blue",
                 "White"
@@ -443,6 +474,7 @@
             "country": "Italy",
             "category": 4,
             "stadium": "Stadio Artemio Franchi",
+            "elo": 1743,
             "colors": [
                 "Purple",
                 "White"
@@ -457,6 +489,7 @@
             "country": "France",
             "category": 2,
             "stadium": "Parc des Princes",
+            "elo": 1911,
             "colors": [
                 "Blue",
                 "Red"
@@ -471,6 +504,7 @@
             "country": "France",
             "category": 3,
             "stadium": "Orange Vélodrome",
+            "elo": 1732,
             "colors": [
                 "Blue",
                 "White"
@@ -485,6 +519,7 @@
             "country": "France",
             "category": 3,
             "stadium": "Parc Olympique Lyonnais",
+            "elo": 1693,
             "colors": [
                 "Blue",
                 "White",
@@ -500,6 +535,7 @@
             "country": "France",
             "category": 4,
             "stadium": "Stade Louis II",
+            "elo": 1736,
             "colors": [
                 "Red",
                 "White"
@@ -514,6 +550,7 @@
             "country": "France",
             "category": 4,
             "stadium": "Stade Pierre-Mauroy",
+            "elo": 1758,
             "colors": [
                 "Red",
                 "White",
@@ -529,6 +566,7 @@
             "country": "France",
             "category": 4,
             "stadium": "Roazhon Park",
+            "elo": 1704,
             "colors": [
                 "Black",
                 "Red"
@@ -543,6 +581,7 @@
             "country": "Portugal",
             "category": 3,
             "stadium": "Estádio do Dragão",
+            "elo": 1769,
             "colors": [
                 "Blue",
                 "White"
@@ -557,6 +596,7 @@
             "country": "Portugal",
             "category": 3,
             "stadium": "Estádio da Luz",
+            "elo": 1790,
             "colors": [
                 "Red",
                 "White"
@@ -571,6 +611,7 @@
             "country": "Portugal",
             "category": 3,
             "stadium": "Estádio José Alvalade",
+            "elo": 1799,
             "colors": [
                 "Green",
                 "White"
@@ -585,6 +626,7 @@
             "country": "Portugal",
             "category": 4,
             "stadium": "Estádio Municipal de Braga",
+            "elo": 1637,
             "colors": [
                 "Red",
                 "White"
@@ -599,6 +641,7 @@
             "country": "Netherlands",
             "category": 3,
             "stadium": "Johan Cruyff Arena",
+            "elo": 1624,
             "colors": [
                 "Red",
                 "White"
@@ -611,6 +654,7 @@
             "country": "Turkey",
             "category": 3,
             "stadium": "Türk Telekom Stadium",
+            "elo": 1713,
             "colors": [
                 "Yellow",
                 "Red"
@@ -623,6 +667,7 @@
             "country": "Ukraine",
             "category": 4,
             "stadium": "Oblasny SportKomplex Metalist",
+            "elo": 1551,
             "colors": [
                 "Orange",
                 "Black"
@@ -635,6 +680,7 @@
             "country": "Ukraine",
             "category": 5,
             "stadium": "NSC Olimpiyskiy",
+            "elo": 1551,
             "colors": [
                 "White",
                 "Blue"
@@ -647,6 +693,7 @@
             "country": "Austria",
             "category": 4,
             "stadium": "Red Bull Arena",
+            "elo": 1552,
             "colors": [
                 "Red",
                 "White"
@@ -659,6 +706,7 @@
             "country": "Belgium",
             "category": 4,
             "stadium": "Jan Breydel Stadium",
+            "elo": 1701,
             "colors": [
                 "Blue",
                 "Black"
@@ -671,6 +719,7 @@
             "country": "Belgium",
             "category": 4,
             "stadium": "Constant Vanden Stock Stadium",
+            "elo": 1653,
             "colors": [
                 "Purple",
                 "White"
@@ -683,6 +732,7 @@
             "country": "Belgium",
             "category": 5,
             "stadium": "Luminus Arena",
+            "elo": 1614,
             "colors": [
                 "Blue",
                 "White"
@@ -695,6 +745,7 @@
             "country": "Netherlands",
             "category": 4,
             "stadium": "Philips Stadion",
+            "elo": 1792,
             "colors": [
                 "Red",
                 "White"
@@ -707,6 +758,7 @@
             "country": "Netherlands",
             "category": 4,
             "stadium": "Stadion Feijenoord (De Kuip)",
+            "elo": 1752,
             "colors": [
                 "Red",
                 "White"
@@ -714,17 +766,17 @@
             "nickname": "De club aan de Maas"
         },
         {
-            "id": 53,
             "name": "Fenerbahçe",
             "full_name": "Fenerbahçe Spor Kulübü",
             "country": "Turkey",
             "category": 4,
             "stadium": "Ülker Stadyumu",
+            "elo": 1710,
             "colors": [
                 "Yellow",
                 "Navy Blue"
             ],
-            "nickname": "Sarı Kanaryalar"
+            "nickname": "Sari Kanaryalar"
         },
         {
             "name": "Celtic FC",
@@ -732,6 +784,7 @@
             "country": "Scotland",
             "category": 4,
             "stadium": "Celtic Park",
+            "elo": 1617,
             "colors": [
                 "Green",
                 "White"

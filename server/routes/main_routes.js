@@ -30,6 +30,7 @@ router.get("/getClubsByCountry", club_controller.clubsByCountry);
 router.get("/getOtherClubs", club_controller.otherClubs);
 router.get("/getClubsByCompetition", club_controller.getClubsByCompetition);
 router.get("/getFromPage", club_controller.getFromPage);
+router.get("/getTeamsNumber", club_controller.getTeamsNumber);
 
 /////////       PARTIDA            ///////////
 router.post("/addPartida", partida_controller.crearPartida);

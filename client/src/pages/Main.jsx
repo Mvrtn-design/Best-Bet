@@ -9,28 +9,31 @@ import { getHelpText } from "./partials/HelpTexts";
 
 function Main() {
   const [openHelp, setopenHelp] = useState(false);
+
+  function handleClickOpenHelp() {
+    setopenHelp(!openHelp);
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let responseNumTeams = await axios.get("http://localhost:3001/getTeamsNumber");
+        if (responseNumTeams.data === 0) {
+          await axios.post("http://localhost:3001/storeClubsJSON", jsonFile);
+          console.log('JSON data stored successfully');
+        }
+      } catch (error) {
+        console.error(`There was an error retrieving the data: ${error}`);
+      }
+    };
+    fetchData();
+  }, []);
   if (openHelp) {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
         {getHelpText("home")}
       </Help>)
   }
-  function handleClickOpenHelp() {
-    setopenHelp(!openHelp);
-  }
-
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //         try {
-  //             await axios.post("http://localhost:3001/storeClubsJSON", jsonFile);
-  //             console.log('JSON data stored successfully');
-  //         } catch (error) {
-  //             console.error(`There was an error retrieving the data: ${error}`);
-  //         }
-  //     };
-  //     fetchData();
-  // }, []);
-
   return (
     <Layout>
       <h1>PÁGINA PRINCIPAL</h1>
@@ -58,7 +61,7 @@ function Main() {
         <figure className="item-galeria">
           <img
             src="../pictures/tournament.jpg"
-            alt=""
+            alt="Torneo"
             className="item-imagen"
           />
           <figcaption className="item-descripcion">
