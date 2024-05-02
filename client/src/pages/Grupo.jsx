@@ -7,6 +7,7 @@ import { AiFillBackward } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getHelpText } from "./partials/HelpTexts";
+import getAPI_URL from "../helpers/api_url";
 
 function Grupo() {
   const [user, setUser] = useState(null);
@@ -24,7 +25,7 @@ function Grupo() {
     try {
       setUser(usuario);
       const response = await axios.get(
-        `http://localhost:3001/getGrupoById/${groupId}`
+        `${getAPI_URL}/getGrupoById/${groupId}`
       );
       setGrupo(response.data);
       setLoading(false);

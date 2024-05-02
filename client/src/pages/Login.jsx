@@ -5,6 +5,7 @@ import { Field, Form, Formik } from "formik";
 import axios from "axios";
 import * as Yup from 'yup';
 import { AuthContext } from "../helpers/AuthContext";
+import getAPI_URL from "../helpers/api_url";
 
 // Define the Yup validation schema
 const loginSchema = Yup.object().shape({
@@ -21,7 +22,7 @@ export default function Login() {
 
   const handleSearch = async (valuess) => {
     try {
-      const teamsResponse = await axios.get("http://localhost:3001/check", {
+      const teamsResponse = await axios.get(`${getAPI_URL}/check`, {
         params: {
           value: valuess,
         },

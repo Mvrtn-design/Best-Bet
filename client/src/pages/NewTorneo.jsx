@@ -4,6 +4,7 @@ import Help from "./partials/Help";
 import axios from "axios";
 import { AiFillBackward } from "react-icons/ai";
 import Layout from "./partials/Layout";
+import getAPI_URL from "../helpers/api_url";
 
 function NewTorneo() {
 
@@ -20,10 +21,9 @@ function NewTorneo() {
   });
   const navigate = useNavigate();
 
-
   useEffect(() => {
     axios
-      .get("http://localhost:3001/getLogUser", {
+      .get(`${getAPI_URL}/getLogUser`, {
         headers: { tokenAcceso: localStorage.getItem("tokenAcceso") },
       })
       .then((response) => {
@@ -58,7 +58,7 @@ function NewTorneo() {
   }
   async function postPartida() {
     try {
-      const response = await axios.post("http://localhost:3001/addPartida", {
+      const response = await axios.post(`${getAPI_URL}/addPartida`, {
         body: user,
       });
       return response.data;
@@ -78,7 +78,7 @@ function NewTorneo() {
 
     try {
       const responseCompeticion = await axios.post(
-        "http://localhost:3001/addCompeticion",
+        `${getAPI_URL}/addCompeticion`,
         formData
       );
       return responseCompeticion;
@@ -91,7 +91,7 @@ function NewTorneo() {
   async function handleEliminarCompeticion(idCompeticion) {
     try {
       console.log(idCompeticion);
-      await axios.get(`http://localhost:3001/eliminarCompeticion`, {
+      await axios.get(`${getAPI_URL}/eliminarCompeticion`, {
         idd: idCompeticion
       });
       alert("Partida Eliminada");
@@ -104,7 +104,7 @@ function NewTorneo() {
   async function getCompeticionesByUser(id_usuario) {
     try {
       const responseCompeticion = await axios.get(
-        `http://localhost:3001/getCompeticionByUser/${id_usuario}`
+        `${getAPI_URL}/getCompeticionByUser/${id_usuario}`
       );
       return responseCompeticion.data;
     } catch (error) {
@@ -122,7 +122,7 @@ function NewTorneo() {
     return (
       <Help trigger={openHelp} setTrigger={setopenHelp}>
 
-        <h2 >Cuadro de ayuda para la página de inicio</h2>
+        <h2 >Cuadro de ayuda: Carga y creación de Torneos</h2>
         <p>Esta sección te ofrece información sobre cómo utilizar el sitio web.
           Si tienes alguna duda o inquietud no dudes en preguntarnos.       </p>
         <div style={{ backgroundColor: `red` }} className="my-div" >

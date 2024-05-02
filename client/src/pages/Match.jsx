@@ -7,7 +7,8 @@ import Help from "./partials/Help";
 import { AuthContext } from "../helpers/AuthContext";
 import { create_odds, generateMatchResult } from "../routes/Route_matches";
 import { getHelpText } from "./partials/HelpTexts";
-import * as AiIcons from "react-icons/ai";
+import { AiFillBackward } from "react-icons/ai";
+import getAPI_URL from "../helpers/api_url";
 
 function Match() {
 
@@ -58,7 +59,7 @@ function Match() {
     const user_aux = authState.status ? authState.username : 'Invitado';
     setUser((userr) => ({ ...userr, nombre_usuario: user_aux }));
     await axios
-      .get("http://localhost:3001/getClubes")
+      .get(`${getAPI_URL}/getClubes`)
       .then((result) => {
         setClubNames(result.data);
       })
@@ -335,7 +336,7 @@ function Match() {
   return (
     <Layout>
       <div>
-        <button className="back-button" onClick={() => navigate(-1)}> <AiIcons.AiFillBackward /> Volver</button>
+        <button className="back-button" onClick={() => navigate(-1)}> <AiFillBackward /> Volver</button>
         <h1>PARTIDO AMISTOSO</h1>
         <h2>SELECCIONE LOS EQUIPOS</h2>
         <select

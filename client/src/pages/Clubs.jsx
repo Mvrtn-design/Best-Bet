@@ -4,7 +4,8 @@ import Help from "./partials/Help";
 import { getHelpText } from "./partials/HelpTexts";
 import Layout from "./partials/Layout";
 import { useNavigate } from "react-router-dom";
-import * as AiIcons from "react-icons/ai";
+import { AiFillBackward } from "react-icons/ai";
+import getAPI_URL from "../helpers/api_url";
 
 function Clubs() {
   const [listaClubes, setListaClubes] = useState([]);
@@ -25,9 +26,7 @@ function Clubs() {
       return;
     }
     try {
-      const result = await axios.get(
-        `http://localhost:3001/getClubByName/${value}`
-      );
+      const result = await axios.get(`${getAPI_URL()}/getClubByName/${value}`);
       const colores_data = result.data[0].colors;
       const colores = colores_data.split('"').filter((str, index) => index % 2 === 1);
       const clubInfo = (
@@ -63,7 +62,7 @@ function Clubs() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get("http://localhost:3001/getClubes")
+      .get(`${getAPI_URL}/getClubes`)
       .then((result) => {
         setListaClubes(result.data);
       })
@@ -87,7 +86,7 @@ function Clubs() {
 
   return (
     <Layout>
-      <button className="back-button" onClick={() => navigate(-1)}><AiIcons.AiFillBackward /> Volver</button>
+      <button className="back-button" onClick={() => navigate(-1)}><AiFillBackward /> Volver</button>
       <h1>INFORMACIÓN DE LOS EQUIPOS</h1>
       <div className="clubes">
         <ul className="club-list">

@@ -3,6 +3,7 @@ import Layout from "./partials/Layout";
 import { Link, useNavigate } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
+import getAPI_URL from "../helpers/api_url";
 
 
 function SetUp() {
@@ -17,7 +18,7 @@ function SetUp() {
 
   const handleSave = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch("http://localhost:3001/add", {
+      const response = await fetch(`${getAPI_URL}/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +34,7 @@ function SetUp() {
       }
     } catch (error) {
       console.log("Error: ", error);
-      alert("fallo: ",error);
+      alert("fallo: ", error);
       setSubmitting(false); // Set submitting to false in case of an error
     }
   };
@@ -80,7 +81,7 @@ function SetUp() {
                     Contraseña: <Field type="password" name="clave" autoComplete="off" placeholder="Contraseña" required />
                   </label>
                 </div>
-                <button  className="button-important" type="submit" disabled={isSubmitting}>
+                <button className="button-important" type="submit" disabled={isSubmitting}>
                   REGISTRARSE
                 </button>
                 <button className="button-important" type="reset" >

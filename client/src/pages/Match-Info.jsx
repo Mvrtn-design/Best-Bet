@@ -5,9 +5,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { generateMatchResult } from "../routes/Route_matches";
 import { useNavigate } from "react-router-dom";
+import getAPI_URL from "../helpers/api_url";
 
-function Match_Info() {
-  const API_URL = 'http://localhost:3001';
+function MatchInfo() {
   const [ID_distributor, setID_distributor] = useState(0);
   const [match, setMatch] = useState(null);
   const [betCard, setBetCart] = useState(false);
@@ -39,12 +39,12 @@ function Match_Info() {
       setLoading(true);
       setUser(usuario);
       const response = await axios.get(
-        `${API_URL}/getPartidoById/${id_match}`, { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
+        `${getAPI_URL}/getPartidoById/${id_match}`, { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
       );
-      const match_info = await response.data[0];
+      const matchInfo = await response.data[0];
       console.log(visitante);
 
-      setMatch(match_info);
+      setMatch(matchInfo);
       setLoading(false);
     } catch (error) {
       console.error("Error: ", error);
@@ -169,7 +169,7 @@ function Match_Info() {
   };
   const postTicket = async (ticket) => {
     const ticket_response = await axios.post(
-      `${API_URL}/addTicket`,
+      `${getAPI_URL}/addTicket`,
       {
         competition: competition.ID,
         potencial_prize: ticket.potencial_prize,
@@ -181,7 +181,7 @@ function Match_Info() {
     console.log(backend_id_ticket);
     ticket.bets.forEach(async (bet) => {
       //POST BET
-      await axios.post(`${API_URL}/addBet`, {
+      await axios.post(`${getAPI_URL}/addBet`, {
         ticket_id: backend_id_ticket,
         match_id: bet.match_ID,
         choice: bet.choice,
@@ -191,7 +191,7 @@ function Match_Info() {
   }
   const updateWallet = async (coins) => {
     await axios.put(
-      `${API_URL}/setCompetitionCoins/${competition.ID}`,
+      `${getAPI_URL}/setCompetitionCoins/${competition.ID}`,
       {
         value1: (competition.monedas - coins),
       }
@@ -214,7 +214,7 @@ function Match_Info() {
     const estado_partido = "ENDED";
     try {
       await axios.put(
-        `${API_URL}/updateResultadoPartido/${id_match}`,
+        `${getAPI_URL}/updateResultadoPartido/${id_match}`,
         {
           value1: marcador_local,
           value2: marcador_visitante,
@@ -224,7 +224,7 @@ function Match_Info() {
 
       //Local
       await axios.put(
-        `${API_URL}/updateEstadisticasEquipo/${local.name}/${match.id_group}`,
+        `${getAPI_URL}/updateEstadisticasEquipo/${local.name}/${match.id_group}`,
         {
           marcados: marcador_local,
           encajados: marcador_visitante,
@@ -242,7 +242,7 @@ function Match_Info() {
 
       //Visitante
       await axios.put(
-        `${API_URL}/updateEstadisticasEquipo/${visitante.name}/${match.id_group}`,
+        `${getAPI_URL}/updateEstadisticasEquipo/${visitante.name}/${match.id_group}`,
         {
           marcados: marcador_visitante,
           encajados: marcador_local,
@@ -418,4 +418,4 @@ function Match_Info() {
     </Layout>
   );
 }
-export default Match_Info;
+export default MatchInfo;

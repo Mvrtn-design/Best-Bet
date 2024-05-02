@@ -5,6 +5,7 @@ import jsonFile from "../files/fichero_equipos.json";
 import axios from "axios";
 import { React, useEffect, useState } from "react";
 import { getHelpText } from "./partials/HelpTexts";
+import getAPI_URL from "../helpers/api_url";
 
 
 function Main() {
@@ -17,9 +18,9 @@ function Main() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        let responseNumTeams = await axios.get("http://localhost:3001/getTeamsNumber");
-        if (responseNumTeams.data === 0) {
-          await axios.post("http://localhost:3001/storeClubsJSON", jsonFile);
+        let responseNumTeams = await axios.get(`${getAPI_URL()}/getTeamsNumber`);
+        if (responseNumTeams.data === 0) {          
+          await axios.post(`${getAPI_URL()}/storeClubsJSON`, jsonFile);
           console.log('JSON data stored successfully');
         }
       } catch (error) {
