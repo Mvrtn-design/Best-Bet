@@ -24,7 +24,7 @@ function Profile() {
 
   useEffect(() => {
     axios
-      .get(`${getAPI_URL}/getLogUser`, {
+      .get(`${getAPI_URL()}/getLogUser`, {
         headers: { tokenAcceso: localStorage.getItem("tokenAcceso") },
       })
       .then((response) => {

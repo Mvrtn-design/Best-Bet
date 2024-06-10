@@ -18,7 +18,7 @@ function SetUp() {
 
   const handleSave = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch(`${getAPI_URL}/add`, {
+      const response = await fetch(`${getAPI_URL()}/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

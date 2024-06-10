@@ -22,7 +22,7 @@ export default function Login() {
 
   const handleSearch = async (valuess) => {
     try {
-      const teamsResponse = await axios.get(`${getAPI_URL}/check`, {
+      const teamsResponse = await axios.get(`${getAPI_URL()}/check`, {
         params: {
           value: valuess,
         },

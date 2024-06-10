@@ -25,7 +25,7 @@ function Grupo() {
     try {
       setUser(usuario);
       const response = await axios.get(
-        `${getAPI_URL}/getGrupoById/${groupId}`
+        `${getAPI_URL()}/getGrupoById/${groupId}`
       );
       setGrupo(response.data);
       setLoading(false);

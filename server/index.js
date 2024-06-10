@@ -29,12 +29,10 @@ app.use(myConnection(mysql,{
     database: 'bestbetdb'
   },'single'/*de que manera se conecta uno al servidor*/))
 
-
 app.use(express.urlencoded({extended: false}));  
 
 //importando rutas
 const rutas = require('./routes/main_routes');
-
 
 //routes
 app.use('/',rutas);

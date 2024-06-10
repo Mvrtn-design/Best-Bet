@@ -120,11 +120,11 @@ const Inicio = () => {
     }
     try {
       const user_backend_data = await axios.get(
-        `${getAPI_URL}/getUSerByPartida/${idPartida}`,
+        `${getAPI_URL()}/getUSerByPartida/${idPartida}`,
         { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
       );
       const competition_response = await axios.get(
-        `${getAPI_URL}/getCompeticionByPartida/${idPartida}`
+        `${getAPI_URL()}/getCompeticionByPartida/${idPartida}`
       );
       if (user_backend_data.data.error) {
         alert(user_backend_data.data.error);
@@ -253,12 +253,12 @@ const Inicio = () => {
       const teamss = [];
       for (let country in teamsByCountry) {
         const response = await axios.get(
-          `${getAPI_URL}/getClubsByCountry`,
+          `${getAPI_URL()}/getClubsByCountry`,
           { params: { value1: country, value2: teamsByCountry[country] } }
         );
         teamss.push(...response.data);
       }
-      const response = await axios.get(`${getAPI_URL}/getOtherClubs`, {
+      const response = await axios.get(`${getAPI_URL()}/getOtherClubs`, {
         params: { value1: Object.keys(teamsByCountry), value2: 10 },
       });
       teamss.push(...response.data);
@@ -310,7 +310,7 @@ const Inicio = () => {
     for (let i in groups.Group_state) {
       const temp_grupo = i.split(",")[0];
       const response = await axios.get(
-        `${getAPI_URL}/getGrupoById/${temp_grupo}`
+        `${getAPI_URL()}/getGrupoById/${temp_grupo}`
       );
       equipos.push(response.data[0]);
       equipos.push(response.data[1]);
@@ -349,7 +349,7 @@ const Inicio = () => {
     for (let i in round_teams) {
       const temp_grupo = i.split(",")[0];
       const response = await axios.get(
-        `${getAPI_URL}/getGrupoById/${temp_grupo}`
+        `${getAPI_URL()}/getGrupoById/${temp_grupo}`
       );
       equipos.push(response.data[0]);
     }
@@ -360,7 +360,7 @@ const Inicio = () => {
   const fetchPartidosDisponibles = async (id_competicion) => {
     try {
       const avaliables = await axios.get(
-        `${getAPI_URL}/checkPartidosDisponibles/${id_competicion}`
+        `${getAPI_URL()}/checkPartidosDisponibles/${id_competicion}`
       );
       setIdMatchesReadyToPlay(avaliables.data);
     } catch (error) {
@@ -371,7 +371,7 @@ const Inicio = () => {
   const fetchGroups = async (id_competicion, round) => {
     try {
       const teamsResponse = await axios.get(
-        `${getAPI_URL}/getGroupsByCompetition`,
+        `${getAPI_URL()}/getGroupsByCompetition`,
         {
           params: {
             value1: id_competicion,
@@ -488,7 +488,7 @@ const Inicio = () => {
   const fetchMathes = async (id_competicion, ronda) => {
     try {
       const teamsResponse = await axios.get(
-        `${getAPI_URL}/getMatchesByCompetition`,
+        `${getAPI_URL()}/getMatchesByCompetition`,
         {
           params: {
             value1: id_competicion,
@@ -609,7 +609,7 @@ const Inicio = () => {
             .replace("T", " ");
 
           axios.post(
-            `${getAPI_URL}/addMatch`,
+            `${getAPI_URL()}/addMatch`,
             {
               local: round_teams[letra][d[i][0]].name,
               visitante: round_teams[letra][d[i][1]].name,
@@ -658,7 +658,7 @@ const Inicio = () => {
               .slice(0, 19)
               .replace("T", " ");
 
-            axios.post(`${getAPI_URL}/addMatch`, {
+            axios.post(`${getAPI_URL()}/addMatch`, {
               local: groups.Group_state[letra][jornadas[i][j]].name,
               visitante: groups.Group_state[letra][jornadas[i][j + 1]].name,
               fecha: formattedDate,
@@ -682,13 +682,13 @@ const Inicio = () => {
   const handleAdvance = async () => {
     if (IdMatchesReadyToPlay <= 0) {
       try {
-        const readies = await axios.put(`${getAPI_URL}/avanzarUnDia`, {
+        const readies = await axios.put(`${getAPI_URL()}/avanzarUnDia`, {
           value1: competition.ID,
         });
         setIdMatchesReadyToPlay(readies.data);
         readies.data.forEach(async (element) => {
           await axios.put(
-            `${getAPI_URL}/partidoDisponible`,
+            `${getAPI_URL()}/partidoDisponible`,
             {
               value1: element.Idd,
             }
@@ -821,10 +821,10 @@ const Inicio = () => {
   };
   const postTicket = async (ticket) => {
     const competition_response = await axios.get(
-      `${getAPI_URL}/getCompeticionByPartida/${idPartida}`
+      `${getAPI_URL()}/getCompeticionByPartida/${idPartida}`
     );
     const ticket_response = await axios.post(
-      `${getAPI_URL}/addTicket`,
+      `${getAPI_URL()}/addTicket`,
       {
         competition: competition_response.data[0].ID,
         potencial_prize: ticket.potencial_prize,
@@ -835,7 +835,7 @@ const Inicio = () => {
     const backend_id_ticket = ticket_response.data;
     ticket.bets.forEach(async (bet) => {
       //POST BET
-      await axios.post(`${getAPI_URL}/addBet`, {
+      await axios.post(`${getAPI_URL()}/addBet`, {
         ticket_id: backend_id_ticket,
         match_id: bet.match_ID,
         choice: bet.choice,
@@ -845,7 +845,7 @@ const Inicio = () => {
   }
   const updateWallet = async (coins) => {
     await axios.put(
-      `${getAPI_URL}/setCompetitionCoins/${competition.ID}`,
+      `${getAPI_URL()}/setCompetitionCoins/${competition.ID}`,
       {
         value1: (competition.monedas + coins),
       }
@@ -938,7 +938,7 @@ const Inicio = () => {
 
   const updateTicket = async (id_Ticket, estado) => {
     await axios.put(
-      `${getAPI_URL}/updateEstadoTicket/${id_Ticket}`,
+      `${getAPI_URL()}/updateEstadoTicket/${id_Ticket}`,
       {
         value1: estado,
       }
@@ -947,7 +947,7 @@ const Inicio = () => {
 
   const fetchBets = async (competition_id) => {
     const tickets_response = await axios.get(
-      `${getAPI_URL}/getLiveBetsByCompeticion/${competition_id}`
+      `${getAPI_URL()}/getLiveBetsByCompeticion/${competition_id}`
     );
 
     const grouped_tickets = groupTickets(tickets_response.data);
@@ -975,7 +975,7 @@ const Inicio = () => {
     const estado_partido = "ENDED";
 
     await axios.put(
-      `${getAPI_URL}/updateResultadoPartido/${id_match}`,
+      `${getAPI_URL()}/updateResultadoPartido/${id_match}`,
       {
         value1: marcador_local,
         value2: marcador_visitante,
@@ -985,7 +985,7 @@ const Inicio = () => {
 
     //Local
     await axios.put(
-      `${getAPI_URL}/updateEstadisticasEquipo/${local.name}/${id_group}`,
+      `${getAPI_URL()}/updateEstadisticasEquipo/${local.name}/${id_group}`,
       {
         marcados: marcador_local,
         encajados: marcador_visitante,
@@ -1002,7 +1002,7 @@ const Inicio = () => {
     );
     //Visitante
     await axios.put(
-      `${getAPI_URL}/updateEstadisticasEquipo/${visitante.name}/${id_group}`,
+      `${getAPI_URL()}/updateEstadisticasEquipo/${visitante.name}/${id_group}`,
       {
         marcados: marcador_visitante,
         encajados: marcador_local,
@@ -1051,7 +1051,7 @@ const Inicio = () => {
   };
   const updateCompetitionState = async (estado) => {
     console.log("Estado a poner: ", estado);
-    await axios.put(`${getAPI_URL}1/updateCompetitionState`, {
+    await axios.put(`${getAPI_URL()}1/updateCompetitionState`, {
       value1: competition.ID,
       value2: estado,
     });
@@ -1071,7 +1071,7 @@ const Inicio = () => {
 
         //POST GROUP
         const groupResponse = await axios.post(
-          `${getAPI_URL}/addGroup`,
+          `${getAPI_URL()}/addGroup`,
           {
             value1: competition.ID,
             value2: competition_rounds[0].toUpperCase(),
@@ -1081,7 +1081,7 @@ const Inicio = () => {
         const backend_id_group = groupResponse.data;
         d[i].forEach(async (team) => {
           //POST TEAM
-          await axios.post(`${getAPI_URL}/addEquipoToGroup`, {
+          await axios.post(`${getAPI_URL()}/addEquipoToGroup`, {
             value1: backend_id_group,
             value2: team.name,
           });
@@ -1137,7 +1137,7 @@ const Inicio = () => {
         let letra = String.fromCharCode(65 + index);
         //POST GROUP
         const groupResponse = await axios.post(
-          `${getAPI_URL}/addGroup`,
+          `${getAPI_URL()}/addGroup`,
           {
             value1: competition.ID,
             value2: ronda,
@@ -1150,7 +1150,7 @@ const Inicio = () => {
           const team_aux = shuffledTeams[index * groupSize + j];
           //POST TEAM
           await axios.post(
-            `${getAPI_URL}/addEquipoToGroup`,
+            `${getAPI_URL()}/addEquipoToGroup`,
             {
               value1: backend_id_group,
               value2: team_aux.name,

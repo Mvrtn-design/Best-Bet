@@ -23,7 +23,7 @@ function NewTorneo() {
 
   useEffect(() => {
     axios
-      .get(`${getAPI_URL}/getLogUser`, {
+      .get(`${getAPI_URL()}/getLogUser`, {
         headers: { tokenAcceso: localStorage.getItem("tokenAcceso") },
       })
       .then((response) => {
@@ -58,7 +58,7 @@ function NewTorneo() {
   }
   async function postPartida() {
     try {
-      const response = await axios.post(`${getAPI_URL}/addPartida`, {
+      const response = await axios.post(`${getAPI_URL()}/addPartida`, {
         body: user,
       });
       return response.data;
@@ -78,7 +78,7 @@ function NewTorneo() {
 
     try {
       const responseCompeticion = await axios.post(
-        `${getAPI_URL}/addCompeticion`,
+        `${getAPI_URL()}/addCompeticion`,
         formData
       );
       return responseCompeticion;
@@ -91,7 +91,7 @@ function NewTorneo() {
   async function handleEliminarCompeticion(idCompeticion) {
     try {
       console.log(idCompeticion);
-      await axios.get(`${getAPI_URL}/eliminarCompeticion`, {
+      await axios.get(`${getAPI_URL()}/eliminarCompeticion`, {
         idd: idCompeticion
       });
       alert("Partida Eliminada");
@@ -104,7 +104,7 @@ function NewTorneo() {
   async function getCompeticionesByUser(id_usuario) {
     try {
       const responseCompeticion = await axios.get(
-        `${getAPI_URL}/getCompeticionByUser/${id_usuario}`
+        `${getAPI_URL()}/getCompeticionByUser/${id_usuario}`
       );
       return responseCompeticion.data;
     } catch (error) {

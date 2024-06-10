@@ -19,7 +19,7 @@ function Main() {
     const fetchData = async () => {
       try {
         let responseNumTeams = await axios.get(`${getAPI_URL()}/getTeamsNumber`);
-        if (responseNumTeams.data === 0) {          
+        if (responseNumTeams.data === 0) {
           await axios.post(`${getAPI_URL()}/storeClubsJSON`, jsonFile);
           console.log('JSON data stored successfully');
         }

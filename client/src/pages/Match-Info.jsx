@@ -39,7 +39,7 @@ function MatchInfo() {
       setLoading(true);
       setUser(usuario);
       const response = await axios.get(
-        `${getAPI_URL}/getPartidoById/${id_match}`, { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
+        `${getAPI_URL()}/getPartidoById/${id_match}`, { headers: { tokenAcceso: localStorage.getItem("tokenAcceso") } }
       );
       const matchInfo = await response.data[0];
       console.log(visitante);
@@ -169,7 +169,7 @@ function MatchInfo() {
   };
   const postTicket = async (ticket) => {
     const ticket_response = await axios.post(
-      `${getAPI_URL}/addTicket`,
+      `${getAPI_URL()}/addTicket`,
       {
         competition: competition.ID,
         potencial_prize: ticket.potencial_prize,
@@ -181,7 +181,7 @@ function MatchInfo() {
     console.log(backend_id_ticket);
     ticket.bets.forEach(async (bet) => {
       //POST BET
-      await axios.post(`${getAPI_URL}/addBet`, {
+      await axios.post(`${getAPI_URL()}/addBet`, {
         ticket_id: backend_id_ticket,
         match_id: bet.match_ID,
         choice: bet.choice,
@@ -191,7 +191,7 @@ function MatchInfo() {
   }
   const updateWallet = async (coins) => {
     await axios.put(
-      `${getAPI_URL}/setCompetitionCoins/${competition.ID}`,
+      `${getAPI_URL()}/setCompetitionCoins/${competition.ID}`,
       {
         value1: (competition.monedas - coins),
       }
@@ -214,7 +214,7 @@ function MatchInfo() {
     const estado_partido = "ENDED";
     try {
       await axios.put(
-        `${getAPI_URL}/updateResultadoPartido/${id_match}`,
+        `${getAPI_URL()}/updateResultadoPartido/${id_match}`,
         {
           value1: marcador_local,
           value2: marcador_visitante,
@@ -224,7 +224,7 @@ function MatchInfo() {
 
       //Local
       await axios.put(
-        `${getAPI_URL}/updateEstadisticasEquipo/${local.name}/${match.id_group}`,
+        `${getAPI_URL()}/updateEstadisticasEquipo/${local.name}/${match.id_group}`,
         {
           marcados: marcador_local,
           encajados: marcador_visitante,
@@ -242,7 +242,7 @@ function MatchInfo() {
 
       //Visitante
       await axios.put(
-        `${getAPI_URL}/updateEstadisticasEquipo/${visitante.name}/${match.id_group}`,
+        `${getAPI_URL()}/updateEstadisticasEquipo/${visitante.name}/${match.id_group}`,
         {
           marcados: marcador_visitante,
           encajados: marcador_local,

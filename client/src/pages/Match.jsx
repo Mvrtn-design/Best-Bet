@@ -59,7 +59,7 @@ function Match() {
     const user_aux = authState.status ? authState.username : 'Invitado';
     setUser((userr) => ({ ...userr, nombre_usuario: user_aux }));
     await axios
-      .get(`${getAPI_URL}/getClubes`)
+      .get(`${getAPI_URL()}/getClubes`)
       .then((result) => {
         setClubNames(result.data);
       })

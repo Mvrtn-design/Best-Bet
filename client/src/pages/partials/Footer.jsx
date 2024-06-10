@@ -24,7 +24,7 @@ function Footer() {
             <div className="footer-col">
               <h4>Social</h4>
               <div className="social-links">
-                <Link to="https://github.com/Mvrtn-design">G</Link>
+                <Link to="https://github.com/Mvrtn-design/Best_bet-frontend">G</Link>
               </div>
             </div>
           </div>

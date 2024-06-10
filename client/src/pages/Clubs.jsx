@@ -62,7 +62,7 @@ function Clubs() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`${getAPI_URL}/getClubes`)
+      .get(`${getAPI_URL()}/getClubes`)
       .then((result) => {
         setListaClubes(result.data);
       })
