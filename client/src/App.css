@@ -24,13 +24,13 @@
 
 [data-theme="claro"] {
   --color-texto-primario: #00004e;
-  --color-texto-primario-dark: #888888;
+  --color-texto-primario-dark: #000150;
   --color-texto-secundario: #067000;
   --color-texto-error: #c00000;
   --color-fondo-primario: #05001f;
   --color-fondo-oscuro-primario: #c1c1c1;
   --color-fondo-oscuro-total: #ffffff;
-  --color-fondo-oscuro-primario-suave: #7d7d7d;
+  --color-fondo-oscuro-primario-suave: #a0a0a0;
   --color-fondo-oscuro-primario-resaltado: #666666;
   --color-fondo-oscuro-primario-resaltado-max: #707070;
 }
@@ -362,6 +362,8 @@ hr {
 /* BUTTON */
 
 button {
+  background-color: var(--color-fondo-primario);
+  color: var(--color-fondo-oscuro-primario-suave);
   outline: none;
   transition: all ease 0.1s;
   padding: 5px;
@@ -453,6 +455,7 @@ button:disabled:hover {
 
 /* BOTON-IMPORTANT */
 .button-important {
+  color: var(--color-fondo-oscuro-primario-suave);
   margin: 7px;
   font-size: large;
   padding: 10px;

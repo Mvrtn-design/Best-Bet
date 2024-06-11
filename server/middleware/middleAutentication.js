@@ -4,7 +4,7 @@ const tokenValido = (req, res, next) => {
     const tokenAcceso = req.header("tokenAcceso");
 
     if (!tokenAcceso) {
-        return res.json({ error: "Usuario no logueado" });
+        return res.json({ error: "El usuario no ha iniciado sesión" });
     } else {
         try {
             const tokenValido = verify(tokenAcceso, "importantsecret");
