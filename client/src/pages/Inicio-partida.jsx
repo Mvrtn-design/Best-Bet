@@ -1051,7 +1051,7 @@ const Inicio = () => {
   };
   const updateCompetitionState = async (estado) => {
     console.log("Estado a poner: ", estado);
-    await axios.put(`${getAPI_URL()}1/updateCompetitionState`, {
+    await axios.put(`${getAPI_URL()}/updateCompetitionState`, {
       value1: competition.ID,
       value2: estado,
     });
@@ -1623,7 +1623,7 @@ const Inicio = () => {
         );
 
       default:
-        return <p>NO INFO TO SHOW YET</p>;
+        return <p>SIN INFORMACIÓN POR EL MOMENTO</p>;
     }
   };
 
