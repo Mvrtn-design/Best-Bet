@@ -28,8 +28,12 @@ través de las fases del torneo en cuestión.
 </div>
 
 <h2>Otras características</h2>
+<h3>Adaptabilidad multidispositivo</h3>
+<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/laptop.png" alt="android" width="550" height="300"/>
+<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/tablet.png" alt="android" width="200" height="270"/>
+<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/smartphone.png" alt="android" width="100" height="170"/>
 <h3>UML</h3>
-<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/uml.png" alt="android" width="550" height="400"/> 
+<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/uml.png" alt="android" width="550" height="500"/> 
 <h3>Esquema de navegación</h3>
-<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/hta.png" alt="android" width="750" height="300"/> 
+<img src="https://github.com/Mvrtn-design/Best_bet/blob/main/ilustraciones/hta.png" alt="android" width="1000" height="300"/> 
 </div>
